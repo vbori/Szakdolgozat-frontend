@@ -1,0 +1,30 @@
+<form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+  <mat-form-field class="example-full-width">
+    <mat-label>Username</mat-label>
+    <input type="text" matInput formControlName="username">
+    <mat-error *ngIf="registerForm.controls.username.invalid">
+      Please enter a minimum of 3 characters!
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>Enter your password</mat-label>
+    <input matInput [type]="hide ? 'password' : 'text'" formControlName="password">
+    <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+      <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </button>
+    <mat-error *ngIf="registerForm.controls.password.invalid">
+      Password is <strong>required</strong>!
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field appearance="fill">
+    <mat-label>Confirm your password</mat-label>
+    <input matInput [type]="hide ? 'password' : 'text'" formControlName="passwordConfirmation">
+    <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+      <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </button>
+    <mat-error *ngIf="registerForm.controls.passwordConfirmation.invalid">
+      The passwords do not match!
+    </mat-error>
+  </mat-form-field>
+  <button type="submit" mat-raised-button color="primary" [disabled]="registerForm.invalid">Register</button>
+</form>
