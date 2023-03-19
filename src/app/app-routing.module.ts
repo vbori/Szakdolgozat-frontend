@@ -6,13 +6,14 @@ import { PasswordChangeComponent } from './researcher-view/password-change/passw
 import { ResearcherViewComponent } from './researcher-view/researcher-view.component';
 import { AuthActivatorService } from './common/services/route-guards/auth-activator.service';
 import { ResearcherActivatorService } from './common/services/route-guards/researcher-activator.service';
+import { ResearcherOverviewComponent } from './researcher-view/researcher-overview/researcher-overview.component';
 
 const routes: Routes = [
   {
     path: 'research',
     canActivate:[ResearcherActivatorService],
     children: [
-      { path: 'dashboard', component: ResearcherViewComponent },
+      { path: 'dashboard', component: ResearcherOverviewComponent },
       { path: 'password',  component: PasswordChangeComponent},
       { path: '**', redirectTo: '/research/dashboard', pathMatch: 'full'}
     ]

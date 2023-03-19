@@ -13,6 +13,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClientModule } from '@angular/common/http';
 import { PasswordChangeComponent } from './password-change/password-change.component';
+import { ResearcherOverviewComponent } from './researcher-overview/researcher-overview.component';
+import { ExperimentListComponent } from './researcher-overview/experiment-list/experiment-list.component';
+import { ExperimentCardComponent } from './researcher-overview/experiment-card/experiment-card.component';
+import {MatCardModule} from '@angular/material/card';
 
 @NgModule({
   declarations: [
@@ -20,7 +24,10 @@ import { PasswordChangeComponent } from './password-change/password-change.compo
     AuthComponent,
     LoginComponent,
     RegisterComponent,
-    PasswordChangeComponent
+    PasswordChangeComponent,
+    ResearcherOverviewComponent,
+    ExperimentListComponent,
+    ExperimentCardComponent
   ],
   imports: [
     CommonModule,
@@ -32,7 +39,8 @@ import { PasswordChangeComponent } from './password-change/password-change.compo
     FormsModule,
     ReactiveFormsModule,
     MatButtonModule,
-    HttpClientModule
+    HttpClientModule,
+    MatCardModule
   ]
 })
 export class ResearcherViewModule { }
