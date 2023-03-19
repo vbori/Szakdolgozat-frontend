@@ -27,7 +27,6 @@ export class RegisterComponent {
   });
 
   onRegister(): void {
-    console.log(this.registerForm.value);
     this.authService.register(this.registerForm.value).subscribe({
       next: (data) => {
         console.log(data.message);

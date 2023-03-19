@@ -1,0 +1,38 @@
+.navbar-custom{
+  position:fixed;
+  top:0;
+  background-color:  #742CDF;
+  width:100%;
+  color: #fff;
+  box-shadow: 0 6px 6px 0 rgba(0,0,0,0.3);
+  z-index: 100;
+}
+
+.navbar-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #fff;
+  font-family: inherit;
+}
+
+.dropdown-menu {
+  right: 1%;
+  z-index: 90;
+}
+
+.dropdown-toggle {
+  color: #fff;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  background-color: #742CDF;
+  color: #fff;
+}
+
+a {
+  cursor: pointer;
+}

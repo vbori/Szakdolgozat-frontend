@@ -31,6 +31,7 @@ export class AuthService {
   }
 
   public logout(): Observable<any> {
+    console.log('logout');
     return this.http.delete(`${environment.baseAuthUrl}/logout?token=${localStorage.getItem('refreshToken')}`).pipe(
       tap(() => {
         localStorage.removeItem('accessToken');

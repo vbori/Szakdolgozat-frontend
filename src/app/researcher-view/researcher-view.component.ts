@@ -8,15 +8,5 @@ import { AuthService } from './services/auth.service';
   styleUrls: ['./researcher-view.component.scss']
 })
 export class ResearcherViewComponent {
-  constructor(private readonly authService: AuthService, private router: Router) {}
-  onLogout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
-      error: (error) => {
-        console.log(error);
-      }
-    });
-  }
+
 }

@@ -2,15 +2,25 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ParticipantViewComponent } from './participant-view/participant-view.component';
 import { AuthComponent } from './researcher-view/auth/auth.component';
+import { PasswordChangeComponent } from './researcher-view/password-change/password-change.component';
 import { ResearcherViewComponent } from './researcher-view/researcher-view.component';
+import { AuthActivatorService } from './common/services/route-guards/auth-activator.service';
+import { ResearcherActivatorService } from './common/services/route-guards/researcher-activator.service';
 
 const routes: Routes = [
-  { path: 'dashboard', component: ResearcherViewComponent },
+  {
+    path: 'research',
+    canActivate:[ResearcherActivatorService],
+    children: [
+      { path: 'dashboard', component: ResearcherViewComponent },
+      { path: 'password',  component: PasswordChangeComponent},
+      { path: '**', redirectTo: '/research/dashboard', pathMatch: 'full'}
+    ]
+  },
   { path: 'experiment', component: ParticipantViewComponent },
-  { path: 'login', component: AuthComponent },
-  { path: 'register', component: AuthComponent },
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full'},
-  { path: '**', redirectTo: '/dashboard', pathMatch: 'full'}
+  { path: 'login', component: AuthComponent, canActivate: [AuthActivatorService] },
+  { path: 'register', component: AuthComponent, canActivate: [AuthActivatorService] },
+  { path: '**', redirectTo: '/login', pathMatch: 'full'}
 ];
 
 @NgModule({

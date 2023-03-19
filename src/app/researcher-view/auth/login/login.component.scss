@@ -3,3 +3,8 @@ form {
   flex-direction: column;
 }
 
+.mat-mdc-raised-button:not(:disabled) {
+  background-color: #742CDF;
+  color:#fff;
+}
+

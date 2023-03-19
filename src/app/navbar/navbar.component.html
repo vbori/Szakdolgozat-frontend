@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <div class="container-fluid">
+    <span class="navbar-title">Fitts</span>
+    <ul class="navbar-nav">
+      <!-- Avatar -->
+      <li mdbDropdown class="nav-item dropdown">
+        <a
+          *ngIf="isLoggedIn"
+          class="nav-link dropdown-toggle d-flex align-items-center"
+          id="navbarDropdownMenuLink"
+          role="button"
+          mdbDropdownToggle
+          aria-expanded="false"
+          (click)="isToggled = !isToggled"
+        >
+          <img
+            src="https://mdbootstrap.com/img/Photos/Avatars/img (31).webp"
+            class="rounded-circle"
+            height="22"
+            alt=""
+            loading="lazy"
+          />
+        </a>
+        <ul mdbDropdownMenu class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" *ngIf="isToggled">
+          <li>
+            <a class="dropdown-item" [routerLink]="['/research/password']">Change password</a>
+          </li>
+          <li>
+            <a class="dropdown-item" (click)="logout()">Logout</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>

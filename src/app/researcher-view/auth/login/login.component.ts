@@ -20,10 +20,9 @@ export class LoginComponent {
   });
 
   onLogin(): void {
-    console.log(this.loginForm.value);
     this.authService.login(this.loginForm.value).subscribe({
       next: (data) => {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/research/dashboard']);
       },
       error: (error) => {
         console.log(error);
