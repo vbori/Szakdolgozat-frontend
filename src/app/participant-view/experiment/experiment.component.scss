@@ -1,0 +1,20 @@
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: default;
+  user-select: none;
+}
+
+#hiddenCanvas {
+  z-index: -1;
+  display: none;
+
+}
+
+
+
+
+#container {
+  position: relative;
+}

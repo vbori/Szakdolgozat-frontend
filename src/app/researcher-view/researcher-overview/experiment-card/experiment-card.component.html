@@ -10,6 +10,6 @@
     <p>{{experiment.researcherDescription}}</p>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-button>Details</button>
+    <button mat-button [routerLink]="['../../experiment/details', experiment._id]">Details</button>
   </mat-card-actions>
 </mat-card>

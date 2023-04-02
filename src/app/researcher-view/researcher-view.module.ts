@@ -16,7 +16,13 @@ import { PasswordChangeComponent } from './password-change/password-change.compo
 import { ResearcherOverviewComponent } from './researcher-overview/researcher-overview.component';
 import { ExperimentListComponent } from './researcher-overview/experiment-list/experiment-list.component';
 import { ExperimentCardComponent } from './researcher-overview/experiment-card/experiment-card.component';
-import {MatCardModule} from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
+import { ExperimentDetailsComponent } from './experiment-details/experiment-details.component';
+import { RouterModule } from '@angular/router';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatListModule } from '@angular/material/list';
+import { MatTableModule } from '@angular/material/table';
+import { RoundsTableComponent } from './experiment-details/rounds-table/rounds-table.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +33,9 @@ import {MatCardModule} from '@angular/material/card';
     PasswordChangeComponent,
     ResearcherOverviewComponent,
     ExperimentListComponent,
-    ExperimentCardComponent
+    ExperimentCardComponent,
+    ExperimentDetailsComponent,
+    RoundsTableComponent
   ],
   imports: [
     CommonModule,
@@ -40,7 +48,11 @@ import {MatCardModule} from '@angular/material/card';
     ReactiveFormsModule,
     MatButtonModule,
     HttpClientModule,
-    MatCardModule
+    MatCardModule,
+    RouterModule,
+    MatDividerModule,
+    MatListModule,
+    MatTableModule
   ]
 })
 export class ResearcherViewModule { }

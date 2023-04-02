@@ -1,0 +1,41 @@
+<h1>{{ experiment.name }}</h1>
+<div>
+  <span [ngClass]="{green: experiment.status === 'Active', orange: experiment.status === 'Draft', red: experiment.status === 'Closed'}">{{experiment.status}}</span>
+  <span *ngIf="experiment.status != 'Draft'"> &#9679; {{experiment.participantNum}} completed</span>
+</div>
+<mat-divider></mat-divider>
+<div>
+  <mat-list>
+    <mat-list-item>
+      <span matListItemTitle>Type</span>
+      <span matListItemLine>{{experiment.type}}</span>
+    </mat-list-item>
+    <mat-list-item *ngIf="experiment.status != 'Draft'">
+      <span matListItemTitle>Opened at</span>
+      <span matListItemLine>{{experiment.openedAt}}</span>
+    </mat-list-item>
+    <mat-list-item *ngIf="experiment.status == 'Closed'">
+      <span matListItemTitle>Closed at</span>
+      <span matListItemLine>{{experiment.closedAt}}</span>
+    </mat-list-item>
+    <mat-list-item [ngSwitch]="experiment.deadline">
+      <span matListItemTitle>Deadline</span>
+      <span matListItemLine *ngSwitchCase="null">-</span>
+      <span matListItemLine *ngSwitchDefault>{{experiment.deadline}}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>Maximum number of participants</span>
+      <span matListItemLine>{{experiment.maxParticipantNum}}</span>
+    </mat-list-item>
+  </mat-list>
+</div>
+<div id="testDiv"></div>
+<div id="mySketch"></div>
+<h2>Description</h2>
+<p>{{ experiment.researcherDescription }}</p>
+<p>Bubi I love you so much ❤️!!!</p>
+<h2>Participant description</h2>
+<p>{{ experiment.participantDescription }}</p>
+
+<app-rounds-table [dataSource]="experiment.rounds"></app-rounds-table>
+

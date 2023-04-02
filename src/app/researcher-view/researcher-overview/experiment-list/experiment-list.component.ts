@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ExperimentExtract, ExperimentStatus } from '../../models/experiment.model';
-import { ResearcherService } from '../../services/researcher.service';
+import { ExperimentService } from 'src/app/common/services/experiment.service';
+import { ExperimentExtract, ExperimentStatus } from '../../../common/models/experiment.model';
 
 @Component({
   selector: 'app-experiment-list',
@@ -13,11 +13,11 @@ export class ExperimentListComponent implements OnInit{
   @Input() experimentStatus: ExperimentStatus;
   experiments: ExperimentExtract[];
 
-  constructor(private readonly researcherService: ResearcherService) {
+  constructor(private readonly experimentService: ExperimentService) {
   }
 
   ngOnInit() {
-    this.researcherService.getExperimentsByStatus(this.experimentStatus).subscribe({
+    this.experimentService.getExperimentsByStatus(this.experimentStatus).subscribe({
       next: (experiments) => {
         this.experiments  = experiments;
       },

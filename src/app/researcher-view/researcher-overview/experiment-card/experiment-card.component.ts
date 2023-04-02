@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ExperimentExtract } from '../../models/experiment.model';
+import { ExperimentExtract } from '../../../common/models/experiment.model';
 
 @Component({
   selector: 'app-experiment-card',

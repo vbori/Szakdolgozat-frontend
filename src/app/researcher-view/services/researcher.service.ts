@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { ExperimentExtract } from '../models/experiment.model';
+import { ExperimentExtract } from '../../common/models/experiment.model';
 
 @Injectable({
   providedIn: 'root'
@@ -21,15 +21,5 @@ export class ResearcherService {
     };
 
     return this.http.patch(`${environment.baseUrl}/research/changePassword`, params, options);
-  }
-
-  public getExperimentsByStatus(status:string): Observable<ExperimentExtract[]> {
-    let options = {
-      headers: new HttpHeaders({
-        "Authorization": 'Bearer ' + localStorage.getItem('accessToken'),
-      }),
-    };
-
-    return this.http.get<ExperimentExtract[]>(`${environment.baseUrl}/research?status=${status}`, options);
   }
 }
