@@ -1,3 +1,4 @@
+//TODO: review whether this will be needed
 interface Flashing {
   flashColor: string;
   flashFrequency: number;

@@ -9,6 +9,8 @@ import { ResearcherActivatorService } from './common/services/route-guards/resea
 import { ResearcherOverviewComponent } from './researcher-view/researcher-overview/researcher-overview.component';
 import { ExperimentDetailsComponent } from './researcher-view/experiment-details/experiment-details.component';
 import { ExperimentComponent } from './participant-view/experiment/experiment.component';
+import { CreateExperimentComponent } from './researcher-view/create-experiment/create-experiment.component';
+//TODO: clean up imports
 
 const routes: Routes = [
   {
@@ -17,19 +19,21 @@ const routes: Routes = [
     children: [
       { path: 'dashboard', component: ResearcherOverviewComponent },
       { path: 'password',  component: PasswordChangeComponent},
-      { path: '**', redirectTo: '/research/dashboard', pathMatch: 'full'}
+      { path: '**', redirectTo: '/research/dashboard'}
     ]
   },
   { path: 'experiment',
     canActivate:[ResearcherActivatorService],
     children: [
-      { path: 'details/:id', component: ExperimentDetailsComponent}
+      { path: 'details/:id', component: ExperimentDetailsComponent},
+      { path: 'create', component: CreateExperimentComponent},
+      { path: '**', redirectTo: '/research/dashboard'}
     ]
   },
   { path: 'login', component: AuthComponent, canActivate: [AuthActivatorService] },
   { path: 'register', component: AuthComponent, canActivate: [AuthActivatorService] },
   { path: 'participant', component: ExperimentComponent},
-  { path: '**', redirectTo: '/login', pathMatch: 'full'}
+  { path: '**', redirectTo: '/login'}
 ];
 
 @NgModule({

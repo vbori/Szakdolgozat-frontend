@@ -17,7 +17,7 @@ export class RegisterComponent {
   checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => {
     let pass = group.get('password')?.value;
     let confirmPass = group.get('passwordConfirmation')?.value;
-    return pass === confirmPass ? null : { notSame: true }
+    return pass === confirmPass ? null : { notSame: true } //TODO: fix password confirmation
   }
 
   registerForm = new FormGroup({
@@ -29,7 +29,7 @@ export class RegisterComponent {
   onRegister(): void {
     this.authService.register(this.registerForm.value).subscribe({
       next: (data) => {
-        console.log(data.message);
+        console.log(data.message); //TODO: add messages to the user
       },
       error: (error) => {
         console.log(error);

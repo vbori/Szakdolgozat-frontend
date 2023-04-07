@@ -21,11 +21,11 @@ export class LoginComponent {
 
   onLogin(): void {
     this.authService.login(this.loginForm.value).subscribe({
-      next: (data) => {
+      next: () => {
         this.router.navigate(['/research/dashboard']);
       },
       error: (error) => {
-        console.log(error);
+        console.log(error); //TODO: add message to the user
       }
     });
   }

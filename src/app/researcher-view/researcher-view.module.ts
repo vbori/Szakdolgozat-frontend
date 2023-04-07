@@ -23,6 +23,12 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { RoundsTableComponent } from './experiment-details/rounds-table/rounds-table.component';
+import { CreateExperimentComponent } from './create-experiment/create-experiment.component';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatStepperModule} from '@angular/material/stepper';
+import { ExperimentBasicsComponent } from './create-experiment/experiment-basics/experiment-basics.component';
+import { ParticipantDescriptionEditorComponent } from './create-experiment/participant-description-editor/participant-description-editor.component';
+//TODO: Clean up imports
 
 @NgModule({
   declarations: [
@@ -35,7 +41,10 @@ import { RoundsTableComponent } from './experiment-details/rounds-table/rounds-t
     ExperimentListComponent,
     ExperimentCardComponent,
     ExperimentDetailsComponent,
-    RoundsTableComponent
+    RoundsTableComponent,
+    CreateExperimentComponent,
+    ExperimentBasicsComponent,
+    ParticipantDescriptionEditorComponent
   ],
   imports: [
     CommonModule,
@@ -52,7 +61,9 @@ import { RoundsTableComponent } from './experiment-details/rounds-table/rounds-t
     RouterModule,
     MatDividerModule,
     MatListModule,
-    MatTableModule
+    MatTableModule,
+    MatProgressBarModule,
+    MatStepperModule
   ]
 })
 export class ResearcherViewModule { }

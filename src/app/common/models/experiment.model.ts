@@ -11,17 +11,17 @@ export interface ExperimentExtract{
 
 export interface Experiment extends ExperimentExtract {
   formId?: string;
-  type: string; //
-  openedAt: Date; //
-  closedAt?: Date; //
-  deadline?: Date; //
-  maxParticipantNum: number; //
+  type: string;
+  openedAt?: Date;
+  closedAt?: Date;
+  deadline?: Date;
+  maxParticipantNum: number;
   controlGroupSize: number;
   trajectoryImageNeeded: boolean;
   positionArrayNeeded: boolean;
-  participantDescription: string; //
-  rounds: Round[]; //
-  experimentConfiguration: Configuration;
+  participantDescription: string;
+  rounds: Round[];
+  experimentConfiguration?: Configuration;
 }
 
 export type ExperimentStatus = 'Active' | 'Draft' | 'Closed';

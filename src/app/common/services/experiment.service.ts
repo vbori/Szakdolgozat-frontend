@@ -28,4 +28,25 @@ export class ExperimentService {
 
     return this.http.get<ExperimentExtract[]>(`${environment.baseUrl}/research?status=${status}`, options);
   }
+
+  public createExperiment(params: any): Observable<any> {
+    console.log("createExperiment service");
+    let options = {
+      headers: new HttpHeaders({
+        "Authorization": 'Bearer ' + localStorage.getItem('accessToken'),
+      }),
+    };
+
+    return this.http.post(`${environment.baseUrl}/research/addExperiment`, params, options);
+  }
+
+  public updateExperiment(body: any): Observable<any> {
+    let options = {
+      headers: new HttpHeaders({
+        "Authorization": 'Bearer ' + localStorage.getItem('accessToken'),
+      }),
+    };
+    console.log("updateExperiment service")
+    return this.http.patch(`${environment.baseUrl}/research/editExperiment`, body, options);
+  }
 }

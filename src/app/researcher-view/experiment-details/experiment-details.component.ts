@@ -24,6 +24,7 @@ export class ExperimentDetailsComponent implements OnInit {
   }
 
   ngAfterViewInit() {
+    //TODO: clean up this mess
     const element = document.getElementById('mySketch') as HTMLElement;
     const button = this.renderer.createElement('button');
     const buttonText = this.renderer.createText('Click me!');

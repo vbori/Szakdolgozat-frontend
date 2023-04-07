@@ -12,6 +12,7 @@ export class ResearcherService {
   constructor(private readonly http: HttpClient) {
   }
 
+  //TODO: type params
   public changePassword(params: any): Observable<any> { // any = { oldPassword: string, newPassword: string }
     let options = {
       headers: new HttpHeaders({

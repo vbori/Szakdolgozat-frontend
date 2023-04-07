@@ -1,0 +1,27 @@
+<div class="progress-bar">
+  <div class="progress-bar--step" [ngStyle]="{width: stepCount / totalSteps * 100 + '%'}"></div>
+</div>
+<div>
+  <mat-stepper orientation= "horizontal" [linear] = "true" labelPosition="bottom" (selectionChange)="onStepChange($event)" #stepper>
+    <mat-step [completed]="experiment?.name && experiment?.researcherDescription">
+      <ng-template matStepLabel>Experiment Basics</ng-template>
+      <!--TODO: look into why two-way binding is not reacting toonExperiment Change-->
+      <app-experiment-basics [experiment]="experiment" (experimentChange) = "onExperimentChange($event)"></app-experiment-basics>
+    </mat-step>
+    <mat-step [completed]="experiment?.participantDescription">
+      <ng-template matStepLabel>Participant Description</ng-template>
+      <app-participant-description-editor [experiment]="experiment" (experimentChange) = "onExperimentChange($event)"></app-participant-description-editor>
+    </mat-step>
+    <!---
+    <mat-step [completed]="experiment?.formId">
+      <ng-template matStepLabel>Participant Form</ng-template>
+      <app-participant-form [experiment]="experiment" (experimentChange) = "onExperimentChange($event)"></app-participant-form>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>Rounds</ng-template>
+      <app-rounds [experiment]="experiment" (experimentChange) = "onExperimentChange($event)"></app-rounds>
+    </mat-step>
+  -->
+  </mat-stepper>
+</div>
+<button *ngIf = "stepCount == totalSteps" id="saveExperimentButton" (click)="createExperiment()" mat-raised-button color="primary">Create</button>

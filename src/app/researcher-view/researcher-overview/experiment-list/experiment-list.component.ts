@@ -22,7 +22,7 @@ export class ExperimentListComponent implements OnInit{
         this.experiments  = experiments;
       },
       error: (error) => {
-        console.log(error);
+        console.log(error); //TODO: display error message
       }
     });
   }

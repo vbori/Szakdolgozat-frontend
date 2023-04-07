@@ -1,0 +1,31 @@
+<form [formGroup]="experimentBasicsForm" (ngSubmit)="onSubmit()">
+  <mat-form-field class="example-full-width">
+    <mat-label>Experiment name</mat-label>
+    <input type="text" matInput formControlName="name">
+    <mat-error *ngIf="experimentBasicsForm.controls.name.invalid">
+      Please enter a minimum of 3 characters!
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field class="example-full-width">
+    <mat-label>Description</mat-label>
+    <textarea matInput formControlName="researcherDescription"></textarea>
+    <mat-error *ngIf="experimentBasicsForm.controls.researcherDescription.invalid">
+      Please enter a minimum of 6 characters!
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field class="example-full-width">
+    <mat-label>Maximum number of participants</mat-label>
+    <input type="number" matInput formControlName="maxParticipantNum">
+    <mat-error *ngIf="experimentBasicsForm.controls.maxParticipantNum.invalid">
+      Number of participants must be between 1 and 100!
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field class="example-full-width">
+    <mat-label>Control group size</mat-label>
+    <input type="number" matInput formControlName="controlGroupSize">
+    <mat-error *ngIf="experimentBasicsForm.controls.controlGroupSize.invalid">
+      The control group size must be between 0 and the maximum number of participants!
+    </mat-error>
+  </mat-form-field>
+  <button mat-button matStepperNext [disabled]="experimentBasicsForm.invalid">Next</button>
+</form>

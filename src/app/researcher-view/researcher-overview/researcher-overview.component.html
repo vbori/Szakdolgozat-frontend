@@ -1,5 +1,5 @@
-<button  id="new-experiment-button" (click) = "createExperiment()" mat-raised-button color="primary">Create new experiment</button>
-<mat-tab-group animationDuration="1000ms">
+<button  id="new-experiment-button" [routerLink]="['../../experiment/create']" mat-raised-button color="primary">Create new experiment</button>
+<mat-tab-group animationDuration="500ms">
   <mat-tab label="Active">
     <app-experiment-list [experimentStatus]="'Active'"></app-experiment-list>
   </mat-tab>

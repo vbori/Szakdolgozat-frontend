@@ -16,6 +16,7 @@ export class AuthService {
     this._isLoggedIn$.next(!!token);
   }
 
+  //TODO: type params
   public login(params: any): Observable<any> { // any = { username: string, password: string }
       return this.http.post(`${environment.baseAuthUrl}/login`, params).pipe(
         tap((response: any) => {
@@ -40,5 +41,7 @@ export class AuthService {
       })
     );
   }
+
+  //TODO: add access token refresh logic, remove old tokens from local storage
 
 }

@@ -8,9 +8,4 @@ import { ResearcherService } from '../services/researcher.service';
 })
 export class ResearcherOverviewComponent {
 
-  constructor(private readonly researcherService: ResearcherService) { }
-
-  createExperiment(): void {
-    console.log("Create experiment");
-  }
 }
