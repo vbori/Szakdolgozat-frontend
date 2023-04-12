@@ -13,6 +13,7 @@ import { ExperimentService } from 'src/app/common/services/experiment.service';
 export class ExperimentBasicsComponent {
   @Input() experiment: Experiment | undefined
   @Output() experimentChange = new EventEmitter<Experiment>();
+  @Output() nextStep = new EventEmitter<void>();
 
   experimentBasicsForm = new FormGroup({
     name: new FormControl<string>('', [Validators.required, Validators.minLength(3)]),
@@ -23,11 +24,13 @@ export class ExperimentBasicsComponent {
 
   constructor(private experimentService: ExperimentService) { }
 
-  onSubmit(){  //TODO: make the stepper move to the next step
+  onSubmit(){
     if(!this.experiment){
       this.createExperiment();
     }else if(!this.experimentBasicsForm.pristine){
       this.updateExperiment();
+    }else{
+      this.nextStep.emit();
     }
   }
 
@@ -37,6 +40,7 @@ export class ExperimentBasicsComponent {
         this.experiment = experiment;
         this.experimentBasicsForm.markAsPristine();
         this.experimentChange.emit(this.experiment);
+        this.nextStep.emit();
       },
       error: (error) => {
         console.log(error); //TODO: display error message
@@ -50,6 +54,7 @@ export class ExperimentBasicsComponent {
         this.experiment = experiment;
         this.experimentBasicsForm.markAsPristine();
         this.experimentChange.emit(this.experiment);
+        this.nextStep.emit();
       },
       error: (error) => {
         console.log(error); //TODO: display error message

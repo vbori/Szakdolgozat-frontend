@@ -1,5 +1,5 @@
 //TODO: review whether this will be needed
-interface Flashing {
+export interface Flashing {
   flashColor: string;
   flashFrequency: number;
 }
@@ -36,7 +36,7 @@ interface ShapeDistraction {
 export interface Round {
   roundIdx: number;
   isPractice: boolean;
-  restTime: number;
+  restTimeSec: number;
   shapes: [Shape];
   useBackGroundDistraction: boolean;
   useShapeDistraction: boolean;

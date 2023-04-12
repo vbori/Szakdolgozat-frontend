@@ -28,6 +28,12 @@ import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatStepperModule} from '@angular/material/stepper';
 import { ExperimentBasicsComponent } from './create-experiment/experiment-basics/experiment-basics.component';
 import { ParticipantDescriptionEditorComponent } from './create-experiment/participant-description-editor/participant-description-editor.component';
+import { RoundCreationComponent } from './create-experiment/round-creation/round-creation.component';
+import { RoundsGeneratorComponent } from './create-experiment/round-creation/rounds-generator/rounds-generator.component';
+import { ManualConfigurationComponent } from './create-experiment/round-creation/manual-configuration/manual-configuration.component';
+import { ColorPickerModule } from 'ngx-color-picker';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 //TODO: Clean up imports
 
 @NgModule({
@@ -44,7 +50,10 @@ import { ParticipantDescriptionEditorComponent } from './create-experiment/parti
     RoundsTableComponent,
     CreateExperimentComponent,
     ExperimentBasicsComponent,
-    ParticipantDescriptionEditorComponent
+    ParticipantDescriptionEditorComponent,
+    RoundCreationComponent,
+    RoundsGeneratorComponent,
+    ManualConfigurationComponent
   ],
   imports: [
     CommonModule,
@@ -63,7 +72,10 @@ import { ParticipantDescriptionEditorComponent } from './create-experiment/parti
     MatListModule,
     MatTableModule,
     MatProgressBarModule,
-    MatStepperModule
+    MatStepperModule,
+    ColorPickerModule,
+    MatSelectModule,
+    MatCheckboxModule
   ]
 })
 export class ResearcherViewModule { }

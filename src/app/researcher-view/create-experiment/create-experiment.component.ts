@@ -29,8 +29,11 @@ export class CreateExperimentComponent {
   onExperimentChange(event: any){
     this.experiment = event.experiment;
     console.log("Experiment changed in main component");
-    //console.log(this.experiment);
-    console.log(this.stepper);
-    this.stepper.next;
+
+    if(this.stepper.selected) this.stepper.selected.completed = true;
+  }
+
+  onNextStep(event: any){
+    this.stepper.next();
   }
 }

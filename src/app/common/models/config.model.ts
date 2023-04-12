@@ -1,7 +1,10 @@
+import { Flashing } from "./round.model";
+
 interface BackGroundDistractionConfig {
     backGroundDistractionColor: string;
     minDistractionDurationTime: number;
     maxDistractionDurationTime: number;
+    flashing?: Flashing;
 }
 
 interface DistractingShapeConfig {
@@ -10,21 +13,26 @@ interface DistractingShapeConfig {
     distractingShapeMinHeight: number;
     distractingShapeMaxHeight: number;
     distractingShapeTypes: string[];
-    distractingShapeColors: string[];
+    distractingShapeColor: string;
     minDistractionDurationTime: number;
     maxDistractionDurationTime: number;
+    flashing?: Flashing;
 }
 
 export interface Configuration {
     setNum: number;
     roundNum: number;
     practiceRoundNum: number;
-    restTime: number;
-    backgroundColors: string[];
-    shapeColors: string[];
+    restTimeSec: number;
+    backgroundColor: string;
+    targetShapeColor: string;
+    baseShapeColor: string;
     distractedRoundNum: number;
     changePosition: boolean;
-    minDistance: number;
+    changeShapeSize: boolean;
+    twoDimensional: boolean;
+    canvasHeight: number;
+    canvasWidth: number;
     baseShapeType: ShapeType[];
     targetShapeType: ShapeType[];
     minWidth: number;
