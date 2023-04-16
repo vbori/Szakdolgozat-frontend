@@ -1,6 +1,6 @@
 <form [formGroup]="participantDescriptionForm" (ngSubmit)="onSubmit()">
   <mat-form-field class="example-full-width">
-    <mat-label>Description</mat-label>
+    <mat-label>Description & instructions for participants</mat-label>
     <textarea matInput formControlName="participantDescription"></textarea>
     <mat-error *ngIf="participantDescriptionForm.controls.participantDescription.invalid">
       Please enter a minimum of 10 characters!

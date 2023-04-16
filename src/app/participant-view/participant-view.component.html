@@ -1,2 +1,30 @@
-<p>participant-view works!</p>
-<!--TODO: add participant description-->
+<div>
+  <mat-stepper orientation= "horizontal" [linear] = "true" labelPosition="bottom" #stepper>
+    <mat-step [editable]="false" [completed]="false">
+      <ng-template matStepLabel>Experiment description</ng-template>
+      <ng-template matStepContent>
+        <ng-container *ngIf="participant">
+          <app-participant-description [experimentId]="participant.experimentId" (nextStep) = "onNextStep()"></app-participant-description>
+        </ng-container>
+      </ng-template>
+    </mat-step>
+    <mat-step [editable]="false" [completed]="false">
+      <ng-template matStepLabel>Participant form</ng-template>
+      <ng-template matStepContent>
+        <app-participant-form [experimentId]="participant.experimentId" [participantId]="participant._id" (nextStep) = "onNextStep()"></app-participant-form>
+      </ng-template>
+    </mat-step>
+    <mat-step [editable]="false" [completed]="false" >
+      <ng-template matStepLabel>Experiment</ng-template>
+      <ng-template matStepContent>
+        <app-experiment [experimentId]="participant.experimentId" (finishedExperiment)="onFinish()"></app-experiment>
+      </ng-template>
+    </mat-step>
+    <mat-step [editable]="false">
+      <ng-template matStepLabel>Thank you</ng-template>
+      <ng-template matStepContent>
+        <app-thank-you-page></app-thank-you-page>
+      </ng-template>
+    </mat-step>
+  </mat-stepper>
+</div>

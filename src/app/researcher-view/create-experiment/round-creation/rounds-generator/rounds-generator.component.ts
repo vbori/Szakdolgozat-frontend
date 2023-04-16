@@ -1,10 +1,9 @@
-import { Component, OnInit} from '@angular/core';
-import { FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { Configuration, ShapeType } from 'src/app/common/models/config.model';
+import { Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
-import { RoundGeneratorForm } from 'src/app/researcher-view/models/rounds-generator-component.model';
-import { RoundCreationConstants } from '../round-creation.constants';
+import { ExperimentCreationConstants } from '../../experiment-creation.constants';
 import { ExperimentRoundsValidator } from 'src/app/common/validators/experiment-rounds.validator';
+import { Experiment } from 'src/app/common/models/experiment.model';
 
 @Component({
   selector: 'app-rounds-generator',
@@ -14,56 +13,60 @@ import { ExperimentRoundsValidator } from 'src/app/common/validators/experiment-
 
 export class RoundsGeneratorComponent implements OnInit{
 
+  @Input() experiment: Experiment | undefined
+  @Output() experimentChange = new EventEmitter<Experiment>();
+  @Output() nextStep = new EventEmitter<void>();
+
   shapeTypes = ['Circle', 'Square', 'Rectangle'] //TODO: get this from the interface Object.values<ShapeType>({} as {[K in ShapeType]: K});
 
   roundGeneratorForm = new FormGroup({ //TODO: instead of magic numbers, use constants
-    setNum: new FormControl<number>(1, [Validators.required, Validators.min(1), Validators.max(100)]),
-    roundNum: new FormControl<number>(10, [Validators.required, Validators.min(1), Validators.max(100)]),
-    practiceRoundNum: new FormControl<number>(3, [Validators.required, Validators.min(1), Validators.max(10)]),
-    restTimeSec: new FormControl<number>(10, [Validators.required, Validators.min(0), Validators.max(60)]),
-    backgroundColor: new FormControl<string>('#FFFFFF', [Validators.required]),
-    targetShapeColor: new FormControl<string>('#00FF00',[Validators.required]),
-    baseShapeColor: new FormControl<string>('#0000FF', [Validators.required]),
-    distractedRoundNum: new FormControl<number>(0, [Validators.required, Validators.min(0)]),
-    useBackgroundDistraction: new FormControl<boolean>(false),
-    useShapeDistraction: new FormControl<boolean>(false),
-    changePosition: new FormControl<boolean>(false),
-    changeShapeSize: new FormControl<boolean>(false),
-    twoDimensional: new FormControl<boolean>(false),
-    canvasHeight: new FormControl<number>(600, [Validators.required, Validators.min(100), Validators.max(1000)]),
-    canvasWidth: new FormControl<number>(600, [Validators.required, Validators.min(100), Validators.max(1000)]),
-    baseShapeType: new FormControl<string[]>([], [Validators.required]),
-    targetShapeType: new FormControl<string[]>([], [Validators.required]),
-    minWidth: new FormControl<number>(30, [Validators.required, Validators.min(10), Validators.max(200)]),
-    maxWidth: new FormControl<number>(60, [Validators.required, Validators.min(10), Validators.max(200)]),
-    minHeight: new FormControl<number>(30, [Validators.required, Validators.min(10), Validators.max(200)]),
-    maxHeight: new FormControl<number>(60, [Validators.required, Validators.min(10), Validators.max(200)]),
+    setNum: new FormControl<number>(1,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(100)]}),
+    roundNum: new FormControl<number>(10,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(100)]}),
+    practiceRoundNum: new FormControl<number>(3, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(10)]}),
+    restTimeSec: new FormControl<number>(10, {nonNullable: true, validators: [Validators.required, Validators.min(0), Validators.max(60)]}),
+    backgroundColor: new FormControl<string>('#FFFFFF', {nonNullable: true, validators: [Validators.required]}),
+    targetShapeColor: new FormControl<string>('#00FF00',{nonNullable: true, validators: [Validators.required]}),
+    baseShapeColor: new FormControl<string>('#0000FF', {nonNullable: true, validators: [Validators.required]}),
+    distractedRoundNum: new FormControl<number>(0, {nonNullable: true, validators: [Validators.required, Validators.min(0)]}),
+    useBackgroundDistraction: new FormControl<boolean>(false, {nonNullable: true}),
+    useShapeDistraction: new FormControl<boolean>(false, {nonNullable: true}),
+    changePosition: new FormControl<boolean>(false, {nonNullable: true}),
+    changeShapeSize: new FormControl<boolean>(false, {nonNullable: true}),
+    twoDimensional: new FormControl<boolean>(false, {nonNullable: true}),
+    canvasHeight: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(100), Validators.max(1000)]}),
+    canvasWidth: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(100), Validators.max(1000)]}),
+    baseShapeType: new FormControl<string[]>([], {nonNullable: true, validators: [Validators.required]}),
+    targetShapeType: new FormControl<string[]>([], {nonNullable: true, validators: [Validators.required]}),
+    minWidth: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
+    maxWidth: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
+    minHeight: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
+    maxHeight: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
     backgroundDistractionConfig : new FormGroup({
-      backGroundDistractionColor: new FormControl<string>('#FF0000',[Validators.required]),
-      minDistractionDurationTime: new FormControl<number>(100, [Validators.required, Validators.min(1), Validators.max(5000)]),
-      maxDistractionDurationTime: new FormControl<number>(2000, [Validators.required, Validators.min(1), Validators.max(5000)]),
-      useFlashing: new FormControl<boolean>(false),
+      backGroundDistractionColor: new FormControl<string>('#FF0000',{nonNullable: true, validators: [Validators.required]}),
+      minDistractionDurationTime: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
+      maxDistractionDurationTime: new FormControl<number>(2000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
+      useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
       flashing: new FormGroup({
-        flashColor: new FormControl<string>('#000000',[Validators.required]),
-        flashFrequency: new FormControl<number>(500, [Validators.required, Validators.min(100)]),
+        flashColor: new FormControl<string>('#000000',{nonNullable: true, validators: [Validators.required]}),
+        flashFrequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(100)]}),
       })
     },{
       validators: [
         ExperimentRoundsValidator.conflictingValuesValidator('minDistractionDurationTime','maxDistractionDurationTime')
       ]}),
     distractingShapeConfig: new FormGroup({
-      distractingShapeMinWidth: new FormControl<number>(30, [Validators.required, Validators.min(10), Validators.max(200)]),
-      distractingShapeMaxWidth: new FormControl<number>(60, [Validators.required, Validators.min(10), Validators.max(200)]),
-      distractingShapeMinHeight: new FormControl<number>(30, [Validators.required, Validators.min(10), Validators.max(200)]),
-      distractingShapeMaxHeight: new FormControl<number>(60, [Validators.required, Validators.min(10), Validators.max(200)]),
-      distractingShapeTypes: new FormControl<string[]>([], [Validators.required]),
-      distractingShapeColor: new FormControl<string>('#FFA500', [Validators.required]), //TODO: add color picker
-      minDistractionDurationTime: new FormControl<number>(100, [Validators.required, Validators.min(1), Validators.max(5000)]),
-      maxDistractionDurationTime: new FormControl<number>(2000, [Validators.required, Validators.min(1), Validators.max(5000)]),
-      useFlashing: new FormControl<boolean>(false),
+      distractingShapeMinWidth: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
+      distractingShapeMaxWidth: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
+      distractingShapeMinHeight: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
+      distractingShapeMaxHeight: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
+      distractingShapeTypes: new FormControl<string[]>([], {nonNullable: true, validators: [Validators.required]}),
+      distractingShapeColor: new FormControl<string>('#FFA500', {nonNullable: true, validators: [Validators.required]}),
+      minDistractionDurationTime: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
+      maxDistractionDurationTime: new FormControl<number>(2000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
+      useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
       flashing: new FormGroup({
-        flashColor: new FormControl<string>('#FFFF00', [Validators.required]),
-        flashFrequency: new FormControl<number>(500, [Validators.required, Validators.min(100)]),
+        flashColor: new FormControl<string>('#FFFF00', {nonNullable: true, validators: [Validators.required]}),
+        flashFrequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(100)]}),
       })
     },{
       validators: [
@@ -83,7 +86,7 @@ export class RoundsGeneratorComponent implements OnInit{
 
   //TODO: add refresh guard
 
-  constructor(private experimentService: ExperimentService, private constants: RoundCreationConstants) { }
+  constructor(private experimentService: ExperimentService, private constants: ExperimentCreationConstants) { }
 
   ngOnInit(): void {
     this.roundGeneratorForm.get('backgroundDistractionConfig')?.disable();
@@ -128,7 +131,23 @@ export class RoundsGeneratorComponent implements OnInit{
   onSubmit(){
     this.setUnnecessaryControlsAvailability(false);
 
-    console.log(this.roundGeneratorForm.value);
+    //console.log(this.roundGeneratorForm.value);
+    const experimentConfiguration = { experimentConfiguration: this.roundGeneratorForm.value};
+    console.log(experimentConfiguration)
+    if(!this.roundGeneratorForm.pristine){
+      this.experimentService.updateExperiment({experimentId: this.experiment?._id, updatedExperiment: experimentConfiguration}).subscribe({
+        next: (experiment) => {
+          this.experiment = experiment;
+          console.log(this.experiment);
+          this.roundGeneratorForm.markAsPristine();
+          this.experimentChange.emit(this.experiment);
+          this.nextStep.emit();
+        },
+        error: (error) => {
+          console.log(error); //TODO: display error message
+        }
+      });
+    }
 
     this.setUnnecessaryControlsAvailability(true);
   }

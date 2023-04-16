@@ -14,9 +14,8 @@ export interface Experiment extends ExperimentExtract {
   type: string;
   openedAt?: Date;
   closedAt?: Date;
-  deadline?: Date;
   maxParticipantNum: number;
-  controlGroupSize: number;
+  controlGroupChance: number;
   trajectoryImageNeeded: boolean;
   positionArrayNeeded: boolean;
   participantDescription: string;

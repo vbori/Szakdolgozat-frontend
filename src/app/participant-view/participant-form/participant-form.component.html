@@ -1,0 +1,20 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <ng-container *ngFor="let question of questions">
+    <div *ngIf="question.type === 'text'">
+      <label>{{question.label}}</label>
+      <input type="text" [formControlName]="question.questionId" required="question.required"/>
+    </div>
+    <div *ngIf="question.type === 'number'">
+        <label>{{question.label}}</label>
+        <input type="number" [formControlName]="question.questionId" min="{{question.validation?.min}}" max="{{question.validation?.max}}" required="question.required"/>
+      </div>
+    <div *ngIf="question.type === 'radio'">
+      <label>{{question.label}}</label>
+      <div *ngFor="let option of question.options">
+        <input type="radio" [value]="option" [formControlName]="question.questionId" required="question.required"/>
+        {{option}}
+      </div>
+    </div>
+  </ng-container>
+  <button mat-button [disabled]="form.invalid">Next</button>
+</form>

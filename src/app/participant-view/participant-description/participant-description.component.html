@@ -1,0 +1,9 @@
+<h1>Experiment description & instructions</h1>
+<div>
+  <p>{{description}}</p>
+</div>
+<form [formGroup]="participantDescriptionForm" (ngSubmit)="onSubmit()">
+  <mat-checkbox formControlName="conditionsCheckbox">I have read and understood the experiment conditions and instructions, and I confirm that I am willingly participating in this experiment. I consent to the researchers anonymously storing my provided data and experiment results. </mat-checkbox>
+  <mat-checkbox formControlName="flashWarningCheckbox">I understand that this experiment may include flashing or rapidly changing images that could potentially trigger seizures or cause discomfort. </mat-checkbox>
+  <button mat-button [disabled]="participantDescriptionForm.invalid">Next</button>
+</form>

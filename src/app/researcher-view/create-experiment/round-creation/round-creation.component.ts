@@ -10,5 +10,8 @@ export class RoundCreationComponent {
   @Input() experiment: Experiment | undefined
   @Output() experimentChange = new EventEmitter<Experiment>();
 
-
+  onExperimentChange(experiment: Experiment){
+    this.experiment = experiment;
+    this.experimentChange.emit(this.experiment);
+  }
 }

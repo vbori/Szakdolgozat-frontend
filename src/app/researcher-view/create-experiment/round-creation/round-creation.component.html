@@ -1,6 +1,6 @@
 <mat-tab-group animationDuration="1000ms">
   <mat-tab label="Generate experiment">
-    <app-rounds-generator></app-rounds-generator>
+    <app-rounds-generator [experiment] = "experiment" (experimentChange)= "onExperimentChange($event)"></app-rounds-generator>
   </mat-tab>
   <mat-tab label="Manual configuration">
     <app-manual-configuration></app-manual-configuration>

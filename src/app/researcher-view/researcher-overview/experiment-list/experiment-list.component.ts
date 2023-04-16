@@ -11,7 +11,7 @@ import { ExperimentExtract, ExperimentStatus } from '../../../common/models/expe
 export class ExperimentListComponent implements OnInit{
 
   @Input() experimentStatus: ExperimentStatus;
-  experiments: ExperimentExtract[];
+  experiments: ExperimentExtract[] = [];
 
   constructor(private readonly experimentService: ExperimentService) {
   }

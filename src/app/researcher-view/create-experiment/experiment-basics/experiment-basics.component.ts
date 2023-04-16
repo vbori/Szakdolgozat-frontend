@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatStepper } from '@angular/material/stepper';
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
+import { ExperimentCreationConstants } from '../experiment-creation.constants';
 
 @Component({
   selector: 'app-experiment-basics',
@@ -18,11 +18,11 @@ export class ExperimentBasicsComponent {
   experimentBasicsForm = new FormGroup({
     name: new FormControl<string>('', [Validators.required, Validators.minLength(3)]),
     researcherDescription: new FormControl<string>('', [Validators.required, Validators.minLength(6)]),
-    maxParticipantNum: new FormControl<number>(20, [Validators.required, Validators.min(1), Validators.max(100)]),
-    controlGroupSize: new FormControl<number>(5, [Validators.required, Validators.min(0), Validators.max(100)]) //TODO: add validator to check if controlGroupSize < maxParticipantNum
+    maxParticipantNum: new FormControl<number>(20, [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_PARTICIPANT_NUM)]),
+    controlGroupChance: new FormControl<number>(20, [Validators.required, Validators.min(0), Validators.max(100)])
   });
 
-  constructor(private experimentService: ExperimentService) { }
+  constructor(private experimentService: ExperimentService, private constants: ExperimentCreationConstants) { }
 
   onSubmit(){
     if(!this.experiment){

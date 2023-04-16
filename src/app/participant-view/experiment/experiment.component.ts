@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { fabric } from 'fabric';
 import { IEvent } from 'fabric/fabric-impl';
 import {NewRound} from '../../common/models/newRound.model';
+import { ExperimentService } from 'src/app/common/services/experiment.service';
 
 @Component({
   selector: 'app-experiment',
@@ -9,26 +10,35 @@ import {NewRound} from '../../common/models/newRound.model';
   styleUrls: ['./experiment.component.scss']
 })
 export class ExperimentComponent implements OnInit{
-
+  @Input() experimentId: string;
   mainCanvas: fabric.Canvas;
   hiddenCanvas: any; //TODO: type this
   clicked: boolean = false;
   //TODO: get this from the server
-  jsons= [
+  rounds= [
     {"objects":[{"type":"rect","target":false, "originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"green","overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"visible":true,"clipTo":null,"rx":0,"ry":0,"x":0,"y":0},{"type":"circle","target":true,"baseColor":"yellow", "flashColor": "red","flashFrequency": 500,"originX":"center","originY":"center","left":300,"top":400,"width":200,"height":200,"fill":"yellow","overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"visible":true,"clipTo":null,"radius":100}],"background":"white","canvasHeight":1000,"canvasWidth":1000}, {"objects":[{"type":"rect","target":false,"originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"#29477F","overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"visible":true,"clipTo":null,"rx":0,"ry":0,"x":0,"y":0},{"type":"circle","target":true,"originX":"center","originY":"center","left":100,"top":400,"width":200,"height":200,"fill":"rgb(166,111,213)","overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"visible":true,"clipTo":null,"radius":100}],"background":"white","canvasHeight":500,"canvasWidth":500},{"objects":[{"type":"rect","target":false,"originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"green","overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"visible":true,"clipTo":null,"rx":0,"ry":0,"x":0,"y":0},{"type":"circle","target":true, "baseColor":"yellow","flashColor": "red","flashFrequency": 500,  "originX":"center","originY":"center","left":300,"top":400,"width":200,"height":200,"fill":"yellow","overlayFill":null,"stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"visible":true,"clipTo":null,"radius":100}],"background":"white","backgroundFlashColor":"blue","backgroundFlashFrequency":500, "canvasHeight":500,"canvasWidth":500} ];
   maxCount: number;
   counter: number = 0;
   baseShape: NewRound  | undefined;
   targetShape: NewRound | undefined;
   isDrawing = false;
+  @Output() finishedExperiment = new EventEmitter();
 
-  constructor() { }
+  constructor(private readonly experimentService: ExperimentService) { }
 
   ngOnInit(): void {
-    this.maxCount = this.jsons.length;
+    this.experimentService.getRounds(this.experimentId).subscribe({
+      next: (rounds) => {
+        console.log(rounds);
+      },
+      error: (error) => {
+        console.log(error); //TODO: display error message
+      }
+    });
+    this.maxCount = this.rounds.length;
     this.mainCanvas = new fabric.Canvas('mainCanvas');
-    this.mainCanvas.setHeight(this.jsons[this.counter].canvasHeight);
-    this.mainCanvas.setWidth(this.jsons[this.counter].canvasWidth);
+    this.mainCanvas.setHeight(this.rounds[this.counter].canvasHeight);
+    this.mainCanvas.setWidth(this.rounds[this.counter].canvasWidth);
     this.hiddenCanvas = new fabric.Canvas('hiddenCanvas', {containerClass: 'hiddenCanvas'});
     this.hiddenCanvas.setHeight(this.mainCanvas.getHeight());
     this.hiddenCanvas.setWidth(this.mainCanvas.getWidth());
@@ -54,7 +64,7 @@ export class ExperimentComponent implements OnInit{
     this.hiddenCanvas.isDrawingMode = false;
     this.mainCanvas.clear();
     this.hiddenCanvas.clear();
-    this.mainCanvas.loadFromJSON(this.jsons[this.counter], this.mainCanvas.renderAll.bind(this.mainCanvas), (o: any, object: any) => {
+    this.mainCanvas.loadFromJSON(this.rounds[this.counter], this.mainCanvas.renderAll.bind(this.mainCanvas), (o: any, object: any) => {
       object.set('selectable', false);
       if(object.flashColor){
         setInterval(() => {
@@ -63,14 +73,14 @@ export class ExperimentComponent implements OnInit{
         }, object.flashFrequency);
       }
     });
-    if(this.jsons[this.counter].backgroundFlashColor){
+    if(this.rounds[this.counter].backgroundFlashColor){
       setInterval(() => {
-        this.mainCanvas.backgroundColor = this.mainCanvas.backgroundColor == this.jsons[this.counter].background ? this.jsons[this.counter].backgroundFlashColor : this.jsons[this.counter].background;
+        this.mainCanvas.backgroundColor = this.mainCanvas.backgroundColor == this.rounds[this.counter].background ? this.rounds[this.counter].backgroundFlashColor : this.rounds[this.counter].background;
         this.mainCanvas.renderAll();
-      }, this.jsons[this.counter].backgroundFlashFrequency);
+      }, this.rounds[this.counter].backgroundFlashFrequency);
     }
 
-    this.hiddenCanvas.loadFromJSON(this.jsons[this.counter], this.hiddenCanvas.renderAll.bind(this.hiddenCanvas), (o: any, object: any) => {
+    this.hiddenCanvas.loadFromJSON(this.rounds[this.counter], this.hiddenCanvas.renderAll.bind(this.hiddenCanvas), (o: any, object: any) => {
       object.set('selectable', false);
     });
 
@@ -103,6 +113,7 @@ export class ExperimentComponent implements OnInit{
             this.setup();
           } else {
             this.mainCanvas.clear();
+            this.finishedExperiment.emit();
             return
           }
         });
@@ -126,5 +137,6 @@ export class ExperimentComponent implements OnInit{
   }
 
   //TODO: add result tracking
+  //TODO: add result saving
 
 }

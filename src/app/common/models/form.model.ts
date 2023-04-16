@@ -3,15 +3,15 @@ export interface Form {
 }
 
 interface Validation {
-  min: Number;
-  max: Number;
+  min: number;
+  max: number;
 }
 
-interface Question {
-  questionId: String;
-  label: String;
-  type: String;
-  options?: [String];
-  validation: Validation;
-  required: Boolean;
+export interface Question {
+  questionId: string;
+  label: string;
+  type: string;
+  options?: [string];
+  validation?: Validation;
+  required: boolean;
 }

@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
     providedIn: 'root'
 })
 
-export class RoundCreationConstants {
+export class ExperimentCreationConstants {
     public MAX_TOTAL_EXPERIMENT_ROUND_NUM = 100;
+    public MAX_PARTICIPANT_NUM = 50;
 }
