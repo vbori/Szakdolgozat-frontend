@@ -8,6 +8,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
 
 import { ParticipantViewComponent } from './participant-view.component';
 import { ExperimentComponent } from './experiment/experiment.component';
@@ -37,7 +39,9 @@ import { ThankYouPageComponent } from './thank-you-page/thank-you-page.component
     MatInputModule,
     MatFormFieldModule,
     MatButtonModule,
-    MatStepperModule
+    MatStepperModule,
+    MatRadioModule,
+    MatSelectModule
   ],
   providers: [
     ExperimentService

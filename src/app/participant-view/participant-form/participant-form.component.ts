@@ -15,20 +15,22 @@ export class ParticipantFormComponent implements OnInit{
   questions : Question[];
   @Input() experimentId: string
   @Input() participantId: string;
+  @Input() demoMode: boolean;
   @Output() nextStep = new EventEmitter<any>();
 
-  constructor(private readonly experimentService: ExperimentService, private readonly participantService: ParticipantService, private readonly fb: FormBuilder) { }
+  constructor(private readonly experimentService: ExperimentService, private readonly participantService: ParticipantService, private readonly formBuilder: FormBuilder) { }
 
   ngOnInit(): void {
-    this.form = this.fb.group({});
+    this.form = this.formBuilder.group({});
     this.experimentService.getForm(this.experimentId).subscribe({
       next: (form) => {
+        console.log(form)
         this.questions = form.questions;
         this.questions.forEach(question => {
           if (question.validation) {
-            this.form.addControl(question.questionId, this.fb.control('', [Validators.min(question.validation?.min),Validators.max(question.validation?.max)]));
+            this.form.addControl(question.questionId, this.formBuilder.control('', [Validators.min(question.validation?.min),Validators.max(question.validation?.max)]));
           } else {
-            this.form.addControl(question.questionId, this.fb.control(''));
+            this.form.addControl(question.questionId, this.formBuilder.control(''));
           }
         });
       },
@@ -39,21 +41,25 @@ export class ParticipantFormComponent implements OnInit{
   }
 
   onSubmit(){
-    console.log(this.form.value); //TODO: send to server
-    let responses: Response[] = [];
+    if(!this.demoMode){
+      console.log(this.form.value);
+      let responses: Response[] = [];
 
-    Object.keys(this.form.value).forEach((key: string) => {
-      const value = this.form.value[key];
-      responses.push({questionId: key, response: value});
-    });
-
-    this.participantService.addResponses({participantId: this.participantId, responses: responses}).subscribe({
-      next: () => {
-        this.nextStep.emit();
-      },
-      error: (error) => {
-        console.log(error); //TODO: handle error
-      }
-    });
+      Object.keys(this.form.value).forEach((key: string) => {
+        const value = this.form.value[key];
+        responses.push({questionId: key, response: value});
+      });
+      
+      this.participantService.addResponses({participantId: this.participantId, responses: responses}).subscribe({
+        next: () => {
+          this.nextStep.emit();
+        },
+        error: (error) => {
+          console.log(error); //TODO: handle error
+        }
+      });
+    }else{
+      this.nextStep.emit();
+    }
   }
 }

@@ -20,4 +20,7 @@ export class ExperimentDetailsComponent implements OnInit {
       error: () => this.router.navigate(['/404'])
     });
   }
+
+  //TODO: add open/close/edit experiment
+  //TODO: add viewing demo of experiment
 }

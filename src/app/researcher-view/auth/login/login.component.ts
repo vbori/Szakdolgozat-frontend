@@ -20,7 +20,9 @@ export class LoginComponent {
   });
 
   onLogin(): void {
-    this.authService.login(this.loginForm.value).subscribe({
+    const {username, password} = this.loginForm.value;
+    if(username && password)
+    this.authService.login({username, password}).subscribe({
       next: () => {
         this.router.navigate(['/research/dashboard']);
       },

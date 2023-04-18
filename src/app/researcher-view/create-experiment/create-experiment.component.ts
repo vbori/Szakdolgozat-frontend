@@ -26,14 +26,16 @@ export class CreateExperimentComponent {
     this.stepCount = event.selectedIndex;
   }
 
-  onExperimentChange(event: any){
-    this.experiment = event.experiment;
+  onExperimentChange(event: Experiment){
+    console.log(event);
+    this.experiment = event;
     console.log("Experiment changed in main component");
+    console.log(this.experiment);
 
     if(this.stepper.selected) this.stepper.selected.completed = true;
   }
 
-  onNextStep(event: any){
+  onNextStep(){
     this.stepper.next();
   }
 }

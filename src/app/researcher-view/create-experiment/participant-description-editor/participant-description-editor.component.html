@@ -1,10 +1,14 @@
+<h1>Let's get the participants informed!</h1>
 <form [formGroup]="participantDescriptionForm" (ngSubmit)="onSubmit()">
   <mat-form-field class="example-full-width">
     <mat-label>Description & instructions for participants</mat-label>
     <textarea matInput formControlName="participantDescription"></textarea>
+    <mat-hint>
+      This is the first thing that participants will see when they join your experiment.  
+    </mat-hint>
     <mat-error *ngIf="participantDescriptionForm.controls.participantDescription.invalid">
       Please enter a minimum of 10 characters!
     </mat-error>
   </mat-form-field>
-  <button mat-button [disabled]="participantDescriptionForm.invalid">Save & Next</button>
+  <button mat-raised-button color="primary"  [disabled]="participantDescriptionForm.invalid">Save & Next</button>
 </form>

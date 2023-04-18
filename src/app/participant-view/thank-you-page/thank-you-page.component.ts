@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-thank-you-page',
@@ -6,5 +7,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./thank-you-page.component.scss']
 })
 export class ThankYouPageComponent {
-
+  @Input() demoMode: boolean;
+  @Input() experimentId: string;
 }

@@ -18,6 +18,11 @@ const routes: Routes = [
   { path: 'login', component: AuthComponent, canActivate: [AuthActivatorService] },
   { path: 'register', component: AuthComponent, canActivate: [AuthActivatorService] },
   {
+    path: 'participant/:experimentId/:demoMode',
+    canActivate: [ResearcherActivatorService],
+    component: ParticipantViewComponent
+  },
+  {
     path: 'participant/:experimentId',
     //canActivate: [ParticipantActivatorService],
     canDeactivate: [participantDeactivator],

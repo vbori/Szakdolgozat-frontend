@@ -1,5 +1,6 @@
 <ng-container *ngIf="experiment">
   <h1>{{ experiment.name }}</h1>
+  <button mat-raised-button color="primary" id="demoButton" [routerLink]="['/participant', experiment._id, 'true']">View demo</button>
   <div>
     <span [ngClass]="{green: experiment.status === 'Active', orange: experiment.status === 'Draft', red: experiment.status === 'Closed'}">{{experiment.status}}</span>
     <span *ngIf="experiment.status != 'Draft'"> &#9679; {{experiment.participantNum}} completed</span>

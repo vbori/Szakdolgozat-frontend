@@ -1,18 +1,54 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <ng-container *ngFor="let question of questions">
-    <div *ngIf="question.type === 'text'">
-      <label>{{question.label}}</label>
-      <input type="text" [formControlName]="question.questionId" required="question.required"/>
-    </div>
-    <div *ngIf="question.type === 'number'">
-        <label>{{question.label}}</label>
-        <input type="number" [formControlName]="question.questionId" min="{{question.validation?.min}}" max="{{question.validation?.max}}" required="question.required"/>
+    <div [ngSwitch]="question.type">
+      <div *ngSwitchCase="'text'">
+        <mat-form-field>
+          <mat-label>{{question.label}}</mat-label>
+          <input matInput type="text" [formControlName]="question.questionId" required="question.required"/>
+          <mat-error *ngIf="form.controls[question.questionId].invalid">
+            This field is required!
+          </mat-error>
+        </mat-form-field>
       </div>
-    <div *ngIf="question.type === 'radio'">
-      <label>{{question.label}}</label>
-      <div *ngFor="let option of question.options">
-        <input type="radio" [value]="option" [formControlName]="question.questionId" required="question.required"/>
-        {{option}}
+      <div *ngSwitchCase="'number'">
+        <mat-form-field>
+          <mat-label>{{question.label}}</mat-label>
+          <input matInput type="number" [formControlName]="question.questionId" min="{{question.validation?.min}}" max="{{question.validation?.max}}" required="question.required"/>
+          <mat-error *ngIf="form.controls[question.questionId].hasError('required')">
+            This field is required!
+          </mat-error>
+          <mat-error *ngIf="!form.controls[question.questionId].hasError('required') && (form.controls[question.questionId].hasError('min') || form.controls[question.questionId].hasError('max'))">
+            Please enter a number between {{question.validation?.min}} and {{question.validation?.max}}!
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div *ngSwitchCase="'radio'">
+        <mat-radio-group [formControlName]="question.questionId"  required="question.required">
+          <mat-label>{{question.label}}</mat-label>
+          <mat-radio-button *ngFor="let option of question.options" [value]="option.optionLabel">{{option.optionLabel}}</mat-radio-button>
+        </mat-radio-group>
+        <mat-error *ngIf="form.controls[question.questionId].invalid">
+          Please select an option!
+        </mat-error>
+      </div>
+      <div *ngSwitchCase="'select'">
+        <mat-form-field>
+          <mat-label>{{question.label}}</mat-label>
+          <mat-select required="question.required" [formControlName]="question.questionId" >
+            <mat-option *ngFor="let option of question.options"  [value]="option.optionLabel">{{ option.optionLabel }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.controls[question.questionId].invalid">
+            Please select an option!
+          </mat-error>
+        </mat-form-field>
+        
+        <!---
+        <div *ngFor="let option of question.options">
+          <mat-radio-button [value]="option.optionLabel" [formControlName]="question.questionId" required="question.required">{{option.optionLabel}}</mat-radio-button>
+        </div> -->
+      </div>
+      <div *ngSwitchCase="'checkbox'">
+        <mat-checkbox [formControlName]="question.questionId" required="question.required">{{question.label}}</mat-checkbox>
       </div>
     </div>
   </ng-container>

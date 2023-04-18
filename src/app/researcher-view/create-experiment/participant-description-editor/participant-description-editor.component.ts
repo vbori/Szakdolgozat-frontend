@@ -15,7 +15,7 @@ export class ParticipantDescriptionEditorComponent {
 
   participantDescriptionForm = new FormGroup({
     participantDescription: new FormControl<string>('', [Validators.required, Validators.minLength(10)])
-  });
+  }); 
 
   constructor(private experimentService: ExperimentService) { }
 
@@ -24,6 +24,7 @@ export class ParticipantDescriptionEditorComponent {
       this.experimentService.updateExperiment({experimentId: this.experiment?._id, updatedExperiment: this.participantDescriptionForm.value}).subscribe({
         next: (experiment) => {
           this.experiment = experiment;
+          console.log("experiment updated in part desc")
           console.log(this.experiment);
           this.participantDescriptionForm.markAsPristine();
           this.experimentChange.emit(this.experiment);

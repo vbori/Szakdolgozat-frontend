@@ -1,3 +1,4 @@
+<h1>Let's start with the basics!</h1>
 <form [formGroup]="experimentBasicsForm" (ngSubmit)="onSubmit()">
   <mat-form-field class="example-full-width">
     <mat-label>Experiment name</mat-label>
@@ -27,5 +28,5 @@
       The control group chance must be between 0 and 100!
     </mat-error>
   </mat-form-field>
-  <button mat-button [disabled]="experimentBasicsForm.invalid">Save & Next</button>
+  <button mat-raised-button color="primary" [disabled]="experimentBasicsForm.invalid">Save & Next</button>
 </form>

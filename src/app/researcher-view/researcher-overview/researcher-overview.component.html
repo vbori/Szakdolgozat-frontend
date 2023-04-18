@@ -1,4 +1,5 @@
 <button  id="new-experiment-button" [routerLink]="['../experiment/create']" mat-raised-button color="primary">Create new experiment</button>
+<!--TODO: control buttons availability based on researcher's active experiment count-->
 <mat-tab-group animationDuration="500ms">
   <mat-tab label="Active">
     <app-experiment-list [experimentStatus]="'Active'"></app-experiment-list>

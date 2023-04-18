@@ -1,0 +1,45 @@
+<form #form>
+  <mat-form-field>
+    <mat-label>Question ID</mat-label>
+    <input name="idInput" matInput [(ngModel)]="question.questionId" type="text" required/>
+    <mat-hint>E.g. "age", "educationLevel", "sleepTime"</mat-hint>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Question / label</mat-label>
+    <input name="labelInput" matInput [(ngModel)]="question.label" type="text" required/>
+    <mat-hint>E.g. "Age", "Level of education", "How much did you sleep last night?"</mat-hint>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Answer type</mat-label>
+    <mat-select [(value)]="question.type" (selectionChange)="onSelectionChange()" required>
+      <mat-option *ngFor="let type of answerTypes" [value]="type">{{ type }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-checkbox name="requiredInput" [(ngModel)]="question.required">Answer is required</mat-checkbox>
+  <div *ngIf="question.type === 'radio' || question.type === 'select'">
+    <div *ngFor="let option of question.options; let i = index">
+      <mat-form-field>
+        <mat-label>Option{{i+1}}</mat-label>
+        <input name="optionLabelInput" matInput [(ngModel)]="option.optionLabel" type="text" required>
+        <mat-error >
+          Please enter a minimum of 1 character!
+        </mat-error>
+      </mat-form-field>
+      <button class="iconButton" (click)="removeOption(i)" [disabled]="question.options?.length == 2"><mat-icon fontIcon="delete"></mat-icon></button>
+    </div>
+    <button mat-button (click)="addOption()">Add Option</button>
+  </div>
+  <div *ngIf="question.type === 'number'">
+    <mat-checkbox name="validateCheckbox" [(ngModel)]="useValidation" (change)="onValidationChange()">Use validation</mat-checkbox>
+    <div *ngIf="useValidation && question.validation">
+      <mat-form-field>
+        <mat-label>Minimum value</mat-label>
+        <input name="minInput" matInput [(ngModel)]="question.validation.min" type="number" required>
+      </mat-form-field>
+      <mat-form-field>
+        <mat-label>Maximum value</mat-label>
+        <input name="maxInput" matInput [(ngModel)]="question.validation.max" type="number" required>
+      </mat-form-field>
+    </div>
+  </div>
+</form>

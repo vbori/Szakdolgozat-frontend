@@ -35,22 +35,31 @@ export class ExperimentBasicsComponent {
   }
 
   createExperiment(){
-    this.experimentService.createExperiment(this.experimentBasicsForm.value).subscribe({
-      next: (experiment) => {
-        this.experiment = experiment;
-        this.experimentBasicsForm.markAsPristine();
-        this.experimentChange.emit(this.experiment);
-        this.nextStep.emit();
-      },
-      error: (error) => {
-        console.log(error); //TODO: display error message
-      }
-    });
+    let {name, researcherDescription, maxParticipantNum, controlGroupChance} = this.experimentBasicsForm.value;
+    if(name && researcherDescription && maxParticipantNum && controlGroupChance)
+      this.experimentService.createExperiment(name, researcherDescription,
+        maxParticipantNum, controlGroupChance).subscribe({
+        next: (experiment) => {
+          console.log("created experiment")
+          console.log(experiment)
+          this.experiment = experiment;
+          console.log("savedexperiment ")
+          console.log(this.experiment)
+          this.experimentBasicsForm.markAsPristine();
+          this.experimentChange.emit(this.experiment);
+          this.nextStep.emit();
+        },
+        error: (error) => {
+          console.log(error); //TODO: display error message
+        }
+      });
   }
 
   updateExperiment(){
     this.experimentService.updateExperiment({experimentId: this.experiment?._id, updatedExperiment: this.experimentBasicsForm.value}).subscribe({
       next: (experiment) => {
+        console.log("updated experiment")
+        console.log(experiment)
         this.experiment = experiment;
         this.experimentBasicsForm.markAsPristine();
         this.experimentChange.emit(this.experiment);

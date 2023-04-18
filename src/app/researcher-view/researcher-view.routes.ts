@@ -12,8 +12,5 @@ export const researchRoutes = [
       { path: 'create', component: CreateExperimentComponent},
       { path: '**', redirectTo: '/research/dashboard'}
     ]
-  },
-  { path: 'details/:id', component: ExperimentDetailsComponent},
-  { path: 'create', component: CreateExperimentComponent},
-  { path: '**', redirectTo: '/research/dashboard'}
+  }
 ]

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ParticipantService } from './services/participant.service';
 import { Participant } from './models/participant.model';
 import { MatStepper } from '@angular/material/stepper';
+import { ExperimentService } from '../common/services/experiment.service';
 
 @Component({
   selector: 'app-participant-view',
@@ -13,9 +14,14 @@ import { MatStepper } from '@angular/material/stepper';
 export class ParticipantViewComponent implements OnInit{
   participant: Participant;
   finished = false;
+  experimentId: string;
+  demoMode = false;
+  hasForm : boolean;
   @ViewChild('stepper') stepper!: MatStepper;
 
-  constructor(private readonly participantService: ParticipantService, private route: ActivatedRoute, private router: Router) { }
+  constructor(private readonly participantService: ParticipantService,
+              private readonly experimentService: ExperimentService, 
+              private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
     window.onbeforeunload = (event) => {
@@ -24,14 +30,39 @@ export class ParticipantViewComponent implements OnInit{
       return true;
     };
 
-    this.participantService.getParticipant(this.route.snapshot.params['experimentId']).subscribe({
-      next: (participant) => {
-        this.participant = participant;
+    if(this.route.snapshot.params['demoMode']){
+      this.demoMode = this.route.snapshot.params['demoMode'] === 'true';
+    }
+
+    this.experimentId = this.route.snapshot.params['experimentId'];
+
+    this.experimentService.hasForm(this.experimentId).subscribe({
+      next: (hasForm) => {
+        this.hasForm = hasForm;
       },
-      error: () => {
-        this.router.navigate(['/404'])
+      error: (error) => {
+        console.log(error); //TODO: handle error
       }
     });
+
+    if(!this.demoMode){
+      this.participantService.getParticipant(this.experimentId).subscribe({
+        next: (participant) => {
+          this.participant = participant;
+        },
+        error: () => {
+          this.router.navigate(['/404'])
+        }
+      });
+    }else{
+      this.participant = {
+        _id: "demo",
+        experimentId: this.experimentId,
+        inControlGroup: false,
+        responses: []
+      }
+    }
+    
   }
 
   onNextStep(){

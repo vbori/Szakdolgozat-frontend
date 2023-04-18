@@ -1,8 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { ExperimentExtract } from '../../common/models/experiment.model';
+import { PasswordChangeCredentials } from '../models/password-change-credentials.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,15 +12,15 @@ export class ResearcherService {
   constructor(private readonly http: HttpClient) {
   }
 
-  //TODO: type params
-  public changePassword(params: any): Observable<any> { // any = { oldPassword: string, newPassword: string }
+  public changePassword(credentials: PasswordChangeCredentials): Observable<HttpResponse<{ message: string }>> {
     let options = {
-      headers: new HttpHeaders({
+      headers : new HttpHeaders({
         "Content-Type": "application/json",
         "Authorization": 'Bearer ' + localStorage.getItem('accessToken'),
       }),
+      observe: 'response' as const
     };
 
-    return this.http.patch(`${environment.baseUrl}/research/changePassword`, params, options);
+    return this.http.patch<{ message: string }>(`${environment.baseUrl}/research/changePassword`, credentials, options);
   }
 }

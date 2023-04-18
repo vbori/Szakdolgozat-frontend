@@ -13,26 +13,28 @@ export class PasswordChangeComponent {
 
   constructor(private readonly researcherService: ResearcherService) {}
 
-
   checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => {
     let pass = group.get('newPassword')?.value;
     let confirmPass = group.get('passwordConfirmation')?.value;
-    return pass === confirmPass ? null : { notSame: true } //TODO: fix password confirmation
+    return pass === confirmPass ? null : { misMatch: true }
   }
 
   passwordForm = new FormGroup({
     oldPassword: new FormControl<string>('', [Validators.required, Validators.minLength(6)]),
     newPassword: new FormControl<string>('', [Validators.required, Validators.minLength(6)]),
-    passwordConfirmation: new FormControl<string>('', [Validators.required, this.checkPasswords])
-  });
+    passwordConfirmation: new FormControl<string>('', [Validators.required])
+  }, {validators: this.checkPasswords});
 
   onChangePassword(): void {
-    this.researcherService.changePassword(this.passwordForm.value).subscribe({
-      next: (data) => {
-        console.log(data.message); //TODO: add messages to the user
+    const {oldPassword, newPassword} = this.passwordForm.value;
+    if(oldPassword && newPassword)
+    this.researcherService.changePassword({oldPassword, newPassword}).subscribe({
+      next: (response) => {
+        console.log(response.status);
+        console.log(response.body?.message); //TODO: add messages to the user
       },
-      error: (error) => {
-        console.log(error);
+      error: (response) => {
+        console.log(response.error.message);
       }
     });
   }

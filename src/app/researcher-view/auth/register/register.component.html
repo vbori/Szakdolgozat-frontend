@@ -2,8 +2,11 @@
   <mat-form-field class="example-full-width">
     <mat-label>Username</mat-label>
     <input type="text" matInput formControlName="username">
-    <mat-error *ngIf="registerForm.controls.username.invalid">
-      Please enter a minimum of 3 characters!
+    <mat-error *ngIf="registerForm.controls.username.hasError('required')">
+      <strong>Required</strong>
+    </mat-error>
+    <mat-error *ngIf="registerForm.controls.username.hasError('minlength') && !registerForm.controls.username.hasError('required') ">
+      <strong>Username must be at least 3 characters long!</strong>
     </mat-error>
   </mat-form-field>
   <mat-form-field appearance="fill">
@@ -12,8 +15,11 @@
     <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
       <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
     </button>
-    <mat-error *ngIf="registerForm.controls.password.invalid">
-      Password is <strong>required</strong>!
+    <mat-error *ngIf="registerForm.controls.password.hasError('required')">
+      <strong>Required</strong>
+    </mat-error>
+    <mat-error *ngIf="registerForm.controls.password.hasError('minlength') && !registerForm.controls.password.hasError('required') ">
+      <strong>Password must be at least 6 characters long!</strong>
     </mat-error>
   </mat-form-field>
   <mat-form-field appearance="fill">
@@ -22,9 +28,9 @@
     <button type="button" mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
       <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
     </button>
-    <mat-error *ngIf="registerForm.controls.passwordConfirmation.invalid">
-      The passwords do not match!
-    </mat-error>
   </mat-form-field>
+  <mat-error>
+    <strong *ngIf="registerForm.hasError('misMatch')&&registerForm.controls.passwordConfirmation.touched">The passwords do not match!</strong>
+  </mat-error>
   <button type="submit" mat-raised-button color="primary" [disabled]="registerForm.invalid">Register</button>
 </form>

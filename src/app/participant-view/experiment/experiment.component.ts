@@ -11,6 +11,7 @@ import { ExperimentService } from 'src/app/common/services/experiment.service';
 })
 export class ExperimentComponent implements OnInit{
   @Input() experimentId: string;
+  @Input() demoMode: boolean; //TODO: handle demo mode
   mainCanvas: fabric.Canvas;
   hiddenCanvas: any; //TODO: type this
   clicked: boolean = false;
@@ -64,6 +65,7 @@ export class ExperimentComponent implements OnInit{
     this.hiddenCanvas.isDrawingMode = false;
     this.mainCanvas.clear();
     this.hiddenCanvas.clear();
+
     this.mainCanvas.loadFromJSON(this.rounds[this.counter], this.mainCanvas.renderAll.bind(this.mainCanvas), (o: any, object: any) => {
       object.set('selectable', false);
       if(object.flashColor){
@@ -73,11 +75,12 @@ export class ExperimentComponent implements OnInit{
         }, object.flashFrequency);
       }
     });
+
     if(this.rounds[this.counter].backgroundFlashColor){
       setInterval(() => {
         this.mainCanvas.backgroundColor = this.mainCanvas.backgroundColor == this.rounds[this.counter].background ? this.rounds[this.counter].backgroundFlashColor : this.rounds[this.counter].background;
         this.mainCanvas.renderAll();
-      }, this.rounds[this.counter].backgroundFlashFrequency);
+      }, this.rounds[this.counter].backgroundFlashFrequency); //TODO: resolve undefined background error
     }
 
     this.hiddenCanvas.loadFromJSON(this.rounds[this.counter], this.hiddenCanvas.renderAll.bind(this.hiddenCanvas), (o: any, object: any) => {

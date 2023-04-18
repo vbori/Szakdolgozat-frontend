@@ -6,21 +6,23 @@
     <mat-step [completed]="experiment?.name && experiment?.researcherDescription">
       <ng-template matStepLabel>Experiment Basics</ng-template>
       <!--TODO: look into why two-way binding is not reacting toonExperiment Change-->
-      <app-experiment-basics [experiment]="experiment" (experimentChange) = "onExperimentChange($event)" (nextStep)="onNextStep($event)"></app-experiment-basics>
+      <app-experiment-basics [experiment]="experiment" (experimentChange) = "onExperimentChange($event)" (nextStep)="onNextStep()"></app-experiment-basics>
     </mat-step>
     <mat-step [completed]="experiment?.participantDescription != ' '">
       <ng-template matStepLabel>Participant Description</ng-template>
-      <app-participant-description-editor [experiment]="experiment" (experimentChange) = "onExperimentChange($event)" (nextStep)="onNextStep($event)"></app-participant-description-editor>
+      <app-participant-description-editor [experiment]="experiment" (experimentChange) = "onExperimentChange($event)" (nextStep)="onNextStep()"></app-participant-description-editor>
     </mat-step>
-    <!--TODO: use lazy rendering with complex components-->
-    <!---
     <mat-step [completed]="experiment?.formId">
       <ng-template matStepLabel>Participant Form</ng-template>
-      <app-participant-form [experiment]="experiment" (experimentChange) = "onExperimentChange($event)"></app-participant-form>
-    </mat-step> -->
+      <ng-template matStepContent>
+        <app-participant-form-editor [experiment]="experiment" (experimentChange) = "onExperimentChange($event)" (nextStep)="onNextStep()"></app-participant-form-editor>
+      </ng-template>
+    </mat-step>
     <mat-step>
       <ng-template matStepLabel>Rounds</ng-template>
-      <app-round-creation [experiment]="experiment" (experimentChange) = "onExperimentChange($event)"></app-round-creation>
+      <ng-template matStepContent>
+        <app-round-creation [experiment]="experiment" (experimentChange) = "onExperimentChange($event)"></app-round-creation>
+      </ng-template>
     </mat-step>
 
   </mat-stepper>

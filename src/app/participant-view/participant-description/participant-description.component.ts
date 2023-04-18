@@ -10,6 +10,7 @@ import { ExperimentService } from 'src/app/common/services/experiment.service';
 export class ParticipantDescriptionComponent implements OnInit{
   @Input() experimentId: string;
   @Output() nextStep = new EventEmitter<any>();
+  @Input() demoMode: boolean;
   description: string;
 
   participantDescriptionForm = new FormGroup({
@@ -21,7 +22,7 @@ export class ParticipantDescriptionComponent implements OnInit{
   constructor(private experimentService: ExperimentService) { }
 
   ngOnInit(): void {
-    this.experimentService.getDescription(this.experimentId).subscribe({
+    this.experimentService.getDescription(this.experimentId, this.demoMode).subscribe({
       next: (description) => {
         this.description = description;
       },

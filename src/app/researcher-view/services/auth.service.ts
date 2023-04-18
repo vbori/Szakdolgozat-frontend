@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { ResearcherCredentials, ResearcherTokens } from '../models/researcher-credentials.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,24 +17,22 @@ export class AuthService {
     this._isLoggedIn$.next(!!token);
   }
 
-  //TODO: type params
-  public login(params: any): Observable<any> { // any = { username: string, password: string }
-      return this.http.post(`${environment.baseAuthUrl}/login`, params).pipe(
-        tap((response: any) => {
-          localStorage.setItem('accessToken', response.accessToken);
-          localStorage.setItem('refreshToken', response.refreshToken);
+  public login(credentials: ResearcherCredentials): Observable<ResearcherTokens> {
+      return this.http.post(`${environment.baseAuthUrl}/login`, credentials).pipe(
+        tap((tokens: any) => {
+          localStorage.setItem('accessToken', tokens.accessToken);
+          localStorage.setItem('refreshToken', tokens.refreshToken);
           this._isLoggedIn$.next(true);
         })
       );
   }
 
-  public register(params: any): Observable<any> { // any = { username: string, password: string }
-    return this.http.post(`${environment.baseUrl}/register/researcher`, params);
+  public register(credentials: ResearcherCredentials): Observable<HttpResponse<{ message: string }>> {
+    return this.http.post<{ message: string }>(`${environment.baseUrl}/register/researcher`, credentials, { observe: 'response' });
   }
 
-  public logout(): Observable<any> {
-    console.log('logout');
-    return this.http.delete(`${environment.baseAuthUrl}/logout?token=${localStorage.getItem('refreshToken')}`).pipe(
+  public logout(): Observable<HttpResponse<{ message: string }>> {
+    return this.http.delete<{ message: string }>(`${environment.baseAuthUrl}/logout?token=${localStorage.getItem('refreshToken')}`, { observe: 'response'}).pipe(
       tap(() => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');

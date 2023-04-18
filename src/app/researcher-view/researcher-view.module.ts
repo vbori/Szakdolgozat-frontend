@@ -14,6 +14,8 @@ import { researchRoutes } from './researcher-view.routes';
 
 import { ColorPickerModule } from 'ngx-color-picker';
 import { MATERIAL_MODULES } from './material-index';
+import { ParticipantFormEditorComponent } from './create-experiment/participant-form-editor/participant-form-editor.component';
+import { QuestionCreationComponent } from './create-experiment/participant-form-editor/question-creation/question-creation.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +34,9 @@ import { MATERIAL_MODULES } from './material-index';
     ParticipantDescriptionEditorComponent,
     RoundCreationComponent,
     RoundsGeneratorComponent,
-    ManualConfigurationComponent
+    ManualConfigurationComponent,
+    ParticipantFormEditorComponent,
+    QuestionCreationComponent
   ],
   imports: [
     CommonModule,

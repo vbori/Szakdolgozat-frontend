@@ -1,5 +1,17 @@
-.example-card {
-  max-width: 400px;
+mat-card {
+  min-width: 50%;
+  margin-bottom: 1em;
+
+  &:first-of-type{
+     margin-top: 1em;
+  }
+
+}
+
+button {
+  width: 100%;
+  border: 1px solid #3f51b5;
+  color: #3f51b5 !important;
 }
 
 .green {
@@ -13,3 +25,9 @@
 .red{
   color: #D80000;
 }
+
+:host {
+  display: flex;
+  justify-content: center;
+}
+
