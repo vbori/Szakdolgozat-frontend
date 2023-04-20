@@ -1,32 +1,58 @@
 <h1>Let's start with the basics!</h1>
 <form [formGroup]="experimentBasicsForm" (ngSubmit)="onSubmit()">
-  <mat-form-field class="example-full-width">
+  <mat-form-field>
     <mat-label>Experiment name</mat-label>
     <input type="text" matInput formControlName="name">
     <mat-error *ngIf="experimentBasicsForm.controls.name.invalid">
       Please enter a minimum of 3 characters!
     </mat-error>
   </mat-form-field>
-  <mat-form-field class="example-full-width">
+  <mat-form-field>
     <mat-label>Description</mat-label>
     <textarea matInput formControlName="researcherDescription"></textarea>
     <mat-error *ngIf="experimentBasicsForm.controls.researcherDescription.invalid">
       Please enter a minimum of 6 characters!
     </mat-error>
   </mat-form-field>
-  <mat-form-field class="example-full-width">
+  <mat-form-field>
     <mat-label>Maximum number of participants</mat-label>
     <input type="number" matInput formControlName="maxParticipantNum">
     <mat-error *ngIf="experimentBasicsForm.controls.maxParticipantNum.invalid">
       Number of participants must be between 1 and 100!
     </mat-error>
   </mat-form-field>
-  <mat-form-field class="example-full-width">
+  <mat-form-field>
     <mat-label>Control group chance</mat-label>
     <input type="number" matInput formControlName="controlGroupChance">
     <mat-error *ngIf="experimentBasicsForm.controls.controlGroupChance.invalid">
       The control group chance must be between 0 and 100!
     </mat-error>
   </mat-form-field>
+  <mat-checkbox formControlName="positionArrayNeeded">Track cursor positions periodically</mat-checkbox>
+  <mat-form-field *ngIf="experimentBasicsForm.value.positionArrayNeeded">
+    <mat-label>Position tracking frequency</mat-label>
+    <input matInput type="number" formControlName="positionTrackingFrequency">
+    <mat-hint>Give a value between 100 and 1000 milliseconds</mat-hint>
+  </mat-form-field>
+  <mat-checkbox formControlName="cursorPathImageNeeded">Save the path of the participant's cursor as an image</mat-checkbox>
+  <div [hidden]="!experimentBasicsForm.value.cursorPathImageNeeded">
+    <mat-form-field>
+      <mat-label>What should be saved on the images?</mat-label>
+      <mat-select formControlName="cursorImageMode">
+        <mat-option *ngFor="let option of ['Outlines only', 'Colors included']" [value]="option">{{option}}</mat-option>
+      </mat-select>
+      <mat-hint>Choose whether the images should display the shapes' and background's current color besides the path, or only the shapes' outline.</mat-hint>
+    </mat-form-field>
+    <div id="container">
+      <div>
+        <canvas id="outlineCanvas" class="canvas"></canvas>
+        <p>Outline only</p>
+      </div>
+      <div>
+        <canvas id="coloredCanvas" class="canvas"></canvas>
+        <p>Colors included</p>
+      </div>
+    </div>
+  </div>
   <button mat-raised-button color="primary" [disabled]="experimentBasicsForm.invalid">Save & Next</button>
 </form>

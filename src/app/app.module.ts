@@ -7,6 +7,8 @@ import { ResearcherViewModule } from './researcher-view/researcher-view.module';
 import { ParticipantViewModule } from './participant-view/participant-view.module';
 import { NavbarComponent } from './navbar/navbar.component';
 import { Error404Component } from './error404/error404.component';
+import { MatIconModule } from '@angular/material/icon';
+
 
 //TODO: clean up imports
 
@@ -21,7 +23,8 @@ import { Error404Component } from './error404/error404.component';
     AppRoutingModule,
     BrowserAnimationsModule,
     ResearcherViewModule,
-    ParticipantViewModule
+    ParticipantViewModule,
+    MatIconModule
   ],
   providers: [],
   bootstrap: [AppComponent]

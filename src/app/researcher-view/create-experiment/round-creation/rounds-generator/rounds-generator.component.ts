@@ -130,15 +130,11 @@ export class RoundsGeneratorComponent implements OnInit{
 
   onSubmit(){
     this.setUnnecessaryControlsAvailability(false);
-
-    //console.log(this.roundGeneratorForm.value);
     const experimentConfiguration = { experimentConfiguration: this.roundGeneratorForm.value};
-    console.log(experimentConfiguration)
     if(!this.roundGeneratorForm.pristine){
       this.experimentService.updateExperiment({experimentId: this.experiment?._id, updatedExperiment: experimentConfiguration}).subscribe({
         next: (experiment) => {
           this.experiment = experiment;
-          console.log(this.experiment);
           this.roundGeneratorForm.markAsPristine();
           this.experimentChange.emit(this.experiment);
           this.nextStep.emit();

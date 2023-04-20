@@ -30,12 +30,12 @@ export class ExperimentService {
     return this.http.get<ExperimentExtract[]>(`${environment.baseUrl}/research?status=${status}`, { headers });
   }
 
-  public createExperiment(name: string, researcherDescription: string, maxParticipantNum: number, controlGroupChance: number): Observable<Experiment> {
+  public createExperiment(name: string, researcherDescription: string, maxParticipantNum: number, controlGroupChance: number, cursorImageMode: string | null, positionTrackingFrequency: number | null): Observable<Experiment> {
     let headers = new HttpHeaders({
       "Authorization": 'Bearer ' + localStorage.getItem('accessToken'),
     });
 
-    let experimentBasics = {name, researcherDescription, maxParticipantNum, controlGroupChance};
+    let experimentBasics = {name, researcherDescription, maxParticipantNum, controlGroupChance, cursorImageMode, positionTrackingFrequency};
 
     return this.http.post<Experiment>(`${environment.baseUrl}/research/addExperiment`, experimentBasics, { headers });
   }
@@ -68,8 +68,8 @@ export class ExperimentService {
     return this.http.get<string>(`${environment.baseUrl}/participant/getDescription/${experimentId}/${demoMode}`);
   }
 
-  public getRounds(experimentId: string): Observable<Round[]> {
-    return this.http.get<Round[]>(`${environment.baseUrl}/participant/getRounds/${experimentId}`);
+  public getRoundsAndTrackingInfo(experimentId: string): Observable<{rounds: Round[], cursorImageMode: string | null, positionTrackingFrequency: number | null}> {
+    return this.http.get<{rounds: Round[], cursorImageMode: string | null, positionTrackingFrequency: number | null}>(`${environment.baseUrl}/participant/getRoundsAndTrackingInfo/${experimentId}`);
   }
 
   public getForm(experimentId: string): Observable<Form> {
@@ -78,5 +78,11 @@ export class ExperimentService {
 
   public hasForm(experimentId: string): Observable<boolean> {
     return this.http.get<boolean>(`${environment.baseUrl}/participant/hasForm/${experimentId}`);
+  }
+
+  public saveImage(imageData: string, experimentId: string, participantId: string, roundIdx: number): Observable<any>   {
+    console.log(imageData)
+    let body = { imageData, experimentId, participantId, roundIdx}
+    return this.http.post<any>(`${environment.baseUrl}/participant/saveImage`, body);
   }
 }

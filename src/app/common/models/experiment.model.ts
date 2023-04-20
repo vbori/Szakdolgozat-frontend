@@ -16,8 +16,8 @@ export interface Experiment extends ExperimentExtract {
   closedAt?: Date;
   maxParticipantNum: number;
   controlGroupChance: number;
-  trajectoryImageNeeded: boolean;
-  positionArrayNeeded: boolean;
+  cursorImageMode?: string;
+  positionTrackingFrequency?: number;
   participantDescription: string;
   rounds: Round[];
   experimentConfiguration?: Configuration;

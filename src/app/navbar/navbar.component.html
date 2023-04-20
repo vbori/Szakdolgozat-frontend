@@ -15,14 +15,7 @@
           aria-expanded="false"
           (click)="isToggled = !isToggled"
         >
-        <!--TODO: add simple profile icon-->
-          <img
-            src="https://mdbootstrap.com/img/Photos/Avatars/img (31).webp"
-            class="rounded-circle"
-            height="22"
-            alt=""
-            loading="lazy"
-          />
+          <mat-icon fontIcon="account_circle"></mat-icon>
         </a>
         <ul mdbDropdownMenu class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" *ngIf="isToggled">
           <li>
