@@ -33,7 +33,7 @@ export class ExperimentComponent implements OnInit{
 
   //TODO: get this from the server
   rounds: NewRound[] = [
-    {"objects":[{"type":"rect","target":false, "originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"green"},{"type":"circle","target":true,"baseColor":"yellow", "flashing": {"color": "red","frequency": 500},"originX":"center","originY":"center","left":300,"top":400,"width":200,"height":200,"fill":"yellow","radius":100}],"background":"black","canvasHeight":1000,"canvasWidth":1000}, {"objects":[{"type":"rect","target":false,"originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"#29477F"},{"type":"circle","target":true,"originX":"center","originY":"center","left":100,"top":400,"width":200,"height":200,"fill":"rgb(166,111,213)","radius":100}],"background":"red","canvasHeight":500,"canvasWidth":500},{"objects":[{"type":"rect","target":false,"originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"green"},{"type":"circle","target":true, "baseColor":"yellow", "flashing": {"color": "red","frequency": 500},  "originX":"center","originY":"center","left":300,"top":400,"width":200,"height":200,"fill":"yellow","radius":100}],"background":"black","canvasHeight":500,"canvasWidth":500,"backgroundFlashing": {"color":"blue","frequency":500}} ];
+    {"objects":[{"type":"rect","target":false, "originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"green", "distraction": false},{"type":"rect","target":false, "originX":"center","originY":"center","left":300,"top":300,"width":150,"height":150,"fill":"green", "distraction": true},{"type":"circle","target":true,"baseColor":"yellow", "flashing": {"color": "red","frequency": 500},"originX":"center","originY":"center","left":300,"top":400,"width":200,"height":200,"fill":"yellow","radius":100, "distraction": false}],"background":"black","canvasHeight":1000,"canvasWidth":1000}, {"objects":[{"type":"rect","target":false,"originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"#29477F", "distraction": false},{"type":"circle","target":true,"originX":"center","originY":"center","left":100,"top":400,"width":200,"height":200,"fill":"rgb(166,111,213)","radius":100,"distraction": false}],"background":"red","canvasHeight":500,"canvasWidth":500},{"objects":[{"type":"rect","target":false,"originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"green", "distraction": false},{"type":"circle","target":true, "baseColor":"yellow", "flashing": {"color": "red","frequency": 500},  "originX":"center","originY":"center","left":300,"top":400,"width":200,"height":200,"fill":"yellow","radius":100, "distraction": false}],"background":"black","canvasHeight":500,"canvasWidth":500,"backgroundFlashing": {"color":"blue","frequency":500}} ];
 
   constructor(private readonly experimentService: ExperimentService) { }
 
@@ -64,37 +64,22 @@ export class ExperimentComponent implements OnInit{
     this.hiddenCanvas = new fabric.Canvas('hiddenCanvas', {containerClass: 'hiddenCanvas'});
     this.hiddenCanvas.selection = false;
 
-    this.mainCanvas.on('mouse:move',({e})=> {
-      if (this.hiddenCanvas.isDrawingMode) {
-        const pointer = this.mainCanvas.getPointer(e);
-        this.hiddenCanvas.freeDrawingBrush.color = this.background == 'red' ? 'blue' : 'red';
-        this.hiddenCanvas.freeDrawingBrush.onMouseMove(pointer,{e: true});
-      }
-    });
+    this.mainCanvas.on('mouse:move', ({e}) => this.handleMouseMove(e));
   }
 
-  initializeCanvases(round: NewRound): void{
-    this.hiddenCanvas.isDrawingMode = false;
-    this.mainCanvas.clear();
-    this.hiddenCanvas.clear();
-
-    this.mainCanvas.setHeight(round.canvasHeight);
-    this.mainCanvas.setWidth(round.canvasWidth);
-
-    this.hiddenCanvas.setHeight(this.mainCanvas.getHeight());
-    this.hiddenCanvas.setWidth(this.mainCanvas.getWidth());
+  playRound(round: NewRound) {
+    this.setBackground(round);
+    this.loadMainCanvas(round);
+    if(this.cursorImageMode != null){
+      this.loadHiddenCanvas(round);
+    }
   }
 
-  loadObjectsAndFlashing(round: NewRound): void{
-    this.mainCanvas.loadFromJSON(round, this.mainCanvas.renderAll.bind(this.mainCanvas), (o: any, object: any) => {
-      object.set('selectable', false);
-      if(object.flashing){
-        setInterval(() => {
-          object.set('fill', object.fill == object.baseColor ? object.flashing.color : object.baseColor);
-          this.mainCanvas.renderAll();
-        }, object.flashing.frequency);
-      }
-    });
+  setBackground(round: NewRound){
+    this.background = round.background;
+    if(round.backgroundFlashing?.color){
+      this.backgroundFlashColor = round.backgroundFlashing?.color;
+    }
 
     if(round.backgroundFlashing){
       setInterval(() => {
@@ -102,14 +87,54 @@ export class ExperimentComponent implements OnInit{
         this.mainCanvas.renderAll();
       }, round.backgroundFlashing?.frequency);
     }
+  }
 
-    if(this.cursorImageMode != null)
+  loadMainCanvas(round: NewRound): void{
+    this.mainCanvas.clear();
+    this.mainCanvas.setHeight(round.canvasHeight);
+    this.mainCanvas.setWidth(round.canvasWidth);
+
+    this.mainCanvas.loadFromJSON(round, this.mainCanvas.renderAll.bind(this.mainCanvas), (o: any, object: any) => {
+      object.set('selectable', false);
+
+      if(object.distraction){
+        object.set('visible', false);
+      }else{
+        if(object.target){
+          object.on('mousedown', this.handleTargetShapeClick.bind(this));
+        }else{
+          object.on('mousedown', this.handleBaseShapeClick.bind(this));
+          object.on('mouseover', this.handleBaseShapeHover.bind(this));
+        }
+      }
+
+      if(object.flashing){
+        setInterval(() => {
+          object.set('fill', object.fill == object.baseColor ? object.flashing.color : object.baseColor);
+          this.mainCanvas.renderAll();
+        }, object.flashing.frequency);
+      }
+    });
+  }
+
+  loadHiddenCanvas(round: NewRound): void{
+    this.hiddenCanvas.isDrawingMode = false;
+    this.hiddenCanvas.clear();
+
+    this.hiddenCanvas.setHeight(this.mainCanvas.getHeight());
+    this.hiddenCanvas.setWidth(this.mainCanvas.getWidth());
+
     this.hiddenCanvas.loadFromJSON(round, this.hiddenCanvas.renderAll.bind(this.hiddenCanvas), (o: any, object: any) => {
       object.set('selectable', false);
-      if(this.cursorImageMode == 'Outlines only'){
-        object.set('fill', 'white');
-        object.set('stroke', 'black');
+      if(!object.distraction){
+        if(this.cursorImageMode == 'Outlines only'){
+          object.set('fill', 'white');
+          object.set('stroke', 'black');
+        }
+      }else{
+        object.set('visible', false);
       }
+
     });
 
     if(this.cursorImageMode == 'Outlines only'){
@@ -117,43 +142,14 @@ export class ExperimentComponent implements OnInit{
     }
   }
 
-  playRound(round: NewRound) {
-    console.log("in playround")
-
-    this.background = round.background;
-    if(round.backgroundFlashing?.color){
-      this.backgroundFlashColor = round.backgroundFlashing?.color;
-    }
-
-    this.initializeCanvases(round);
-    this.loadObjectsAndFlashing(round);
-
-    let mainObjects = this.mainCanvas.getObjects() as FabricShape[];
-    this.baseShape = mainObjects.find((shape: FabricShape) => !shape.target) ?? undefined;
-    this.targetShape = mainObjects.find((shape: FabricShape) => shape.target) ?? undefined;
-
-    if(this.baseShape == undefined || this.targetShape == undefined){
-      return; //TODO: handle error
-    }
-
-    this.baseShape.on('mousedown', this.handleBaseShapeClick.bind(this));
-    this.baseShape.on('mouseover', this.handleBaseShapeHover.bind(this));
-    this.targetShape.on('mousedown', this.handleTargetShapeClick.bind(this));
-  }
-
   handleBaseShapeClick(): void {
     if (this.clicked) {
       this.clicked = false;
       this.counter++;
-      const imageData = this.hiddenCanvas.toDataURL("image/jpeg", 0.75);
-      this.experimentService.saveImage(imageData, this.experimentId, this.participantId, this.counter - 1).subscribe({
-        next: (response) => {
-        console.log('Image uploaded to server', response);
-        },
-        error:(error)  => {
-        console.error('Failed to upload image to server', error);
-        }
-      });
+
+      if(!this.demoMode){
+        this.saveResults();
+      }
 
       if (this.counter < this.maxCount) {
         console.log('setup')
@@ -163,50 +159,49 @@ export class ExperimentComponent implements OnInit{
         this.finishedExperiment.emit();
         return
       }
-
-      /*this.hiddenCanvas.getElement().toBlob((blob:any) => {
-        if(blob != null){
-          //TODO: save this on the server
-          const link = document.createElement('a');
-          link.download = 'myCanvas.jpg';
-          link.href = URL.createObjectURL(blob);
-          link.click();
-          console.log('downloaded');
-
-          //const formData = new FormData();
-          //formData.append('image', blob, 'myCanvas.jpg');
-          //console.log(formData)
-
-
-
-        }
-
-        if (this.counter < this.maxCount) {
-          console.log('setup')
-          this.playRound(this.rounds[this.counter]);
-        } else {
-          this.mainCanvas.clear();
-          this.finishedExperiment.emit();
-          return
-        }
-
-
-      });*/
     }
   }
 
   handleTargetShapeClick(): void {
     this.clicked = true;
-    this.hiddenCanvas.freeDrawingBrush._finalizeAndAddPath();
-    this.hiddenCanvas.isDrawingMode = false;
-  }
-
-  handleBaseShapeHover(): void {
-    if(!this.clicked && !this.hiddenCanvas.isDrawingMode){
-      this.hiddenCanvas.isDrawingMode = true;
+    if(this.cursorImageMode != null){
+      this.hiddenCanvas.freeDrawingBrush._finalizeAndAddPath();
+      this.hiddenCanvas.isDrawingMode = false;
     }
   }
 
+  handleBaseShapeHover(): void {
+    if(!this.clicked){
+      if(this.cursorImageMode != null && !this.hiddenCanvas.isDrawingMode){
+        this.hiddenCanvas.isDrawingMode = true;
+        this.hiddenCanvas.freeDrawingBrush = new fabric.PencilBrush(this.hiddenCanvas);
+      }
+    }
+  }
+
+  handleMouseMove(event: MouseEvent): void {
+    if (this.hiddenCanvas.isDrawingMode) {
+      const pointer = this.mainCanvas.getPointer(event);
+      this.hiddenCanvas.freeDrawingBrush.color = this.background == 'red' ? 'blue' : 'red';
+      this.hiddenCanvas.freeDrawingBrush.onMouseMove(pointer,{e: true});
+    }
+  }
+
+  saveResults(): void{
+    if(this.cursorImageMode != null){
+      const imageData = this.hiddenCanvas.toDataURL("image/jpeg", 0.75);
+      this.experimentService.saveImage(imageData, this.experimentId, this.participantId, this.counter - 1).subscribe({
+        next: (response) => {
+          console.log('Image uploaded to server', response);
+        },
+        error:(error)  => {
+          console.error('Failed to upload image to server', error);
+        }
+      });
+
+      this.hiddenCanvas.clear();
+    }
+  }
 
   //TODO: add result tracking
   //TODO: add result saving
