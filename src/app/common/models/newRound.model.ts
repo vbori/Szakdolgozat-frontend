@@ -1,5 +1,5 @@
 export interface FabricShape extends fabric.Object {
-  target: boolean;
+  target?: boolean;
   flashing?: Flashing;
   baseColor?: string;
 }
@@ -11,6 +11,7 @@ interface Flashing{
 
 export interface NewShape{
   target: boolean;
+  distraction: boolean;
   flashing?: Flashing;
   baseColor?: string;
   type: ShapeType;
@@ -24,15 +25,23 @@ export interface NewShape{
   fill: string;
 }
 
+interface BackGroundDistraction {
+  color: string;
+  duration: number;
+  flashing?: Flashing;
+}
+
 export interface NewRound {
   roundIdx?: number;
+  roundId?: string;
   isPractice?: boolean;
   restTimeSec?: number;
   objects: NewShape[];
-  backgroundFlashing?: Flashing;
   canvasHeight: number;
   canvasWidth: number;
   background: string;
+  shapeDistractionDuration?: number;
+  backgroundDistraction?: BackGroundDistraction;
 }
 
 type ShapeType = 'rect' | 'circle'

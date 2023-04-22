@@ -1,10 +1,11 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Experiment, ExperimentExtract } from '../models/experiment.model';
 import { environment } from 'src/environments/environment';
 import { Round } from '../models/round.model';
 import { Form } from '../models/form.model';
+import { Result } from '../models/result.model';
 
 @Injectable({
   providedIn: 'root'
@@ -81,8 +82,11 @@ export class ExperimentService {
   }
 
   public saveImage(imageData: string, experimentId: string, participantId: string, roundIdx: number): Observable<any>   {
-    console.log(imageData)
     let body = { imageData, experimentId, participantId, roundIdx}
     return this.http.post<any>(`${environment.baseUrl}/participant/saveImage`, body);
+  }
+
+  public saveResult(result: Result): Observable<string> {
+    return this.http.post<string>(`${environment.baseUrl}/participant/addResult`, {result});
   }
 }

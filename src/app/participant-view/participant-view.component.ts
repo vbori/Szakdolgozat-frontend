@@ -20,7 +20,7 @@ export class ParticipantViewComponent implements OnInit{
   @ViewChild('stepper') stepper!: MatStepper;
 
   constructor(private readonly participantService: ParticipantService,
-              private readonly experimentService: ExperimentService, 
+              private readonly experimentService: ExperimentService,
               private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
@@ -49,6 +49,8 @@ export class ParticipantViewComponent implements OnInit{
       this.participantService.getParticipant(this.experimentId).subscribe({
         next: (participant) => {
           this.participant = participant;
+          console.log("Participant: ")
+          console.log(participant)
         },
         error: () => {
           this.router.navigate(['/404'])
@@ -62,7 +64,7 @@ export class ParticipantViewComponent implements OnInit{
         responses: []
       }
     }
-    
+
   }
 
   onNextStep(){

@@ -30,7 +30,7 @@ export class ExperimentBasicsComponent implements AfterViewInit{
     cursorPathImageNeeded: new FormControl<boolean>(false),
     cursorImageMode: new FormControl<string>('Colors included'),
     positionArrayNeeded: new FormControl<boolean>(false),
-    positionTrackingFrequency: new FormControl<number>(500)
+    positionTrackingFrequency: new FormControl<number>(500, [Validators.min(100),Validators.max(1000)])
   });
 
   constructor(private experimentService: ExperimentService, private constants: ExperimentCreationConstants) { }

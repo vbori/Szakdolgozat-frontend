@@ -44,7 +44,7 @@ export class RoundsGeneratorComponent implements OnInit{
     backgroundDistractionConfig : new FormGroup({
       backGroundDistractionColor: new FormControl<string>('#FF0000',{nonNullable: true, validators: [Validators.required]}),
       minDistractionDurationTime: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
-      maxDistractionDurationTime: new FormControl<number>(2000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
+      maxDistractionDurationTime: new FormControl<number>(5000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
       useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
       flashing: new FormGroup({
         flashColor: new FormControl<string>('#000000',{nonNullable: true, validators: [Validators.required]}),
@@ -62,7 +62,7 @@ export class RoundsGeneratorComponent implements OnInit{
       distractingShapeTypes: new FormControl<string[]>([], {nonNullable: true, validators: [Validators.required]}),
       distractingShapeColor: new FormControl<string>('#FFA500', {nonNullable: true, validators: [Validators.required]}),
       minDistractionDurationTime: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
-      maxDistractionDurationTime: new FormControl<number>(2000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
+      maxDistractionDurationTime: new FormControl<number>(5000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
       useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
       flashing: new FormGroup({
         flashColor: new FormControl<string>('#FFFF00', {nonNullable: true, validators: [Validators.required]}),

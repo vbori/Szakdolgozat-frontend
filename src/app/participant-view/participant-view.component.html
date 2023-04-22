@@ -17,13 +17,13 @@
     <mat-step [editable]="false" [completed]="false" >
       <ng-template matStepLabel>Experiment</ng-template>
       <ng-template matStepContent>
-        <app-experiment [experimentId]="participant.experimentId" [participantId]="participant._id" [demoMode]="demoMode" (finishedExperiment)="onFinish()"></app-experiment>
+        <app-experiment [experimentId]="participant.experimentId" [participantId]="participant._id" [demoMode]="demoMode" [controlMode]="participant.inControlGroup" (finishedExperiment)="onFinish()"></app-experiment>
       </ng-template>
     </mat-step>
     <mat-step [editable]="false">
       <ng-template matStepLabel>Thank you</ng-template>
       <ng-template matStepContent>
-        <app-thank-you-page [experimentId]="participant.experimentId" [demoMode]="demoMode" ></app-thank-you-page>
+        <app-thank-you-page [experimentId]="participant.experimentId" [demoMode]="demoMode"></app-thank-you-page>
       </ng-template>
     </mat-step>
   </mat-stepper>
