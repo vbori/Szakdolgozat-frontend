@@ -9,6 +9,7 @@ import { Experiment } from 'src/app/common/models/experiment.model';
 export class RoundCreationComponent {
   @Input() experiment: Experiment | undefined
   @Output() experimentChange = new EventEmitter<Experiment>();
+  selectedTabIndex = 0;
 
   onExperimentChange(experiment: Experiment){
     this.experiment = experiment;

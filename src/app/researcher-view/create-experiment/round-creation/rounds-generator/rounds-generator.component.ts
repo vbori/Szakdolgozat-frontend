@@ -19,11 +19,11 @@ export class RoundsGeneratorComponent implements OnInit{
 
   shapeTypes = ['Circle', 'Square', 'Rectangle'] //TODO: get this from the interface Object.values<ShapeType>({} as {[K in ShapeType]: K});
 
-  roundGeneratorForm = new FormGroup({ //TODO: instead of magic numbers, use constants
-    setNum: new FormControl<number>(1,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(100)]}),
-    roundNum: new FormControl<number>(10,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(100)]}),
-    practiceRoundNum: new FormControl<number>(3, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(10)]}),
-    restTimeSec: new FormControl<number>(10, {nonNullable: true, validators: [Validators.required, Validators.min(0), Validators.max(60)]}),
+  roundGeneratorForm = new FormGroup({
+    setNum: new FormControl<number>(1,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM)]}),
+    roundNum: new FormControl<number>(10,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM)]}),
+    practiceRoundNum: new FormControl<number>(3, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_PRACTICE_ROUND_NUM)]}),
+    restTimeSec: new FormControl<number>(10, {nonNullable: true, validators: [Validators.required, Validators.min(0), Validators.max(this.constants.MAX_REST_TIME_SEC)]}),
     backgroundColor: new FormControl<string>('#FFFFFF', {nonNullable: true, validators: [Validators.required]}),
     targetShapeColor: new FormControl<string>('#00FF00',{nonNullable: true, validators: [Validators.required]}),
     baseShapeColor: new FormControl<string>('#0000FF', {nonNullable: true, validators: [Validators.required]}),
@@ -33,40 +33,40 @@ export class RoundsGeneratorComponent implements OnInit{
     changePosition: new FormControl<boolean>(false, {nonNullable: true}),
     changeShapeSize: new FormControl<boolean>(false, {nonNullable: true}),
     twoDimensional: new FormControl<boolean>(false, {nonNullable: true}),
-    canvasHeight: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(100), Validators.max(1000)]}),
-    canvasWidth: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(100), Validators.max(1000)]}),
+    canvasHeight: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_CANVAS_HEIGHT), Validators.max(this.constants.MAX_CANVAS_HEIGHT)]}),
+    canvasWidth: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_CANVAS_WIDTH), Validators.max(this.constants.MAX_CANVAS_WIDTH)]}),
     baseShapeType: new FormControl<string[]>([], {nonNullable: true, validators: [Validators.required]}),
     targetShapeType: new FormControl<string[]>([], {nonNullable: true, validators: [Validators.required]}),
-    minWidth: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
-    maxWidth: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
-    minHeight: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
-    maxHeight: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
+    minWidth: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE)]}),
+    maxWidth: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE)]}),
+    minHeight: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE)]}),
+    maxHeight: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE)]}),
     backgroundDistractionConfig : new FormGroup({
       backGroundDistractionColor: new FormControl<string>('#FF0000',{nonNullable: true, validators: [Validators.required]}),
-      minDistractionDurationTime: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
-      maxDistractionDurationTime: new FormControl<number>(5000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
+      minDistractionDurationTime: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME)]}),
+      maxDistractionDurationTime: new FormControl<number>(5000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME)]}),
       useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
       flashing: new FormGroup({
         flashColor: new FormControl<string>('#000000',{nonNullable: true, validators: [Validators.required]}),
-        flashFrequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(100)]}),
+        flashFrequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_FLASHING_FREQUENCY), Validators.max(this.constants.MAX_FLASHING_FREQUENCY)]}),
       })
     },{
       validators: [
         ExperimentRoundsValidator.conflictingValuesValidator('minDistractionDurationTime','maxDistractionDurationTime')
       ]}),
     distractingShapeConfig: new FormGroup({
-      distractingShapeMinWidth: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
-      distractingShapeMaxWidth: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
-      distractingShapeMinHeight: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
-      distractingShapeMaxHeight: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(10), Validators.max(200)]}),
+      distractingShapeMinWidth: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE)]}),
+      distractingShapeMaxWidth: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE)]}),
+      distractingShapeMinHeight: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE)]}),
+      distractingShapeMaxHeight: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE)]}),
       distractingShapeTypes: new FormControl<string[]>([], {nonNullable: true, validators: [Validators.required]}),
       distractingShapeColor: new FormControl<string>('#FFA500', {nonNullable: true, validators: [Validators.required]}),
-      minDistractionDurationTime: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
-      maxDistractionDurationTime: new FormControl<number>(5000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(5000)]}),
+      minDistractionDurationTime: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME)]}),
+      maxDistractionDurationTime: new FormControl<number>(2000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME)]}),
       useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
       flashing: new FormGroup({
         flashColor: new FormControl<string>('#FFFF00', {nonNullable: true, validators: [Validators.required]}),
-        flashFrequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(100)]}),
+        flashFrequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_FLASHING_FREQUENCY), Validators.max(this.constants.MAX_FLASHING_FREQUENCY)]}),
       })
     },{
       validators: [
@@ -86,7 +86,8 @@ export class RoundsGeneratorComponent implements OnInit{
 
   //TODO: add refresh guard
 
-  constructor(private experimentService: ExperimentService, private constants: ExperimentCreationConstants) { }
+  constructor(private experimentService: ExperimentService, public readonly constants: ExperimentCreationConstants) {
+  }
 
   ngOnInit(): void {
     this.roundGeneratorForm.get('backgroundDistractionConfig')?.disable();

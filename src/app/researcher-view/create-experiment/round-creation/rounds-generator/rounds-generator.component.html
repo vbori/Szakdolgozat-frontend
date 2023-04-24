@@ -4,32 +4,31 @@
     <mat-label>Number of sets</mat-label>
     <input matInput formControlName="setNum" type="number"/>
     <mat-error *ngIf="roundGeneratorForm.controls.setNum.invalid">
-      Number of sets must be between 1 and 100!
+      Number of sets must be between 1 and {{constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM}}!
     </mat-error>
-    <!--TODO: instead of magic numbers, use constants-->
   </mat-form-field>
   <mat-form-field>
     <mat-label>Number of rounds in each set</mat-label>
     <input matInput formControlName="roundNum" type="number"/>
     <mat-error *ngIf="roundGeneratorForm.controls.roundNum.invalid">
-      Number of rounds must be between 1 and 100!
+      Number of rounds must be between 1 and {{constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM}}!
     </mat-error>
   </mat-form-field>
   <mat-error *ngIf="roundGeneratorForm.errors?.['tooManyTotalRounds']">
-    The total number of rounds must be between 1 and 100!
+    The total number of rounds must be between 1 and {{constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM}}!
   </mat-error>
   <mat-form-field>
     <mat-label>Number of practice rounds</mat-label>
     <input matInput formControlName="practiceRoundNum" type="number"/>
     <mat-error *ngIf="roundGeneratorForm.controls.practiceRoundNum.invalid">
-      Number of practice rounds must be between 0 and 10!
+      Number of practice rounds must be between 0 and {{constants.MAX_PRACTICE_ROUND_NUM}}!
     </mat-error>
   </mat-form-field>
   <mat-form-field>
     <mat-label>Rest time between sets</mat-label> <!--TODO: add seconds tag-->
     <input matInput formControlName="restTimeSec" type="number"/>
     <mat-error *ngIf="roundGeneratorForm.controls.restTimeSec.invalid">
-      Rest time must be between 0 and 60 seconds!
+      Rest time must be between 0 and {{constants.MAX_REST_TIME_SEC}} seconds!
     </mat-error>
   </mat-form-field>
   <mat-checkbox formControlName="changePosition">Change shape position</mat-checkbox>
@@ -54,14 +53,14 @@
     <mat-label>Canvas height</mat-label>
     <input matInput formControlName="canvasHeight" type="number"/>
     <mat-error *ngIf="roundGeneratorForm.controls.canvasHeight.invalid">
-      Canvas height must be between 100 and 1000!
+      Canvas height must be between {{constants.MIN_CANVAS_HEIGHT}} and {{constants.MAX_CANVAS_HEIGHT}}!
     </mat-error>
   </mat-form-field>
   <mat-form-field>
     <mat-label>Canvas width</mat-label>
     <input matInput formControlName="canvasWidth" type="number"/>
     <mat-error *ngIf="roundGeneratorForm.controls.canvasWidth.invalid">
-      Canvas width must be between 100 and 1000!
+      Canvas width must be between {{constants.MIN_CANVAS_WIDTH}} and {{constants.MAX_CANVAS_WIDTH}}!
     </mat-error>
   </mat-form-field>
   <h4>Shape settings</h4>
@@ -81,7 +80,7 @@
     <mat-label>Minimum width of shapes</mat-label>
     <input matInput formControlName="minWidth" type="number"/>
     <mat-error *ngIf="roundGeneratorForm.controls.minWidth.invalid">
-      Minimum width must be between 10 and 200!
+      Minimum width must be between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!
     </mat-error>
   </mat-form-field>
   <mat-form-field>
@@ -89,13 +88,13 @@
     <input matInput formControlName="maxWidth" type="number"/>
   </mat-form-field>
   <mat-error *ngIf="roundGeneratorForm.controls.maxWidth.invalid || roundGeneratorForm.errors?.['conflictingValuesminWidthmaxWidth']">
-    Maximum width must be between minimum width and 200!
+    Maximum width must be between minimum width and {{constants.MAX_SHAPE_SIZE}}!
   </mat-error>
   <mat-form-field>
     <mat-label>Minimum height of shapes</mat-label>
     <input matInput formControlName="minHeight" type="number"/>
     <mat-error *ngIf="roundGeneratorForm.controls.minHeight.invalid">
-      Minimum height must be between 10 and 200!
+      Minimum height must be between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!
     </mat-error>
   </mat-form-field>
   <mat-form-field>
@@ -103,7 +102,7 @@
     <input matInput formControlName="maxHeight" type="number"/>
   </mat-form-field>
   <mat-error *ngIf="roundGeneratorForm.controls.maxHeight.invalid || roundGeneratorForm.errors?.['conflictingValuesminHeightmaxHeight']">
-    Maximum height must be between minimum height and 200!
+    Maximum height must be between minimum height and {{constants.MAX_SHAPE_SIZE}}!
   </mat-error>
   <mat-form-field >
     <mat-label>Background color</mat-label>
@@ -125,7 +124,7 @@
       <mat-label>Minimum distraction duration time</mat-label>
       <input matInput type="number" formControlName="minDistractionDurationTime" required>
       <mat-error *ngIf="roundGeneratorForm.controls.backgroundDistractionConfig.controls.minDistractionDurationTime.invalid">
-        Minimum distraction duration time must be between 1 and 5000 milliseconds!
+        Minimum distraction duration time must be between 1 and {{constants.MAX_DISTRACTION_DURATION_TIME}} milliseconds!
       </mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -133,7 +132,7 @@
       <input matInput type="number" formControlName="maxDistractionDurationTime" required>
     </mat-form-field>
     <mat-error *ngIf="roundGeneratorForm.controls.backgroundDistractionConfig.controls.maxDistractionDurationTime.invalid || roundGeneratorForm.controls.backgroundDistractionConfig.errors?.['conflictingValuesminDistractionDurationTimemaxDistractionDurationTime']">
-      Maximum distraction duration time must be between minimum distraction duration time and 5000 milliseconds!
+      Maximum distraction duration time must be between minimum distraction duration time and {{constants.MAX_DISTRACTION_DURATION_TIME}} milliseconds!
     </mat-error>
     <mat-checkbox formControlName="useFlashing">Use flashing</mat-checkbox>
     <div *ngIf="roundGeneratorForm.value.backgroundDistractionConfig && roundGeneratorForm.value.backgroundDistractionConfig.useFlashing" formGroupName="flashing">
@@ -141,7 +140,7 @@
         <mat-label>Flash frequency</mat-label>
         <input matInput type="number" formControlName="flashFrequency" required>
         <mat-error *ngIf="roundGeneratorForm.controls.backgroundDistractionConfig.controls.flashing.controls.flashFrequency.invalid">
-          Flash frequency must be between 100 and 1000 milliseconds!
+          Flash frequency must be between {{constants.MIN_FLASHING_FREQUENCY}} and {{constants.MAX_FLASHING_FREQUENCY}} milliseconds!
         </mat-error>
       </mat-form-field>
       <mat-form-field >
@@ -158,7 +157,7 @@
       <mat-label>Minimum width of distracting shape</mat-label>
       <input matInput type="number" formControlName="distractingShapeMinWidth" required>
       <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.distractingShapeMinWidth.invalid">
-        Minimum width must be between 10 and 200!
+        Minimum width must be between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!
       </mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -166,13 +165,13 @@
       <input matInput type="number" formControlName="distractingShapeMaxWidth" required>
     </mat-form-field>
     <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.distractingShapeMaxWidth.invalid || roundGeneratorForm.controls.distractingShapeConfig.errors?.['conflictingValuesdistractingShapeMinWidthdistractingShapeMaxWidth']">
-      Maximum width must be between minimum width and 200!
+      Maximum width must be between minimum width and {{constants.MAX_SHAPE_SIZE}}!
     </mat-error>
     <mat-form-field>
       <mat-label>Minimum height of distracting shape</mat-label>
       <input matInput type="number" formControlName="distractingShapeMinHeight" required>
       <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.distractingShapeMinHeight.invalid">
-        Minimum height must be between 10 and 200!
+        Minimum height must be between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!
       </mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -180,7 +179,7 @@
       <input matInput type="number" formControlName="distractingShapeMaxHeight" required>
     </mat-form-field>
     <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.distractingShapeMaxHeight.invalid || roundGeneratorForm.controls.distractingShapeConfig.errors?.['conflictingValuesdistractingShapeMinHeightdistractingShapeMaxHeight']">
-      Maximum height must be between minimum height and 200!
+      Maximum height must be between minimum height and {{constants.MAX_SHAPE_SIZE}}!
     </mat-error>
     <mat-form-field>
       <mat-label>Distracting shape types</mat-label>
@@ -196,7 +195,7 @@
       <mat-label>Minimum distraction duration time</mat-label>
       <input matInput type="number" formControlName="minDistractionDurationTime" required>
       <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.minDistractionDurationTime.invalid">
-        Minimum distraction duration time must be between 1 and 5000 milliseconds!
+        Minimum distraction duration time must be between 1 and {{constants.MAX_DISTRACTION_DURATION_TIME}} milliseconds!
       </mat-error>
     </mat-form-field>
     <mat-form-field>
@@ -204,13 +203,16 @@
       <input matInput type="number" formControlName="maxDistractionDurationTime" required>
     </mat-form-field>
     <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.maxDistractionDurationTime.invalid || roundGeneratorForm.controls.distractingShapeConfig.errors?.['conflictingValuesminDistractionDurationTimemaxDistractionDurationTime']">
-      Maximum distraction duration time must be between minimum distraction duration time and 5000 milliseconds!
+      Maximum distraction duration time must be between minimum distraction duration time and {{constants.MAX_DISTRACTION_DURATION_TIME}} milliseconds!
     </mat-error>
     <mat-checkbox formControlName="useFlashing">Use flashing</mat-checkbox>
     <div *ngIf="roundGeneratorForm.value.distractingShapeConfig && roundGeneratorForm.value.distractingShapeConfig.useFlashing" formGroupName="flashing">
       <mat-form-field>
         <mat-label>Flash frequency</mat-label>
         <input matInput type="number" formControlName="flashFrequency" required>
+        <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.flashing.controls.flashFrequency.invalid">
+          Flash frequency must be between {{constants.MIN_FLASHING_FREQUENCY}} and {{constants.MAX_FLASHING_FREQUENCY}} milliseconds!
+        </mat-error>
       </mat-form-field>
       <mat-form-field >
         <mat-label>Flash color</mat-label>

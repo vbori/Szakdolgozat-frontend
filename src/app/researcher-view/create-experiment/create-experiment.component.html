@@ -1,8 +1,9 @@
+
 <div class="progress-bar">
   <div class="progress-bar--step" [ngStyle]="{width: stepCount / totalSteps * 100 + '%'}"></div>
 </div>
 <div>
-  <mat-stepper orientation= "horizontal" [linear] = "true" labelPosition="bottom" (selectionChange)="onStepChange($event)" #stepper>
+  <mat-stepper orientation= "horizontal" [linear] = "true" labelPosition="end" (selectionChange)="onStepChange($event)" #stepper>
     <mat-step [completed]="experiment?.name && experiment?.researcherDescription">
       <ng-template matStepLabel>Experiment Basics</ng-template>
       <!--TODO: look into why two-way binding is not reacting toonExperiment Change-->
@@ -24,7 +25,6 @@
         <app-round-creation [experiment]="experiment" (experimentChange) = "onExperimentChange($event)"></app-round-creation>
       </ng-template>
     </mat-step>
-
   </mat-stepper>
 </div>
-<button *ngIf = "stepCount == totalSteps" id="saveExperimentButton" (click)="createExperiment()" mat-raised-button color="primary">Create</button>
+<button class="bigStepperButton" *ngIf = "stepCount == totalSteps" id="saveExperimentButton" (click)="createExperiment()" mat-raised-button color="primary">Create</button>

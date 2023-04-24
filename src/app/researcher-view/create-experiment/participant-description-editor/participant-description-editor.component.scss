@@ -1,8 +1,10 @@
 form {
   display: flex;
+  height: 80%;
   flex-direction: column;
 }
 
 textarea {
   min-height: 100px;
+  height: 90%;
 }

@@ -16,6 +16,8 @@ import { ColorPickerModule } from 'ngx-color-picker';
 import { MATERIAL_MODULES } from './material-index';
 import { ParticipantFormEditorComponent } from './create-experiment/participant-form-editor/participant-form-editor.component';
 import { QuestionCreationComponent } from './create-experiment/participant-form-editor/question-creation/question-creation.component';
+import { FabricCanvasComponent } from './create-experiment/round-creation/manual-configuration/fabric-canvas/fabric-canvas.component';
+import { ShapeFormComponent } from './create-experiment/round-creation/manual-configuration/fabric-canvas/shape-form/shape-form.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +38,9 @@ import { QuestionCreationComponent } from './create-experiment/participant-form-
     RoundsGeneratorComponent,
     ManualConfigurationComponent,
     ParticipantFormEditorComponent,
-    QuestionCreationComponent
+    QuestionCreationComponent,
+    FabricCanvasComponent,
+    ShapeFormComponent
   ],
   imports: [
     CommonModule,

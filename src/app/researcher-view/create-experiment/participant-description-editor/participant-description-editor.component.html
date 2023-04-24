@@ -4,11 +4,11 @@
     <mat-label>Description & instructions for participants</mat-label>
     <textarea matInput formControlName="participantDescription"></textarea>
     <mat-hint>
-      This is the first thing that participants will see when they join your experiment.  
+      Write here everything you want the participants to know about the experiment. You can also add instructions and conditions.
     </mat-hint>
     <mat-error *ngIf="participantDescriptionForm.controls.participantDescription.invalid">
       Please enter a minimum of 10 characters!
     </mat-error>
   </mat-form-field>
-  <button mat-raised-button color="primary"  [disabled]="participantDescriptionForm.invalid">Save & Next</button>
+  <button class="bigStepperButton" mat-raised-button color="primary"  [disabled]="participantDescriptionForm.invalid">Save & Next</button>
 </form>

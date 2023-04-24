@@ -6,13 +6,18 @@ mat-progress-bar {
 .progress-bar {
   border-radius: 10px;
   background-color: rgba(63, 81, 181, 0.25);
-  width: 100%;
+  width: 95%;
   height: 8px;
-  margin: 70px 10px 10px 20px;
+  margin: 70px auto 10px auto;
   &--step {
     background-color: #3f51b5;
     border-radius: 10px;
     height:  100%;
     transition: width 0.5s ease-in-out;
   }
+}
+
+.bigStepperButton {
+  width: 100%;
+  margin-top: 30px;
 }

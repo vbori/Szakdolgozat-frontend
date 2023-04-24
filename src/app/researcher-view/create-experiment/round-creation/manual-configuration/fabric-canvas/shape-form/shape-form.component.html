@@ -1,0 +1,71 @@
+<form [formGroup]="shapeConfigForm">
+  <mat-form-field>
+    <mat-label>Shape</mat-label>
+    <mat-select formControlName="type" (selectionChange)="onTypeChange($event)">
+      <mat-option *ngFor="let shape of shapeTypes" [value]="shape.value">
+        {{shape.viewValue}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field >
+    <mat-label>Color</mat-label>
+    <input matInput formControlName="fill" type="color" #fill (change)="setObjectAttribute('fill', fill.value)">
+  </mat-form-field>
+  <h3>Position</h3>
+  <mat-form-field >
+    <mat-label>Distance from the top of the canvas</mat-label>
+    <input matInput formControlName="top" type="number" #top (input)="setObjectAttribute('top', top.value)">
+    <span matSuffix>px &nbsp;</span>
+    <mat-error>
+      <span *ngIf="shapeConfigForm.controls.top.hasError('required')">Distance from the top of the canvas is required</span>
+      <span *ngIf="!shapeConfigForm.controls.top.hasError('required') && (shapeConfigForm.controls.top.hasError('min') || shapeConfigForm.controls.top.hasError('overLimit'))">The shape can not leave the canvas!</span>
+    </mat-error>
+  </mat-form-field>
+  <mat-form-field >
+    <mat-label>Distance from the left side of the canvas</mat-label>
+    <input matInput formControlName="left" type="number" #left (input)="setObjectAttribute('left', left.value)">
+    <span matSuffix>px &nbsp;</span>
+    <mat-error>
+      <span *ngIf="shapeConfigForm.controls.left.hasError('required')">Distance from the top of the canvas is required</span>
+      <span *ngIf="!shapeConfigForm.controls.left.hasError('required') && (shapeConfigForm.controls.left.hasError('min') || shapeConfigForm.controls.left.hasError('overLimit'))">The shape can not leave the canvas!</span>
+    </mat-error>
+  </mat-form-field>
+  <h3>Size</h3>
+  <mat-form-field *ngIf="shape.type == 'circle'">
+    <mat-label>Radius</mat-label>
+    <input matInput formControlName="radius" (ngModelChange)="onRadiusChange($event)" type="number">
+    <span matSuffix>px &nbsp;</span>
+    <mat-error>
+      <span *ngIf="shapeConfigForm.controls.radius.hasError('required')">Radius is required</span>
+      <span *ngIf="!shapeConfigForm.controls.radius.hasError('required') && (shapeConfigForm.controls.radius.hasError('min') || shapeConfigForm.controls.radius.hasError('max'))">Radius must be between {{constants.MIN_SHAPE_SIZE /2}} and {{constants.MAX_SHAPE_SIZE /2}}</span>
+    </mat-error>
+    <mat-hint>
+      Provide a value between {{constants.MIN_SHAPE_SIZE /2}} and {{constants.MAX_SHAPE_SIZE /2}} pixels
+    </mat-hint>
+  </mat-form-field>
+  <mat-form-field *ngIf="shape.type == 'rect'">
+    <mat-label>Height</mat-label>
+    <input matInput formControlName="height" type="number" #height (input)="setObjectAttribute('height', height.value)">
+    <span matSuffix>px &nbsp;</span>
+    <mat-error>
+      <span *ngIf="shapeConfigForm.controls.height.hasError('required')">Distance from the height of the canvas is required</span>
+      <span *ngIf="!shapeConfigForm.controls.height.hasError('required') && (shapeConfigForm.controls.height.hasError('min') || shapeConfigForm.controls.height.hasError('max'))">Height must be between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!</span>
+    </mat-error>
+    <mat-hint>
+      Provide a value between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}} pixels
+    </mat-hint>
+  </mat-form-field>
+  <mat-form-field *ngIf="shape.type == 'rect'">
+    <mat-label>Width</mat-label>
+    <input matInput formControlName="width" type="number" #width (input)="setObjectAttribute('width', width.value)">
+    <span matSuffix>px &nbsp;</span>
+    <mat-error>
+      <span *ngIf="shapeConfigForm.controls.width.hasError('required')">Distance from the top of the canvas is required</span>
+      <span *ngIf="!shapeConfigForm.controls.width.hasError('required') && (shapeConfigForm.controls.width.hasError('min') || shapeConfigForm.controls.width.hasError('max'))">Width must be between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!</span>
+    </mat-error>
+    <mat-hint>
+      Provide a value between between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}} pixels
+    </mat-hint>
+  </mat-form-field>
+  <button mat-button [disabled]="shapeConfigForm.invalid">Mehetünk</button>
+</form>

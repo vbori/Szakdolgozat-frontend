@@ -1,0 +1,18 @@
+<div class="horizontalFlex">
+  <canvas id="myCanvas" class="canvas"></canvas>
+  <mat-tab-group animationDuration="1000ms" [(selectedIndex)]="selectedTabIndex" dynamicHeight>
+    <mat-tab label="Base shape">
+      <app-shape-form *ngIf="baseShape" [shape] = "baseShape" [canvas]="canvas"></app-shape-form>
+    </mat-tab>
+    <mat-tab label="Target shape">
+      <app-shape-form *ngIf="targetShape" [shape] = "targetShape" [canvas]="canvas"></app-shape-form>
+    </mat-tab>
+    <mat-tab label="Distracting shape">
+      <ng-template matTabContent>
+        <app-shape-form *ngIf="distractingShape" [shape] = "distractingShape" [canvas]="canvas"></app-shape-form>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+

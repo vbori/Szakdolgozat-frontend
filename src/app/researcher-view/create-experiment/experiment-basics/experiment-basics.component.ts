@@ -4,12 +4,11 @@ import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { ExperimentCreationConstants } from '../experiment-creation.constants';
 import { fabric } from 'fabric';
-import { NewRound } from 'src/app/common/models/newRound.model';
 
 @Component({
   selector: 'app-experiment-basics',
   templateUrl: './experiment-basics.component.html',
-  styleUrls: ['./experiment-basics.component.scss']
+  styleUrls: ['./experiment-basics.component.scss', '../create-experiment.component.scss']
 })
 
 export class ExperimentBasicsComponent implements AfterViewInit{
