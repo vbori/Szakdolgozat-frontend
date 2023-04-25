@@ -1,10 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { FabricShape } from 'src/app/common/models/newRound.model';
 import { fabric } from 'fabric';
 import { MatSelectChange } from '@angular/material/select';
 import { ShapeService } from 'src/app/researcher-view/services/shape.service';
 import { ExperimentCreationConstants } from 'src/app/researcher-view/create-experiment/experiment-creation.constants';
+import { MatCheckboxChange } from '@angular/material/checkbox';
+import { Flashing } from 'src/app/common/models/newRound.model';
 
 interface ShapeType {
   value: string;
@@ -17,10 +19,11 @@ interface ShapeType {
   styleUrls: ['./shape-form.component.scss']
 })
 
-export class ShapeFormComponent implements OnInit{
+export class ShapeFormComponent implements OnInit, AfterViewInit{
   @Input() role: string;
   @Input() shape: FabricShape;
   @Input() canvas: fabric.Canvas;
+  @Output() validityChange = new EventEmitter<boolean>();
 
   shapeTypes: ShapeType[] = [
     {value: 'rect', viewValue: 'Rectangle'},
@@ -37,8 +40,8 @@ export class ShapeFormComponent implements OnInit{
     fill: new FormControl<string>('blue', {validators: [Validators.required]}),
     useFlashing: new FormControl<boolean>(false),
     flashing: new FormGroup({
-      color: new FormControl<string>('red', {validators: [Validators.required]}),
-      frequency: new FormControl<number>(1, {validators: [Validators.required, Validators.min(this.constants.MIN_FLASHING_FREQUENCY), Validators.max(this.constants.MAX_FLASHING_FREQUENCY)]}),
+      color: new FormControl<string>('#000000', {validators: [Validators.required]}),
+      frequency: new FormControl<number>(500, {validators: [Validators.required, Validators.min(this.constants.MIN_FLASHING_FREQUENCY), Validators.max(this.constants.MAX_FLASHING_FREQUENCY)]}),
     })
   });
 
@@ -47,39 +50,33 @@ export class ShapeFormComponent implements OnInit{
   ngOnInit(): void {
       this.initializeForm();
       this.addEventHandlers(this.shape);
-
-      /*if(this.shape.type === 'rect'){
-        this.shapeConfigForm.controls['radius'].disable();
-      }else{
-        this.shapeConfigForm.controls['width'].disable();
-        this.shapeConfigForm.controls['height'].disable();
-      }*/
-
-      //this.shape.on('scaling', this.handleObjectScaling.bind(this));
-      //this.shape.on('moving', this.handleObjectMoving.bind(this));
   }
 
-  initializeForm(){
+  ngAfterViewInit(): void {
+    this.shapeConfigForm.statusChanges?.subscribe((status) => {
+      this.validityChange.emit(status === 'VALID');
+    });
+  }
+
+  initializeForm(): void{
     this.shapeConfigForm.controls.left.addValidators([this.checkLimits('left')]);
     this.shapeConfigForm.controls.top.addValidators([this.checkLimits('top')]);
     this.shapeConfigForm.controls.width.setValue(this.shape.width ? this.shape.width : 50);
     this.shapeConfigForm.controls.height.setValue(this.shape.height ? this.shape.height : 50);
     this.shapeConfigForm.controls.left.setValue(this.shape.left ? this.shape.left : 100);
     this.shapeConfigForm.controls.top.setValue(this.shape.top ? this.shape.top : 100);
-    console.log(this.shape.fill)
     this.shapeConfigForm.controls.fill.setValue(this.shape.fill ? this.shape.fill as string : 'blue');
-    console.log(this.shapeConfigForm.controls.fill.value)
     this.shapeConfigForm.controls.radius.setValue(this.shape.radius ? this.shape.radius : 25);
   }
 
-  addEventHandlers(shape: FabricShape){
+  addEventHandlers(shape: FabricShape): void{
     shape.on('scaling', this.handleObjectScaling.bind(this));
     shape.on('moving', this.handleObjectMoving.bind(this));
   }
 
-  onTypeChange(event: MatSelectChange){
+  onTypeChange(event: MatSelectChange): void{
     console.log(event.value)
-    const shape = this.shapeService.createShape(event.value, this.shape);
+    const shape = this.shapeService.changeShapeType(event.value, this.shape);
     if(shape){
       this.addEventHandlers(shape);
       this.canvas.remove(this.shape);
@@ -89,7 +86,7 @@ export class ShapeFormComponent implements OnInit{
     }
   }
 
-  onRadiusChange(value: number){
+  onRadiusChange(value: number): void{
     if(value <= this.constants.MAX_SHAPE_SIZE / 2 && value >= this.constants.MIN_SHAPE_SIZE / 2){
       this.shape.set('width', value * 2);
       this.shape.set('height', value * 2);
@@ -98,7 +95,7 @@ export class ShapeFormComponent implements OnInit{
     }
   }
 
-  handleObjectScaling(){
+  handleObjectScaling(): void{
     if(this.shape.getScaledWidth() > this.constants.MAX_SHAPE_SIZE){
       const newWidth = this.shape.scaleX ? this.constants.MAX_SHAPE_SIZE / this.shape.scaleX : this.constants.MAX_SHAPE_SIZE;
       this.shape.set('width', newWidth);
@@ -121,7 +118,7 @@ export class ShapeFormComponent implements OnInit{
     this.handleObjectMoving();
   }
 
-  handleObjectMoving(){
+  handleObjectMoving(): void{
     if(this.shape.left){
       if(this.shape.left > this.canvas.getWidth() - this.shape.getScaledWidth() ){
         this.shape.set('left', this.canvas.getWidth() - this.shape.getScaledWidth());
@@ -142,7 +139,6 @@ export class ShapeFormComponent implements OnInit{
   }
 
   setObjectAttribute(attribute: keyof FabricShape, value: string) :void {
-
     if(attribute === 'fill'){
       this.shape.set(attribute, value);
     }else{
@@ -165,7 +161,7 @@ export class ShapeFormComponent implements OnInit{
     this.canvas.renderAll();
   }
 
-  getLimits(attribute: keyof FabricShape): {minLimit: number | undefined, maxLimit: number | undefined}{
+  getLimits(attribute: string): {minLimit: number | undefined, maxLimit: number | undefined}{
     let minLimit;
     let maxLimit;
     switch(attribute){
@@ -182,6 +178,10 @@ export class ShapeFormComponent implements OnInit{
         minLimit = 0;
         maxLimit = this.canvas.getHeight() - this.shape.getScaledHeight();
         break;
+      case 'frequency':
+        minLimit = this.constants.MIN_FLASHING_FREQUENCY;
+        maxLimit = this.constants.MAX_FLASHING_FREQUENCY;
+        break;
       default:
         break;
     }
@@ -194,6 +194,30 @@ export class ShapeFormComponent implements OnInit{
     return (control: AbstractControl):  ValidationErrors | null => {
       const {minLimit, maxLimit} = this.getLimits(attribute);
       return (minLimit != undefined && maxLimit != undefined && parseFloat(control.value) <= maxLimit && parseFloat(control.value) >= minLimit) || minLimit == undefined || maxLimit == undefined  ? null : { overLimit: true }
+    }
+  }
+
+  setFlashing(event: MatCheckboxChange): void{
+    if(event.checked){
+      this.shape.set('flashing', {color: this.shapeConfigForm.value.flashing?.color ?? '#000000', frequency: this.shapeConfigForm.value.flashing?.frequency ?? 500});
+      this.shapeConfigForm.controls.flashing?.enable();
+    }else{
+      this.shape.set('flashing', undefined);
+      this.shapeConfigForm.controls.flashing?.disable();
+    }
+  }
+
+  changeFlashing(attribute: keyof Flashing, value: string): void{
+    if(this.shape.flashing){
+      if(attribute === 'color'){
+        this.shape.flashing.color = value;
+      }else if(attribute === 'frequency'){
+        const {minLimit, maxLimit} = this.getLimits(attribute);
+        if(minLimit != undefined && maxLimit != undefined && parseFloat(value) <= maxLimit && parseFloat(value) >= minLimit){
+          this.shape.flashing.frequency = Math.floor(parseInt(value));
+        }
+      }
+      console.log(this.shape.flashing);
     }
   }
 }

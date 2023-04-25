@@ -11,7 +11,7 @@ input[type="color"] {
   border: none;
   border-radius: 10px;
   width: 23px;
-  height: 20px;
+  height: 0px;
   cursor: pointer;
 }
 input[type="color"]::-webkit-color-swatch {
@@ -24,4 +24,3 @@ input[type="color"]::-webkit-color-swatch-wrapper {
   border-radius: 10px;
   padding: 0;
 }
-

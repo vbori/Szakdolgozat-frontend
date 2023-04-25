@@ -10,6 +10,7 @@
   <mat-form-field>
     <mat-label>Description</mat-label>
     <textarea matInput formControlName="researcherDescription"></textarea>
+    <mat-hint>Only you will see this</mat-hint>
     <mat-error *ngIf="experimentBasicsForm.controls.researcherDescription.invalid">
       Please enter a minimum of 6 characters!
     </mat-error>
@@ -24,14 +25,16 @@
   <mat-form-field>
     <mat-label>Control group chance</mat-label>
     <input type="number" matInput formControlName="controlGroupChance">
+    <span matSuffix>% &nbsp;</span>
     <mat-error *ngIf="experimentBasicsForm.controls.controlGroupChance.invalid">
-      The control group chance must be between 0 and 100!
+      The control group chance must be between 0% and 100%!
     </mat-error>
   </mat-form-field>
   <mat-checkbox formControlName="positionArrayNeeded">Track cursor positions periodically</mat-checkbox>
   <mat-form-field *ngIf="experimentBasicsForm.value.positionArrayNeeded">
     <mat-label>Position tracking frequency</mat-label>
     <input matInput type="number" formControlName="positionTrackingFrequency">
+    <span matSuffix>ms &nbsp;</span>
     <mat-hint>Give a value between 100 and 1000 milliseconds</mat-hint>
   </mat-form-field>
   <mat-checkbox formControlName="cursorPathImageNeeded">Save the path of the participant's cursor as an image</mat-checkbox>
@@ -44,7 +47,7 @@
       <mat-hint>Choose whether the images should display the shapes' and background's current color besides the path, or only the shapes' outline.</mat-hint>
     </mat-form-field>
     <div id="container">
-      <div>
+      <div> <!--FIXME: crooked shape images-->
         <canvas id="outlineCanvas" class="canvas"></canvas>
         <p>Outline only</p>
       </div>

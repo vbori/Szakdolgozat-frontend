@@ -47,8 +47,8 @@ export class RoundsGeneratorComponent implements OnInit{
       maxDistractionDurationTime: new FormControl<number>(5000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME)]}),
       useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
       flashing: new FormGroup({
-        flashColor: new FormControl<string>('#000000',{nonNullable: true, validators: [Validators.required]}),
-        flashFrequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_FLASHING_FREQUENCY), Validators.max(this.constants.MAX_FLASHING_FREQUENCY)]}),
+        color: new FormControl<string>('#000000',{nonNullable: true, validators: [Validators.required]}),
+        frequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_FLASHING_FREQUENCY), Validators.max(this.constants.MAX_FLASHING_FREQUENCY)]}),
       })
     },{
       validators: [
@@ -65,8 +65,8 @@ export class RoundsGeneratorComponent implements OnInit{
       maxDistractionDurationTime: new FormControl<number>(2000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME)]}),
       useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
       flashing: new FormGroup({
-        flashColor: new FormControl<string>('#FFFF00', {nonNullable: true, validators: [Validators.required]}),
-        flashFrequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_FLASHING_FREQUENCY), Validators.max(this.constants.MAX_FLASHING_FREQUENCY)]}),
+        color: new FormControl<string>('#FFFF00', {nonNullable: true, validators: [Validators.required]}),
+        frequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_FLASHING_FREQUENCY), Validators.max(this.constants.MAX_FLASHING_FREQUENCY)]}),
       })
     },{
       validators: [

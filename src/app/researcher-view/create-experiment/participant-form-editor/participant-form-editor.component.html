@@ -1,12 +1,15 @@
 <div>
   <h1>Create a custom form to collect information about the participants!</h1>
-  <!--TODO: allow opting out of form creation-->
   <ng-container *ngFor="let question of questions; let i=index;">
+    <h3>Question {{i+1}}</h3>
     <app-question-creation [question]="question" (questionChange)="onQuestionChange()"  (validityChange)="onValidityChange(i, $event)"></app-question-creation>
     <button mat-raised-button color="primary" (click)="removeQuestion(i)" [disabled]="questions.length == 1">Remove Question</button>
+    <mat-divider></mat-divider>
   </ng-container>
 
-  <button mat-raised-button color="primary" (click)="addQuestion()">Add Question</button>
-  <button mat-raised-button color="primary" (click)="saveForm()" [disabled]="isSubmitDisabled()">Create and Save Form</button>
-  <button mat-raised-button color="primary" (click)="noForm()">I don't need a form</button>
+  <div class="buttonsContainer">
+    <button mat-raised-button color="primary" (click)="addQuestion()">Add Question</button>
+    <button mat-raised-button color="primary" (click)="saveForm()" [disabled]="isSubmitDisabled()">Create and Save Form</button>
+    <button mat-raised-button color="primary" (click)="noForm()">I don't need a form</button>
+  </div>
 </div>

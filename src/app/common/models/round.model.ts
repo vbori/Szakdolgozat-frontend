@@ -1,7 +1,7 @@
 //TODO: review whether this will be needed
 export interface Flashing {
-  flashColor: string;
-  flashFrequency: number;
+  color: string;
+  frequency: number;
 }
 
 interface Point {

@@ -34,23 +34,23 @@
       <div *ngSwitchCase="'select'">
         <mat-form-field>
           <mat-label>{{question.label}}</mat-label>
-          <mat-select required="question.required" [formControlName]="question.questionId" >
+          <mat-select required="question.required" [formControlName]="question.questionId" multiple>
             <mat-option *ngFor="let option of question.options"  [value]="option.optionLabel">{{ option.optionLabel }}</mat-option>
           </mat-select>
           <mat-error *ngIf="form.controls[question.questionId].invalid">
             Please select an option!
           </mat-error>
         </mat-form-field>
-        
+
         <!---
         <div *ngFor="let option of question.options">
           <mat-radio-button [value]="option.optionLabel" [formControlName]="question.questionId" required="question.required">{{option.optionLabel}}</mat-radio-button>
         </div> -->
       </div>
       <div *ngSwitchCase="'checkbox'">
-        <mat-checkbox [formControlName]="question.questionId" required="question.required">{{question.label}}</mat-checkbox>
+        <mat-checkbox [formControlName]="question.questionId" required="question.required">{{question.label}}</mat-checkbox> <!--FIXME: required doesn't work-->
       </div>
     </div>
   </ng-container>
-  <button mat-button [disabled]="form.invalid">Next</button>
+  <button mat-button [disabled]="this.form ? form.invalid : false">Next</button>  <!--FIXME: ExpressionChangedAfterItHasBeenCheckedError-->
 </form>

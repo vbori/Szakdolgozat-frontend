@@ -11,6 +11,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import {MatSliderModule} from '@angular/material/slider';
 
 export const MATERIAL_MODULES = [
   MatTabsModule,
@@ -26,4 +27,5 @@ export const MATERIAL_MODULES = [
   MatStepperModule,
   MatSelectModule,
   MatCheckboxModule,
+  MatSliderModule
 ];

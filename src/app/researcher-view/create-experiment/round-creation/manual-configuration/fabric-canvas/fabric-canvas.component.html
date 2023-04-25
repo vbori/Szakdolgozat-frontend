@@ -1,18 +1,69 @@
+<form [formGroup]="distractionForm">
+  <mat-form-field >
+    <mat-label>Background color</mat-label>
+    <input matInput formControlName="backgroundColor" type="color" (change)="onBackgroundChange()">
+  </mat-form-field>
+  <h3>Distraction settings</h3>
+  <mat-checkbox formControlName="useBackgroundDistraction" (change)="setBackgroundDistraction($event)">Use background distraction</mat-checkbox>
+  <mat-checkbox formControlName="useShapeDistraction" (change)="setShapeDistraction($event)">Use shape distraction</mat-checkbox>
+  <div *ngIf="distractionForm.value.useBackgroundDistraction" formGroupName="backgroundDistraction">
+    <h4>Background distraction settings</h4>
+    <mat-form-field>
+      <mat-label>Distraction duration time</mat-label>
+      <input matInput type="number" formControlName="duration" (change)="changeBackgroundDistractionDuration()" required>
+      <span matSuffix>ms &nbsp;</span>
+      <mat-error *ngIf="distractionForm.controls.backgroundDistraction.controls.duration.invalid">
+        Distraction duration time must be between 1 and {{constants.MAX_DISTRACTION_DURATION_TIME}} milliseconds!
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field >
+      <mat-label>Distracting background color</mat-label>
+      <input matInput formControlName="color" type="color" (change)="changeBackgroundDistractionColor()">
+    </mat-form-field>
+    <mat-checkbox formControlName="useFlashing" (change)="setBackgroundFlashing($event)">Use flashing</mat-checkbox>
+    <div *ngIf="distractionForm.value.backgroundDistraction?.useFlashing" formGroupName="flashing">
+      <mat-form-field>
+        <mat-label>Flash frequency</mat-label>
+        <input matInput type="number" formControlName="frequency" required (change)="changeBackgroundDistractionFlashingFrequency()">
+        <span matSuffix>ms &nbsp;</span>
+        <mat-error *ngIf="distractionForm.controls.backgroundDistraction.controls.flashing.controls.frequency.invalid">
+          Flash frequency must be between {{constants.MIN_FLASHING_FREQUENCY}} and {{constants.MAX_FLASHING_FREQUENCY}} milliseconds!
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field >
+        <mat-label>Flash color</mat-label>
+        <input matInput formControlName="color" type="color" (change)="changeBackgroundDistractionFlashingColor()">
+      </mat-form-field>
+    </div>
+  </div>
+  <div *ngIf="distractionForm.value.useShapeDistraction">
+    <h4>Shape distraction settings</h4>
+    <mat-form-field>
+      <mat-label>Distraction duration time</mat-label>
+      <input matInput type="number" formControlName="shapeDistractionDuration" (change)="changeShapeDistractionDuration()" required>
+      <span matSuffix>ms &nbsp;</span>
+      <mat-error *ngIf="distractionForm.controls.backgroundDistraction.controls.duration.invalid">
+        Distraction duration time must be between 1 and {{constants.MAX_DISTRACTION_DURATION_TIME}} milliseconds!
+      </mat-error>
+    </mat-form-field>
+  </div>
+</form>
 <div class="horizontalFlex">
-  <canvas id="myCanvas" class="canvas"></canvas>
-  <mat-tab-group animationDuration="1000ms" [(selectedIndex)]="selectedTabIndex" dynamicHeight>
-    <mat-tab label="Base shape">
-      <app-shape-form *ngIf="baseShape" [shape] = "baseShape" [canvas]="canvas"></app-shape-form>
-    </mat-tab>
-    <mat-tab label="Target shape">
-      <app-shape-form *ngIf="targetShape" [shape] = "targetShape" [canvas]="canvas"></app-shape-form>
-    </mat-tab>
-    <mat-tab label="Distracting shape">
-      <ng-template matTabContent>
-        <app-shape-form *ngIf="distractingShape" [shape] = "distractingShape" [canvas]="canvas"></app-shape-form>
-      </ng-template>
-    </mat-tab>
-  </mat-tab-group>
+  <canvas [id]="'canvas' + roundIdx" class="canvas"></canvas>
+  <div>
+    <mat-tab-group animationDuration="1000ms" [(selectedIndex)]="selectedTabIndex" dynamicHeight>
+      <mat-tab label="Base shape">
+        <app-shape-form *ngIf="baseShape" (validityChange)="onValidityChange($event, 'baseShape')" [shape] = "baseShape" [canvas]="canvas"></app-shape-form>
+      </mat-tab>
+      <mat-tab label="Target shape">
+        <app-shape-form *ngIf="targetShape" (validityChange)="onValidityChange($event, 'targetShape')" [shape] = "targetShape" [canvas]="canvas"></app-shape-form>
+      </mat-tab>
+      <mat-tab label="Distracting shape" *ngIf="distractionForm.value.useShapeDistraction">
+          <app-shape-form *ngIf="distractingShape" (validityChange)="onValidityChange($event, 'distractingShape')" [shape] = "distractingShape" [canvas]="canvas"></app-shape-form>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
 </div>
 
 

@@ -17,8 +17,8 @@ export class ExperimentComponent implements OnInit{
   @Input() controlMode: boolean;
   @Output() finishedExperiment = new EventEmitter();
 
-  cursorImageMode: string | null = null;
-  positionTrackingFrequency: number | null = null;
+  cursorImageMode: string | undefined = undefined;
+  positionTrackingFrequency: number | undefined = undefined;
 
   mainCanvas: fabric.Canvas;
   hiddenCanvas: any; //TODO: type this
@@ -42,10 +42,7 @@ export class ExperimentComponent implements OnInit{
   timeNeeded: number;
   cursorPositions: Position[] = [];
   cursorPathLength: number = 0;
-
-  //TODO: get this from the server
-  rounds: NewRound[] = [
-    {"objects":[{"type":"rect","target":false, "originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"green", "distraction": false},{"type":"rect","target":false, "originX":"center","originY":"center","left":300,"top":300,"width":150,"height":150,"fill":"green", "distraction": true, "flashing": {"color": "red","frequency": 500}},{"type":"circle","target":true,"baseColor":"yellow", "flashing": {"color": "red","frequency": 500},"originX":"center","originY":"center","left":300,"top":400,"width":200,"height":200,"fill":"yellow","radius":100, "distraction": false}],"background":"black","canvasHeight":1000,"canvasWidth":1000, "shapeDistractionDuration":3000, "roundId": "641dd2cb416e154f1ad8b12f", "roundIdx": 1}, {"objects":[{"type":"rect","target":false,"originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"#29477F", "distraction": false},{"type":"circle","target":true,"originX":"center","originY":"center","left":100,"top":400,"width":200,"height":200,"fill":"rgb(166,111,213)","radius":100,"distraction": false}],"background":"red","canvasHeight":500,"canvasWidth":500, "roundId": "641dd2cb416e154f1ad8b12f", "roundIdx": 2},{"objects":[{"type":"rect","target":false,"originX":"center","originY":"center","left":300,"top":150,"width":150,"height":150,"fill":"green", "distraction": false},{"type":"circle","target":true, "baseColor":"yellow", "flashing": {"color": "red","frequency": 500},  "originX":"center","originY":"center","left":300,"top":400,"width":200,"height":200,"fill":"yellow","radius":100, "distraction": false}],"background":"black","canvasHeight":500,"canvasWidth":500,"backgroundDistraction": {"color": "white","duration":  2000,"flashing": {"color":"blue","frequency":500}}, "roundId": "641dd2cb416e154f1ad8b12f", "roundIdx": 3}];
+  rounds: NewRound[];
 
   constructor(private readonly experimentService: ExperimentService) { }
 
@@ -54,19 +51,16 @@ export class ExperimentComponent implements OnInit{
       next: (response) => {
         console.log(response.rounds);
         this.cursorImageMode = response.cursorImageMode;
+        console.log("cursorImageMode",this.cursorImageMode)
         this.positionTrackingFrequency = response.positionTrackingFrequency;
+        this.rounds = response.rounds;
+        this.maxCount = this.rounds.length;
         this.playRound(this.rounds[this.counter]);
-
-        /*this.rounds = response.rounds;
-        this.maxCount = this.rounds.length; */
       },
       error: (error) => {
         console.log(error); //TODO: display error message
       }
     });
-
-    this.maxCount = this.rounds.length;
-
   }
 
   ngAfterViewInit(): void {
@@ -81,16 +75,16 @@ export class ExperimentComponent implements OnInit{
     this.mainCanvas.on('mouse:down', ({e}) => this.handleMouseDown(e));
   }
 
-  playRound(round: NewRound) {
+  playRound(round: NewRound): void {
     this.initializeRound();
     this.setBackground(round);
     this.loadMainCanvas(round);
-    if(this.cursorImageMode != null){
+    if(this.cursorImageMode){
       this.loadHiddenCanvas(round);
     }
   }
 
-  initializeRound(){
+  initializeRound(): void{
     if(this.positionTrackingFrequency){
       this.positionTracker = setInterval(() => {
         this.trackable = true;
@@ -105,7 +99,7 @@ export class ExperimentComponent implements OnInit{
     this.shapeDistractionOn = undefined;
   }
 
-  setBackground(round: NewRound){
+  setBackground(round: NewRound): void{
     this.background = round.background;
     this.distractingBackground = round.backgroundDistraction?.color;
     if(round.backgroundDistraction?.flashing?.color){
@@ -199,7 +193,7 @@ export class ExperimentComponent implements OnInit{
       clearInterval(this.positionTracker);
     }
 
-    if(this.cursorImageMode != null){
+    if(this.cursorImageMode){
       this.hiddenCanvas.freeDrawingBrush._finalizeAndAddPath();
       this.hiddenCanvas.isDrawingMode = false;
     }
@@ -207,7 +201,7 @@ export class ExperimentComponent implements OnInit{
 
   handleBaseShapeHover(): void {
     if(!this.clicked){
-      if(this.cursorImageMode != null && !this.hiddenCanvas.isDrawingMode){
+      if(this.cursorImageMode && !this.hiddenCanvas.isDrawingMode){
         this.hiddenCanvas.isDrawingMode = true;
         this.hiddenCanvas.freeDrawingBrush = new fabric.PencilBrush(this.hiddenCanvas);
       }
@@ -295,7 +289,7 @@ export class ExperimentComponent implements OnInit{
   }
 
   saveResults(counter: number): void{
-    if(this.cursorImageMode != null){
+    if(this.cursorImageMode){
       const imageData = this.hiddenCanvas.toDataURL("image/jpeg", 0.75);
       this.experimentService.saveImage(imageData, this.experimentId, this.participantId, counter).subscribe({
         next: (response) => {
@@ -312,11 +306,11 @@ export class ExperimentComponent implements OnInit{
     let result: Result;
     console.log("saving result")
     console.log(this.participantId);
-    if(this.positionTrackingFrequency != null){
+    if(this.positionTrackingFrequency){
       result = {
         experimentId: this.experimentId,
         participantId: this.participantId,
-        roundId: this.rounds[counter].roundId,
+        roundId: this.rounds[counter]._id,
         roundIdx: this.rounds[counter].roundIdx,
         timeNeeded: this.timeNeeded,
         cursorPathLength: this.cursorPathLength,
@@ -328,7 +322,7 @@ export class ExperimentComponent implements OnInit{
       result = {
         experimentId: this.experimentId,
         participantId: this.participantId,
-        roundId: this.rounds[counter].roundId,
+        roundId: this.rounds[counter]._id,
         roundIdx: this.rounds[counter].roundIdx,
         timeNeeded: this.timeNeeded,
         clicks: this.clicks,

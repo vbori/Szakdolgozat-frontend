@@ -16,8 +16,6 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; margin-top:
   &::-webkit-scrollbar {
     display: none;
   }
-
-
 }
 
 @media (pointer: none), (pointer: coarse) {
@@ -62,4 +60,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; margin-top:
   display:none;
 }
 
+mat-divider {
+  margin: 10px 0 !important;
+}
 

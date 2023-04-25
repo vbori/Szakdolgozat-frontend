@@ -6,6 +6,7 @@ import { environment } from 'src/environments/environment';
 import { Round } from '../models/round.model';
 import { Form } from '../models/form.model';
 import { Result } from '../models/result.model';
+import { NewRound } from '../models/newRound.model';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +32,7 @@ export class ExperimentService {
     return this.http.get<ExperimentExtract[]>(`${environment.baseUrl}/research?status=${status}`, { headers });
   }
 
-  public createExperiment(name: string, researcherDescription: string, maxParticipantNum: number, controlGroupChance: number, cursorImageMode: string | null, positionTrackingFrequency: number | null): Observable<Experiment> {
+  public createExperiment(name: string, researcherDescription: string, maxParticipantNum: number, controlGroupChance: number, cursorImageMode: string | undefined, positionTrackingFrequency: number | undefined): Observable<Experiment> {
     let headers = new HttpHeaders({
       "Authorization": 'Bearer ' + localStorage.getItem('accessToken'),
     });
@@ -69,8 +70,8 @@ export class ExperimentService {
     return this.http.get<string>(`${environment.baseUrl}/participant/getDescription/${experimentId}/${demoMode}`);
   }
 
-  public getRoundsAndTrackingInfo(experimentId: string): Observable<{rounds: Round[], cursorImageMode: string | null, positionTrackingFrequency: number | null}> {
-    return this.http.get<{rounds: Round[], cursorImageMode: string | null, positionTrackingFrequency: number | null}>(`${environment.baseUrl}/participant/getRoundsAndTrackingInfo/${experimentId}`);
+  public getRoundsAndTrackingInfo(experimentId: string): Observable<{rounds: NewRound[], cursorImageMode: string | undefined, positionTrackingFrequency: number | undefined}> {
+    return this.http.get<{rounds: NewRound[], cursorImageMode: string | undefined, positionTrackingFrequency: number | undefined}>(`${environment.baseUrl}/participant/getRoundsAndTrackingInfo/${experimentId}`);
   }
 
   public getForm(experimentId: string): Observable<Form> {

@@ -2,12 +2,12 @@
   <mat-form-field>
     <mat-label>Question ID</mat-label>
     <input name="idInput" matInput [(ngModel)]="question.questionId" type="text" required/>
-    <mat-hint>E.g. "age", "educationLevel", "sleepTime"</mat-hint>
+    <mat-hint>The participant's answer will be labeled with this (e.g. "age", "educationLevel", "sleepTime)"</mat-hint>
   </mat-form-field>
   <mat-form-field>
     <mat-label>Question / label</mat-label>
     <input name="labelInput" matInput [(ngModel)]="question.label" type="text" required/>
-    <mat-hint>E.g. "Age", "Level of education", "How much did you sleep last night?"</mat-hint>
+    <mat-hint>This will be displayed for the participants (e.g. "Age", "Level of education", "How much did you sleep last night?")</mat-hint>
   </mat-form-field>
   <mat-form-field>
     <mat-label>Answer type</mat-label>
@@ -20,7 +20,7 @@
     <div *ngFor="let option of question.options; let i = index">
       <mat-form-field>
         <mat-label>Option{{i+1}}</mat-label>
-        <input name="optionLabelInput" matInput [(ngModel)]="option.optionLabel" type="text" required>
+        <input name="optionLabelInput" matInput [value]="option.optionLabel" (change)="onOptionChange(i, $event)" type="text" required>
         <mat-error >
           Please enter a minimum of 1 character!
         </mat-error>

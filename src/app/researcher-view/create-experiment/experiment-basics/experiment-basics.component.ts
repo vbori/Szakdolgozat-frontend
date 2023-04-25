@@ -60,13 +60,13 @@ export class ExperimentBasicsComponent implements AfterViewInit{
 
   createExperiment(){
     let {name, researcherDescription, maxParticipantNum, controlGroupChance, cursorPathImageNeeded} = this.experimentBasicsForm.value;
-    let positionTrackingFrequency = null;
-    let cursorImageMode = null;
+    let positionTrackingFrequency: number | undefined = undefined;
+    let cursorImageMode = undefined;
 
-    if(this.experimentBasicsForm.controls.positionArrayNeeded)
-      positionTrackingFrequency = this.experimentBasicsForm.controls.positionTrackingFrequency.value;
-    if(this.experimentBasicsForm.controls.cursorPathImageNeeded)
-      cursorImageMode = this.experimentBasicsForm.controls.cursorImageMode.value;
+    if(this.experimentBasicsForm.value.positionArrayNeeded)
+      positionTrackingFrequency = this.experimentBasicsForm.controls.positionTrackingFrequency.value ?? undefined;
+    if(this.experimentBasicsForm.value.cursorPathImageNeeded)
+      cursorImageMode = this.experimentBasicsForm.controls.cursorImageMode.value ?? undefined;
 
     if(name && researcherDescription && maxParticipantNum && controlGroupChance)
       this.experimentService.createExperiment(name, researcherDescription,

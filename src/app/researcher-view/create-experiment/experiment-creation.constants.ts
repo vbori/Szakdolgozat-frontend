@@ -7,9 +7,9 @@ import { Injectable } from '@angular/core';
 export class ExperimentCreationConstants {
     public readonly MAX_TOTAL_EXPERIMENT_ROUND_NUM = 100;
     public readonly MAX_PARTICIPANT_NUM = 50;
-    public readonly MIN_CANVAS_HEIGHT = 200;
-    public readonly MIN_CANVAS_WIDTH = 200;
-    public readonly MAX_CANVAS_HEIGHT = 1000;
+    public readonly MIN_CANVAS_HEIGHT = 400;
+    public readonly MIN_CANVAS_WIDTH = 400;
+    public readonly MAX_CANVAS_HEIGHT = 700;
     public readonly MAX_CANVAS_WIDTH = 1000;
     public readonly MAX_SHAPE_SIZE = 400;
     public readonly MIN_SHAPE_SIZE = 10;

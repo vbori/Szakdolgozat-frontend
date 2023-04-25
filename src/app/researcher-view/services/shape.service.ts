@@ -8,12 +8,12 @@ import { FabricShape } from 'src/app/common/models/newRound.model';
 export class ShapeService {
 
   constructor() { }
-  createShape(type: string, currentShape : FabricShape): FabricShape {
+  changeShapeType(newType: string, currentShape : FabricShape): FabricShape {
     let shape: FabricShape;
     let width = currentShape.getScaledWidth();
     let height = currentShape.getScaledHeight();
     let { left, top, fill, target, distraction, originX, originY } = currentShape;
-    switch (type) {
+    switch (newType) {
       case 'circle':
         let newSize: number;
         if(height && width){

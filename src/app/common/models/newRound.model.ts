@@ -6,7 +6,7 @@ export interface FabricShape extends fabric.Object {
   radius?: number;
 }
 
-interface Flashing{
+export interface Flashing{
   color: string;
   frequency: number;
 }
@@ -16,7 +16,7 @@ export interface NewShape{
   distraction: boolean;
   flashing?: Flashing;
   baseColor?: string;
-  type: ShapeType;
+  type: string;  //TODO: try to refactor to ShapeType
   radius?: number;
   originX: string;
   originY: string;
@@ -32,7 +32,7 @@ export class NewShapeModel implements NewShape{
   distraction: boolean;
   flashing?: Flashing;
   baseColor?: string;
-  type: ShapeType;
+  type: string; //TODO: try to refactor to ShapeType
   radius?: number;
   originX: string;
   originY: string;
@@ -59,7 +59,7 @@ export class NewShapeModel implements NewShape{
   }
 }
 
-interface BackGroundDistraction {
+export interface BackgroundDistraction {
   color: string;
   duration: number;
   flashing?: Flashing;
@@ -67,15 +67,31 @@ interface BackGroundDistraction {
 
 export interface NewRound {
   roundIdx?: number;
-  roundId?: string;
-  isPractice?: boolean;
-  restTimeSec?: number;
+  _id?: string;
   objects: NewShape[];
   canvasHeight: number;
   canvasWidth: number;
   background: string;
   shapeDistractionDuration?: number;
-  backgroundDistraction?: BackGroundDistraction;
+  backgroundDistraction?: BackgroundDistraction;
+}
+
+export class NewRoundClass implements NewRound{
+  roundIdx?: number;
+  _id?: string;
+  objects: NewShape[];
+  canvasHeight: number;
+  canvasWidth: number;
+  background: string;
+  shapeDistractionDuration?: number;
+  backgroundDistraction?: BackgroundDistraction;
+
+  constructor(objects: NewShape[] =  [], canvasHeight: number = 500, canvasWidth: number = 500, background: string = '#fff'){
+    this.objects = objects;
+    this.canvasHeight = canvasHeight;
+    this.canvasWidth = canvasWidth;
+    this.background = background;
+  }
 }
 
 type ShapeType = 'rect' | 'circle'

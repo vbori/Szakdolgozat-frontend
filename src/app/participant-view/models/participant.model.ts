@@ -1,6 +1,6 @@
 export interface Response {
   questionId: string;
-  response: any
+  response: number | boolean | string | string[];
 };
 
 export interface Participant {

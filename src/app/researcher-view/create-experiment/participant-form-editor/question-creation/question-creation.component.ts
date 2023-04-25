@@ -25,8 +25,10 @@ export class QuestionCreationComponent implements AfterViewInit {
     });
   }
 
-  addOption() { //TODO: investigate why every time I add an option, the previous options are overwritten, but only on the UI
+  addOption() { //FIXME: investigate why every time I add an option, the previous options are overwritten, but only on the UI
+    console.log( this.question.options);
     this.question.options?.push({optionLabel: `option${this.question.options.length + 1}`});
+    console.log( this.question.options);
   }
 
   removeOption(index: number) {
@@ -39,5 +41,11 @@ export class QuestionCreationComponent implements AfterViewInit {
 
   onSelectionChange(){
     this.question.options = this.question.type === 'select' || this.question.type === 'radio' ? [{optionLabel: 'option1'}, {optionLabel: 'option2'}] : undefined;
+  }
+
+  onOptionChange(index: number, event: Event){
+    let target = event.target as HTMLInputElement;
+    if(this.question.options && event.target)
+      this.question.options[index].optionLabel = target.value;
   }
 }
