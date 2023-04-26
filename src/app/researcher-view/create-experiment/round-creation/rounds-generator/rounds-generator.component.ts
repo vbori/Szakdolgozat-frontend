@@ -22,8 +22,6 @@ export class RoundsGeneratorComponent implements OnInit{
   roundGeneratorForm = new FormGroup({
     setNum: new FormControl<number>(1,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM)]}),
     roundNum: new FormControl<number>(10,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM)]}),
-    practiceRoundNum: new FormControl<number>(3, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_PRACTICE_ROUND_NUM)]}),
-    restTimeSec: new FormControl<number>(10, {nonNullable: true, validators: [Validators.required, Validators.min(0), Validators.max(this.constants.MAX_REST_TIME_SEC)]}),
     backgroundColor: new FormControl<string>('#FFFFFF', {nonNullable: true, validators: [Validators.required]}),
     targetShapeColor: new FormControl<string>('#00FF00',{nonNullable: true, validators: [Validators.required]}),
     baseShapeColor: new FormControl<string>('#0000FF', {nonNullable: true, validators: [Validators.required]}),
@@ -90,46 +88,56 @@ export class RoundsGeneratorComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    if(this.experiment?.experimentConfiguration){
+      this.restoreForm();
+    }else{
+      this.initializeForm();
+    }
+  }
+
+  restoreForm(): void{
+    if(this.experiment?.experimentConfiguration){
+      this.roundGeneratorForm.patchValue(this.experiment.experimentConfiguration);
+      this.roundGeneratorForm.get('useBackgroundDistraction')?.setValue(this.experiment.experimentConfiguration.backgroundDistractionConfig !== undefined);
+      this.roundGeneratorForm.get('useShapeDistraction')?.setValue(this.experiment.experimentConfiguration.distractingShapeConfig !== undefined);
+      this.roundGeneratorForm.get('backgroundDistractionConfig')?.get('useFlashing')?.setValue(this.experiment.experimentConfiguration.backgroundDistractionConfig?.flashing !== undefined);
+      this.roundGeneratorForm.get('distractingShapeConfig')?.get('useFlashing')?.setValue(this.experiment.experimentConfiguration.distractingShapeConfig?.flashing !== undefined);
+    }
+  }
+
+  initializeForm(): void{
     this.roundGeneratorForm.get('backgroundDistractionConfig')?.disable();
     this.roundGeneratorForm.get('distractingShapeConfig')?.disable();
 
-    this.roundGeneratorForm.get('useBackgroundDistraction')?.valueChanges.subscribe(value => {
-      if(value){
-        this.roundGeneratorForm.get('backgroundDistractionConfig')?.enable();
-      }else{
-        this.roundGeneratorForm.get('backgroundDistractionConfig')?.get('useFlashing')?.setValue(false);
-        this.roundGeneratorForm.get('backgroundDistractionConfig')?.disable();
-      }
-    });
+    this.subscribeToDistractionChange('useBackgroundDistraction', 'backgroundDistractionConfig');
+    this.subscribeToDistractionChange('useShapeDistraction', 'distractingShapeConfig');
 
-    this.roundGeneratorForm.get('useShapeDistraction')?.valueChanges.subscribe(value => {
-      if(value){
-        this.roundGeneratorForm.get('distractingShapeConfig')?.enable();
-      }else{
-        this.roundGeneratorForm.get('distractingShapeConfig')?.get('useFlashing')?.setValue(false);
-        this.roundGeneratorForm.get('distractingShapeConfig')?.disable();
-      }
-    });
-
-    this.roundGeneratorForm.get('backgroundDistractionConfig')?.get('useFlashing')?.valueChanges.subscribe(value => {
-      if(value){
-        this.roundGeneratorForm.get('backgroundDistractionConfig')?.get('flashing')?.enable();
-      }else{
-        this.roundGeneratorForm.get('backgroundDistractionConfig')?.get('flashing')?.disable();
-      }
-    });
-
-    this.roundGeneratorForm.get('distractingShapeConfig')?.get('useFlashing')?.valueChanges.subscribe(value => {
-      if(value){
-        this.roundGeneratorForm.get('distractingShapeConfig')?.get('flashing')?.enable();
-      }else{
-        this.roundGeneratorForm.get('distractingShapeConfig')?.get('flashing')?.disable();
-      }
-    });
-
+    this.subscribeToFlashingChange('backgroundDistractionConfig');
+    this.subscribeToFlashingChange('distractingShapeConfig');
   }
 
-  onSubmit(){
+  subscribeToDistractionChange(checkboxControlName: string, configFormName: string): void {
+    this.roundGeneratorForm.get(checkboxControlName)?.valueChanges.subscribe(value => {
+      if(value){
+        this.roundGeneratorForm.get(configFormName)?.enable();
+      }else{
+        this.roundGeneratorForm.get(configFormName)?.disable();
+        this.roundGeneratorForm.get(configFormName)?.get('useFlashing')?.setValue(false);
+      }
+    });
+  }
+
+  subscribeToFlashingChange(configFormName: string): void {
+    this.roundGeneratorForm.get(configFormName)?.get('useFlashing')?.valueChanges.subscribe(value => {
+      if(value){
+        this.roundGeneratorForm.get(configFormName)?.get('flashing')?.enable();
+      }else{
+        this.roundGeneratorForm.get(configFormName)?.get('flashing')?.disable();
+      }
+    });
+  }
+
+  onSubmit(): void{
     this.setUnnecessaryControlsAvailability(false);
     const experimentConfiguration = { experimentConfiguration: this.roundGeneratorForm.value};
     if(!this.roundGeneratorForm.pristine){
@@ -149,7 +157,7 @@ export class RoundsGeneratorComponent implements OnInit{
     this.setUnnecessaryControlsAvailability(true);
   }
 
-  setUnnecessaryControlsAvailability(available: boolean){
+  setUnnecessaryControlsAvailability(available: boolean): void{
     if(available){
       this.roundGeneratorForm.get('useBackgroundDistraction')?.enable();
       this.roundGeneratorForm.get('useShapeDistraction')?.enable();

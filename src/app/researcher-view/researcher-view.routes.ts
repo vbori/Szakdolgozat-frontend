@@ -9,8 +9,10 @@ export const researchRoutes = [
   { path: 'experiment',
     children: [
       { path: 'details/:id', component: ExperimentDetailsComponent},
+      { path: 'create/:id', component: CreateExperimentComponent},
       { path: 'create', component: CreateExperimentComponent},
       { path: '**', redirectTo: '/research/dashboard'}
     ]
-  }
+  },
+  { path: '**', redirectTo: '/research/dashboard'}
 ]

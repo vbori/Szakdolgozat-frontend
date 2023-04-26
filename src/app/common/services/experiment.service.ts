@@ -66,6 +66,14 @@ export class ExperimentService {
     return this.http.patch<{message: string, experiment: Experiment, activeExperimentCount: number}>(`${environment.baseUrl}/research/closeExperiment`, { experimentId: experimentId }, { headers });
   }
 
+  public deleteExperiment(experimentId: string): Observable<{message: string}> {
+    let headers = new HttpHeaders({
+      "Authorization": 'Bearer ' + localStorage.getItem('accessToken'),
+    });
+
+    return this.http.delete<{message: string}>(`${environment.baseUrl}/research/deleteExperiment/${experimentId}`, { headers });
+  }
+
   public getDescription(experimentId: string, demoMode: boolean = false ): Observable<string> {
     return this.http.get<string>(`${environment.baseUrl}/participant/getDescription/${experimentId}/${demoMode}`);
   }

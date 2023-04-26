@@ -1,5 +1,5 @@
 import { Configuration } from "./config.model";
-import { Round } from "./round.model";
+import { NewRound } from "./newRound.model";
 
 export interface ExperimentExtract{
   _id: string;
@@ -12,14 +12,14 @@ export interface ExperimentExtract{
 export interface Experiment extends ExperimentExtract {
   formId?: string;
   type: string;
-  openedAt?: Date;
-  closedAt?: Date;
+  openedAt?: string;
+  closedAt?: string;
   maxParticipantNum: number;
   controlGroupChance: number;
   cursorImageMode?: string;
   positionTrackingFrequency?: number;
   participantDescription: string;
-  rounds: Round[];
+  rounds: NewRound[];
   experimentConfiguration?: Configuration;
 }
 

@@ -2,7 +2,7 @@
 <div class="progress-bar">
   <div class="progress-bar--step" [ngStyle]="{width: stepCount / totalSteps * 100 + '%'}"></div>
 </div>
-<div>
+<ng-container *ngIf="experimentChecked">
   <mat-stepper orientation= "horizontal" [linear] = "true" labelPosition="end" (selectionChange)="onStepChange($event)" #stepper>
     <mat-step [completed]="experiment?.name && experiment?.researcherDescription">
       <ng-template matStepLabel>Experiment Basics</ng-template>
@@ -26,5 +26,5 @@
       </ng-template>
     </mat-step>
   </mat-stepper>
-</div>
+</ng-container>
 <button class="bigStepperButton" *ngIf = "stepCount == totalSteps" id="saveExperimentButton" (click)="createExperiment()" mat-raised-button color="primary">Create</button>

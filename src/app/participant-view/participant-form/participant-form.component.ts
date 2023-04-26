@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Question } from 'src/app/common/models/form.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
@@ -11,14 +11,17 @@ import { Response } from '../models/participant.model';
   styleUrls: ['./participant-form.component.scss']
 })
 export class ParticipantFormComponent implements OnInit{
-  form: FormGroup;
+  form: FormGroup   = new FormGroup({});
   questions : Question[];
   @Input() experimentId: string
   @Input() participantId: string;
   @Input() demoMode: boolean;
   @Output() nextStep = new EventEmitter<any>();
 
-  constructor(private readonly experimentService: ExperimentService, private readonly participantService: ParticipantService, private readonly formBuilder: FormBuilder) { }
+  constructor(private readonly experimentService: ExperimentService,
+              private readonly participantService: ParticipantService,
+              private readonly formBuilder: FormBuilder,
+              private readonly changeDetector: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({});
@@ -33,6 +36,7 @@ export class ParticipantFormComponent implements OnInit{
             this.form.addControl(question.questionId, this.formBuilder.control(''));
           }
         });
+        this.changeDetector.detectChanges();
       },
       error: (error) => {
         console.log(error); //TODO: display error message
@@ -49,7 +53,7 @@ export class ParticipantFormComponent implements OnInit{
         const value = this.form.value[key];
         responses.push({questionId: key, response: value});
       });
-      
+
       this.participantService.addResponses({participantId: this.participantId, responses: responses}).subscribe({
         next: () => {
           this.nextStep.emit();

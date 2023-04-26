@@ -25,8 +25,7 @@ export class QuestionCreationComponent implements AfterViewInit {
     });
   }
 
-  addOption() { //FIXME: investigate why every time I add an option, the previous options are overwritten, but only on the UI
-    console.log( this.question.options);
+  addOption() {
     this.question.options?.push({optionLabel: `option${this.question.options.length + 1}`});
     console.log( this.question.options);
   }

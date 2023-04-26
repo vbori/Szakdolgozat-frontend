@@ -25,6 +25,7 @@ export interface NewShape{
   width: number;
   height: number;
   fill: string;
+  strokeWidth: number;
 }
 
 export class NewShapeModel implements NewShape{
@@ -41,6 +42,7 @@ export class NewShapeModel implements NewShape{
   width: number;
   height: number;
   fill: string;
+  strokeWidth: number;
 
   constructor(shape: NewShape){
     this.target = shape.target;
@@ -56,6 +58,7 @@ export class NewShapeModel implements NewShape{
     this.width = shape.width;
     this.height = shape.height;
     this.fill = shape.fill;
+    this.strokeWidth = 0;
   }
 }
 
@@ -77,7 +80,7 @@ export interface NewRound {
 }
 
 export class NewRoundClass implements NewRound{
-  roundIdx?: number;
+  /*roundIdx?: number;
   _id?: string;
   objects: NewShape[];
   canvasHeight: number;
@@ -91,6 +94,24 @@ export class NewRoundClass implements NewRound{
     this.canvasHeight = canvasHeight;
     this.canvasWidth = canvasWidth;
     this.background = background;
+  }*/
+
+  roundIdx?: number;
+  _id?: string;
+  objects: NewShape[] = [];
+  canvasHeight = 0;
+  canvasWidth = 0;
+  background = '';
+  shapeDistractionDuration?: number;
+  backgroundDistraction?: BackgroundDistraction;
+
+  constructor();
+  constructor(round: NewRound);
+  constructor(round?: NewRound) {
+    if (round) {
+      Object.assign(this, round);
+      this.objects = round.objects.map(object => ({ ...object }));
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
@@ -32,9 +32,33 @@ export class ExperimentBasicsComponent implements AfterViewInit{
     positionTrackingFrequency: new FormControl<number>(500, [Validators.min(100),Validators.max(1000)])
   });
 
-  constructor(private experimentService: ExperimentService, private constants: ExperimentCreationConstants) { }
+  constructor(private experimentService: ExperimentService,
+              private constants: ExperimentCreationConstants,
+              private changeDetector: ChangeDetectorRef) { }
 
   ngAfterViewInit(): void {
+    this.createCanvases();
+
+    if(this.experiment){
+      this.initializeForm();
+      this.changeDetector.detectChanges();
+    }
+  }
+
+  initializeForm(): void{
+    if(this.experiment){
+      this.experimentBasicsForm.controls.name.setValue(this.experiment?.name);
+      this.experimentBasicsForm.controls.researcherDescription.setValue(this.experiment?.researcherDescription);
+      this.experimentBasicsForm.controls.maxParticipantNum.setValue(this.experiment?.maxParticipantNum);
+      this.experimentBasicsForm.controls.controlGroupChance.setValue(this.experiment?.controlGroupChance);
+      this.experimentBasicsForm.controls.positionArrayNeeded.setValue(this.experiment?.positionTrackingFrequency !== undefined);
+      this.experimentBasicsForm.controls.positionTrackingFrequency.setValue(this.experiment?.positionTrackingFrequency ?? 500);
+      this.experimentBasicsForm.controls.cursorPathImageNeeded.setValue(this.experiment?.cursorImageMode !== undefined);
+      this.experimentBasicsForm.controls.cursorImageMode.setValue(this.experiment?.cursorImageMode ?? 'Colors included');
+    }
+  }
+
+  createCanvases(): void{
     this.outlineCanvas = new fabric.Canvas('outlineCanvas');
     this.outlineCanvas.selection = false;
     this.coloredCanvas = new fabric.Canvas('coloredCanvas');
@@ -48,7 +72,7 @@ export class ExperimentBasicsComponent implements AfterViewInit{
     });
   }
 
-  onSubmit(){
+  onSubmit(): void{
     if(!this.experiment){
       this.createExperiment();
     }else if(!this.experimentBasicsForm.pristine){
@@ -58,8 +82,8 @@ export class ExperimentBasicsComponent implements AfterViewInit{
     }
   }
 
-  createExperiment(){
-    let {name, researcherDescription, maxParticipantNum, controlGroupChance, cursorPathImageNeeded} = this.experimentBasicsForm.value;
+  createExperiment(): void{
+    let {name, researcherDescription, maxParticipantNum, controlGroupChance} = this.experimentBasicsForm.value;
     let positionTrackingFrequency: number | undefined = undefined;
     let cursorImageMode = undefined;
 
@@ -74,10 +98,7 @@ export class ExperimentBasicsComponent implements AfterViewInit{
         next: (experiment) => {
           console.log("created experiment")
           console.log(experiment)
-          this.experiment = experiment;
-          this.experimentBasicsForm.markAsPristine();
-          this.experimentChange.emit(this.experiment);
-          this.nextStep.emit();
+          this.handleExperimentChange(experiment);
         },
         error: (error) => {
           console.log(error); //TODO: display error message
@@ -85,20 +106,24 @@ export class ExperimentBasicsComponent implements AfterViewInit{
       });
   }
 
-  updateExperiment(){
+  updateExperiment(): void{
     console.log(this.experimentBasicsForm.value)
     this.experimentService.updateExperiment({experimentId: this.experiment?._id, updatedExperiment: this.experimentBasicsForm.value}).subscribe({
       next: (experiment) => {
         console.log("updated experiment")
         console.log(experiment)
-        this.experiment = experiment;
-        this.experimentBasicsForm.markAsPristine();
-        this.experimentChange.emit(this.experiment);
-        this.nextStep.emit();
+        this.handleExperimentChange(experiment);
       },
       error: (error) => {
         console.log(error); //TODO: display error message
       }
     });
+  }
+
+  handleExperimentChange(experiment: Experiment): void {
+    this.experiment = experiment;
+    this.experimentBasicsForm.markAsPristine();
+    this.experimentChange.emit(this.experiment);
+    this.nextStep.emit();
   }
 }

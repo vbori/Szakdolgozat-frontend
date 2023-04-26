@@ -43,7 +43,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
         frequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_FLASHING_FREQUENCY), Validators.max(this.constants.MAX_FLASHING_FREQUENCY)]}),
       })
     })
-  })
+  });
 
   constructor(private changeDetector: ChangeDetectorRef, public constants: ExperimentCreationConstants) { }
 
@@ -56,7 +56,11 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     });
 
     this.initializeCanvas();
-    this.loadCanvasData();
+    if(this.round.objects.length > 0){
+      this.loadCanvasData(this.round);
+    }else{
+      this.loadCanvasData(this.CANVASDATA);
+    }
     this.canvas.renderAll();
     this.changeDetector.detectChanges();
   }
@@ -84,9 +88,9 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     fabric.Object.NUM_FRACTION_DIGITS = 2;
   }
 
-  loadCanvasData(): void{
+  loadCanvasData(round: NewRound): void{
     if(this.canvas)
-    this.canvas.loadFromJSON(this.CANVASDATA, this.canvas.renderAll.bind(this.canvas), (o: any, shape: any) => {
+    this.canvas.loadFromJSON(round, this.canvas.renderAll.bind(this.canvas), (o: any, shape: any) => {
       shape.setControlsVisibility({ mtr: false });
       shape.set('noScaleCache', false);
       if(shape.type === 'circle') {
@@ -220,7 +224,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     console.log("validity change in middle", allValid, this.validities);
   }
 
-  readonly CANVASDATA = {
+  readonly CANVASDATA: NewRound = {
     "objects": [
       {
         "type": "circle",
@@ -264,6 +268,9 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
         "target": false,
         "strokeWidth": 0
       }
-    ]
+    ],
+    "background": "#ffffff",
+    "canvasHeight": 600,
+    "canvasWidth": 600
   }
 }

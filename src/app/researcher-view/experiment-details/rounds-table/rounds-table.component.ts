@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
-import { Round } from 'src/app/common/models/round.model';
 import { Column } from 'src/app/researcher-view/models/column.model';
+import { NewRound } from 'src/app/common/models/newRound.model';
 
 @Component({
   selector: 'app-rounds-table',
@@ -17,11 +17,11 @@ import { Column } from 'src/app/researcher-view/models/column.model';
 })
 
 export class RoundsTableComponent {
-  @Input() dataSource: Round[];
+  @Input() dataSource: NewRound[];
   columnsToDisplay: Column[] = [{header: 'Index', property: 'roundIdx'}, {header: 'Rest Time', property: 'restTime'}, {header: 'Practice Round', property: 'isPractice'}, {header: 'Use Background Distraction', property: 'useBackgroundDistraction'}, {header: 'Use Shape Distractions', property: 'useShapeDistractions'}];
   headers = this.columnsToDisplay.map(column => column.header);
   columnsToDisplayWithExpand = [...this.headers,'expand'];
-  expandedElement: Round | null;
+  expandedElement: NewRound | null;
 
   ngOnInit(): void {
     console.log(this.dataSource);

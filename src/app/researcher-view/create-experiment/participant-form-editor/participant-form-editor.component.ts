@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormService } from '../../services/form.service';
 import { Question, QuestionClass } from 'src/app/common/models/form.model';
 import { Experiment } from 'src/app/common/models/experiment.model';
@@ -9,7 +9,7 @@ import { ExperimentService } from 'src/app/common/services/experiment.service';
   templateUrl: './participant-form-editor.component.html',
   styleUrls: ['./participant-form-editor.component.scss']
 })
-export class ParticipantFormEditorComponent{
+export class ParticipantFormEditorComponent implements OnInit{
   @Input() experiment: Experiment | undefined;
   @Input() isDirty: boolean = false;
   @Output() nextStep = new EventEmitter<any>();
@@ -18,6 +18,20 @@ export class ParticipantFormEditorComponent{
   isQuestionValid: Boolean[] = [true];
 
   constructor(private readonly formService: FormService, private readonly experimentService: ExperimentService) { }
+
+  ngOnInit(): void {
+    if(this.experiment?.formId){
+      this.formService.getForm(this.experiment._id).subscribe({
+        next: (form) => {
+          this.questions = form.questions.map((question) => new QuestionClass(question.questionId, question.label, question.type, question.options, question.validation, question.required));
+          this.isQuestionValid = this.questions.map(() => true);
+        },
+        error: (error) => {
+          console.log(error); //TODO: display error message
+        }
+      });
+    }
+  }
 
   addQuestion() {
     this.questions.push(new QuestionClass(`question${this.questions.length + 1}`, `Question ${this.questions.length + 1}`));
@@ -45,17 +59,18 @@ export class ParticipantFormEditorComponent{
     if(this.experiment)
     this.formService.deleteForm(this.experiment._id).subscribe({
       next: () => {
-        if(this.experiment)
-        this.experimentService.getExperimentById(this.experiment._id).subscribe({
-          next: (experiment) => {
-            this.experiment = experiment;
-            this.experimentChange.emit(this.experiment);
-            this.nextStep.emit();
-          },
-          error: (error) => {
-            console.log(error); //TODO: handle error
-          }
-        });
+        if(this.experiment){
+          this.experimentService.getExperimentById(this.experiment._id).subscribe({
+            next: (experiment) => {
+              this.experiment = experiment;
+              this.experimentChange.emit(this.experiment);
+              this.nextStep.emit();
+            },
+            error: (error) => {
+              console.log(error); //TODO: handle error
+            }
+          });
+        }
       },
       error: (error) => {
         console.log(error); //TODO: handle error
@@ -67,17 +82,18 @@ export class ParticipantFormEditorComponent{
     if(this.experiment)
     this.formService.addForm(this.experiment._id, this.questions).subscribe({
       next: () => {
-        if(this.experiment)
-        this.experimentService.getExperimentById(this.experiment._id).subscribe({
-          next: (experiment) => {
-            this.experiment = experiment;
-            this.experimentChange.emit(this.experiment);
-            this.nextStep.emit();
-          },
-          error: (error) => {
-            console.log(error); //TODO: handle error
-          }
-        });
+        if(this.experiment){
+          this.experimentService.getExperimentById(this.experiment._id).subscribe({
+            next: (experiment) => {
+              this.experiment = experiment;
+              this.experimentChange.emit(this.experiment);
+              this.nextStep.emit();
+            },
+            error: (error) => {
+              console.log(error); //TODO: handle error
+            }
+          });
+        }
       },
       error: (error) => {
         console.log(error); //TODO: handle error

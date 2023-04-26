@@ -1,6 +1,6 @@
 import { Flashing } from "./round.model";
 
-interface BackGroundDistractionConfig {
+interface BackgroundDistractionConfig {
     backGroundDistractionColor: string;
     minDistractionDurationTime: number;
     maxDistractionDurationTime: number;
@@ -22,8 +22,6 @@ interface DistractingShapeConfig {
 export interface Configuration {
     setNum: number;
     roundNum: number;
-    practiceRoundNum: number;
-    restTimeSec: number;
     backgroundColor: string;
     targetShapeColor: string;
     baseShapeColor: string;
@@ -39,7 +37,7 @@ export interface Configuration {
     maxWidth: number;
     minHeight: number;
     maxHeight: number;
-    backGroundDistractionConfig?: BackGroundDistractionConfig;
+    backgroundDistractionConfig?: BackgroundDistractionConfig;
     distractingShapeConfig?: DistractingShapeConfig;
 }
 

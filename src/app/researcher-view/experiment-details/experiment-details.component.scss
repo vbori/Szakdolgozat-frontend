@@ -10,8 +10,32 @@
   color: #D80000;
 }
 
-#demoButton {
-  position: absolute;
-  right: 30px;
-  top: 60px;
+.buttonsContainer {
+
+  button {
+     margin: 0 10px;
+  }
 }
+
+dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 10px;
+  border:none;
+text-align: center;
+  div > button {
+    margin: 10px 10px;
+  }
+
+
+}
+ ng-container {
+  position: relative;
+ }

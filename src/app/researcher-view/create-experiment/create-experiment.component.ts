@@ -1,5 +1,6 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatStepper } from '@angular/material/stepper';
+import { ActivatedRoute } from '@angular/router';
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 
@@ -8,13 +9,30 @@ import { ExperimentService } from 'src/app/common/services/experiment.service';
   templateUrl: './create-experiment.component.html',
   styleUrls: ['./create-experiment.component.scss']
 })
-export class CreateExperimentComponent {
+export class CreateExperimentComponent implements OnInit{
   totalSteps = 4;
   stepCount = 0;
-  experiment: Experiment | undefined
+  experiment: Experiment | undefined;
+  experimentChecked: boolean;
   @ViewChild('stepper') stepper!: MatStepper;
 
-  constructor(private experimentService: ExperimentService) {
+  constructor(private experimentService: ExperimentService, private readonly route: ActivatedRoute) {
+  }
+
+  ngOnInit(): void {
+    if(this.route.snapshot.params['id'] != undefined){
+      this.experimentService.getExperimentById(this.route.snapshot.params['id']).subscribe({
+        next: (experiment) => {
+          this.experiment = experiment;
+          this.experimentChecked = true;
+          console.log("Experiment loaded in main component");
+          console.log(this.experiment);
+        },
+        error: () => console.log("Error loading experiment")
+      });
+    }else{
+      this.experimentChecked = true;
+    }
   }
 
   createExperiment(){
