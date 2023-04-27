@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { fabric } from 'fabric';
-import { FabricShape, NewRound } from 'src/app/common/models/newRound.model';
+import { FabricShape, Round } from 'src/app/common/models/round.model';
 import { ExperimentCreationConstants } from '../../../experiment-creation.constants';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 
@@ -16,14 +16,13 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
   @Input() canvasWidth: number;
   @Input() canvasHeight: number;
   @Input() roundIdx: number;
-  @Input() round: NewRound;
+  @Input() round: Round;
 
   @Output() validityChange = new EventEmitter<boolean>();
   @Output() questionChange = new EventEmitter<void>();
   @Output() canvasCreated = new EventEmitter<fabric.Canvas>();
 
   selectedTabIndex = 0;
-  shapes: FabricShape[] = [];
   distractingShape: FabricShape | undefined = undefined;
   targetShape: FabricShape | undefined = undefined;
   baseShape: FabricShape | undefined = undefined;
@@ -88,7 +87,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     fabric.Object.NUM_FRACTION_DIGITS = 2;
   }
 
-  loadCanvasData(round: NewRound): void{
+  loadCanvasData(round: Round): void{
     if(this.canvas)
     this.canvas.loadFromJSON(round, this.canvas.renderAll.bind(this.canvas), (o: any, shape: any) => {
       shape.setControlsVisibility({ mtr: false });
@@ -224,7 +223,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     console.log("validity change in middle", allValid, this.validities);
   }
 
-  readonly CANVASDATA: NewRound = {
+  readonly CANVASDATA: Round = {
     "objects": [
       {
         "type": "circle",

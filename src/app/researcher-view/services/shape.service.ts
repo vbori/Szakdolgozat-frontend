@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { fabric } from 'fabric';
-import { FabricShape } from 'src/app/common/models/newRound.model';
+import { FabricShape } from 'src/app/common/models/round.model';
 
 @Injectable({
   providedIn: 'root'

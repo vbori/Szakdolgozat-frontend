@@ -6,7 +6,6 @@
   <mat-stepper orientation= "horizontal" [linear] = "true" labelPosition="end" (selectionChange)="onStepChange($event)" #stepper>
     <mat-step [completed]="experiment?.name && experiment?.researcherDescription">
       <ng-template matStepLabel>Experiment Basics</ng-template>
-      <!--TODO: look into why two-way binding is not reacting toonExperiment Change-->
       <app-experiment-basics [experiment]="experiment" (experimentChange) = "onExperimentChange($event)" (nextStep)="onNextStep()"></app-experiment-basics>
     </mat-step>
     <mat-step [completed]="experiment?.participantDescription != ' '">

@@ -1,6 +1,6 @@
 <div>
   <mat-stepper orientation= "horizontal" [linear] = "true" labelPosition="bottom" #stepper>
-    <mat-step [editable]="false" [completed]="false"> <!--TODO: resolve pressionChangedAfterItHasBeenCheckedError -->
+    <mat-step [editable]="false" [completed]="false">
       <ng-template matStepLabel>Experiment description</ng-template>
       <ng-template matStepContent>
         <ng-container *ngIf="participant">

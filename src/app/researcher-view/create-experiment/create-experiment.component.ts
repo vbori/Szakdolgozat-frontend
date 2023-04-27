@@ -1,3 +1,4 @@
+import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatStepper } from '@angular/material/stepper';
 import { ActivatedRoute } from '@angular/router';
@@ -35,16 +36,16 @@ export class CreateExperimentComponent implements OnInit{
     }
   }
 
-  createExperiment(){
+  createExperiment(): void{
     this.stepCount++;
     console.log("Create Experiment")
   }
 
-  onStepChange(event: any){ //TODO: type events
+  onStepChange(event: StepperSelectionEvent): void{ 
     this.stepCount = event.selectedIndex;
   }
 
-  onExperimentChange(event: Experiment){
+  onExperimentChange(event: Experiment): void{
     console.log(event);
     this.experiment = event;
     console.log("Experiment changed in main component");
@@ -53,7 +54,7 @@ export class CreateExperimentComponent implements OnInit{
     if(this.stepper.selected) this.stepper.selected.completed = true;
   }
 
-  onNextStep(){
+  onNextStep(): void{
     this.stepper.next();
   }
 }

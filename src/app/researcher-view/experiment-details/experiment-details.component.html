@@ -1,45 +1,59 @@
 <ng-container *ngIf="experiment">
-  <h1>{{ experiment.name }}</h1>
+  <h1><b>{{ experiment.name }}</b></h1>
   <div>
-    <span [ngClass]="{green: experiment.status === 'Active', orange: experiment.status === 'Draft', red: experiment.status === 'Closed'}">{{experiment.status}}</span>
+    <span [ngClass]="{green: experiment.status === 'Active', orange: experiment.status === 'Draft', red: experiment.status === 'Closed'}"><b>{{experiment.status}}</b></span>
     <span *ngIf="experiment.status != 'Draft'"> &#9679; {{experiment.participantNum}} completed</span>
   </div>
   <div class="buttonsContainer">
     <button mat-raised-button color="primary" [routerLink]="['/participant', experiment._id, 'true']">View demo</button>
     <button mat-raised-button color="warn" *ngIf="experiment.status == 'Active'" (click)="closeExperiment()">Close experiment</button>
+    <button mat-raised-button color="primary" *ngIf="experiment.status == 'Active'" (click)="shareExperiment()">Copy invite link</button>
     <button mat-raised-button color="primary" *ngIf="experiment.status == 'Draft'" (click)="openExperiment()">Open experiment</button>
     <button mat-raised-button color="primary" *ngIf="experiment.status == 'Draft'" [routerLink]="['/research/experiment/create', experiment._id]">Edit experiment</button>
     <button mat-raised-button color="primary" *ngIf="experiment.status == 'Closed'">Download results</button>
     <button mat-raised-button color="warn" *ngIf="experiment.status == 'Closed' || experiment.status =='Draft'" (click)="dialog.showModal()">Delete experiment</button>
   </div>
   <mat-divider></mat-divider>
-  <div>
-    <mat-list>
-      <mat-list-item>
-        <span matListItemTitle>Type</span>
-        <span matListItemLine>{{experiment.type}}</span>
-      </mat-list-item>
-      <mat-list-item *ngIf="experiment.status != 'Draft'">
-        <span matListItemTitle>Opened at</span>
-        <span matListItemLine>{{experiment.openedAt}}</span> <!--FIXME: format is not correct-->
-      </mat-list-item>
-      <mat-list-item *ngIf="experiment.status == 'Closed'">
-        <span matListItemTitle>Closed at</span>
-        <span matListItemLine>{{experiment.closedAt}}</span>
-      </mat-list-item>
-      <mat-list-item>
-        <span matListItemTitle>Maximum number of participants</span>
-        <span matListItemLine>{{experiment.maxParticipantNum}}</span>
-      </mat-list-item>
-    </mat-list>
-  </div>
-  <div id="testDiv"></div>
-  <div id="mySketch"></div>
+  <mat-list>
+    <mat-list-item *ngIf="experiment.status != 'Draft'">
+      <span matListItemTitle>Opened at</span>
+      <span matListItemLine>{{experiment.openedAt}}</span>
+    </mat-list-item>
+    <mat-list-item *ngIf="experiment.status == 'Closed'">
+      <span matListItemTitle>Closed at</span>
+      <span matListItemLine>{{experiment.closedAt}}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>Maximum number of participants</span>
+      <span matListItemLine>{{experiment.maxParticipantNum}}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>Control group chance</span>
+      <span matListItemLine>{{experiment.controlGroupChance}}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>Saving cursor path</span>
+      <span matListItemLine>{{experiment.cursorImageMode ?? 'No'}}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>Cursor position tracking frequency</span>
+      <span matListItemLine>{{experiment.positionTrackingFrequency ?? 'None'}}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>Canvas width</span>
+      <span matListItemLine>{{experiment.rounds[0].canvasWidth}}</span>
+    </mat-list-item>
+    <mat-list-item>
+      <span matListItemTitle>Canvas height</span>
+      <span matListItemLine>{{experiment.rounds[0].canvasHeight}}</span>
+    </mat-list-item>
+  </mat-list>
   <h2>Description</h2>
-  <p>{{ experiment.researcherDescription }}</p>44
+  <p>{{ experiment.researcherDescription }}</p>
   <h2>Participant description</h2>
   <p>{{ experiment.participantDescription }}</p>
 
+  <h2>Rounds</h2>
   <app-rounds-table [dataSource]="experiment.rounds"></app-rounds-table>
 
 </ng-container>

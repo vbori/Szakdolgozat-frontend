@@ -3,10 +3,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Experiment, ExperimentExtract } from '../models/experiment.model';
 import { environment } from 'src/environments/environment';
-import { Round } from '../models/round.model';
 import { Form } from '../models/form.model';
 import { Result } from '../models/result.model';
-import { NewRound } from '../models/newRound.model';
+import { Round } from '../models/round.model';
 
 @Injectable({
   providedIn: 'root'
@@ -78,8 +77,8 @@ export class ExperimentService {
     return this.http.get<string>(`${environment.baseUrl}/participant/getDescription/${experimentId}/${demoMode}`);
   }
 
-  public getRoundsAndTrackingInfo(experimentId: string): Observable<{rounds: NewRound[], cursorImageMode: string | undefined, positionTrackingFrequency: number | undefined}> {
-    return this.http.get<{rounds: NewRound[], cursorImageMode: string | undefined, positionTrackingFrequency: number | undefined}>(`${environment.baseUrl}/participant/getRoundsAndTrackingInfo/${experimentId}`);
+  public getRoundsAndTrackingInfo(experimentId: string): Observable<{rounds: Round[], cursorImageMode: string | undefined, positionTrackingFrequency: number | undefined}> {
+    return this.http.get<{rounds: Round[], cursorImageMode: string | undefined, positionTrackingFrequency: number | undefined}>(`${environment.baseUrl}/participant/getRoundsAndTrackingInfo/${experimentId}`);
   }
 
   public getForm(experimentId: string): Observable<Form> {

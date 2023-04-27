@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { fabric } from 'fabric';
-import {NewRound, FabricShape} from '../../common/models/newRound.model';
+import {Round, FabricShape} from '../../common/models/round.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { Click, Position, Result } from 'src/app/common/models/result.model';
 
@@ -12,7 +12,7 @@ import { Click, Position, Result } from 'src/app/common/models/result.model';
 
 export class ExperimentComponent implements OnInit{
   @Input() experimentId: string;
-  @Input() demoMode: boolean; //TODO: handle demo mode
+  @Input() demoMode: boolean;
   @Input() participantId: string;
   @Input() controlMode: boolean;
   @Output() finishedExperiment = new EventEmitter();
@@ -31,7 +31,7 @@ export class ExperimentComponent implements OnInit{
   distractingBackground: string | undefined ='blue';
   maxCount: number;
   counter: number = 0;
-  clicked: boolean = false;
+  targetClicked: boolean = false;
   startTime: number | undefined = undefined;
   trackable: boolean = false;
   positionTracker: any = undefined;
@@ -42,7 +42,7 @@ export class ExperimentComponent implements OnInit{
   timeNeeded: number;
   cursorPositions: Position[] = [];
   cursorPathLength: number = 0;
-  rounds: NewRound[];
+  rounds: Round[];
 
   constructor(private readonly experimentService: ExperimentService) { }
 
@@ -75,7 +75,7 @@ export class ExperimentComponent implements OnInit{
     this.mainCanvas.on('mouse:down', ({e}) => this.handleMouseDown(e));
   }
 
-  playRound(round: NewRound): void {
+  playRound(round: Round): void {
     this.initializeRound();
     this.setBackground(round);
     this.loadMainCanvas(round);
@@ -92,14 +92,15 @@ export class ExperimentComponent implements OnInit{
     }
     this.cursorPathLength = 0;
     this.clicks = [];
+    this.targetClicked = false;
     this.misclickCount = 0;
     this.cursorPositions = [];
-    this.startTime = undefined;
     this.backgroundDistractionOn = undefined;
     this.shapeDistractionOn = undefined;
+    this.startTime = new Date().getTime();
   }
 
-  setBackground(round: NewRound): void{
+  setBackground(round: Round): void{
     this.background = round.background;
     this.distractingBackground = round.backgroundDistraction?.color;
     if(round.backgroundDistraction?.flashing?.color){
@@ -107,7 +108,7 @@ export class ExperimentComponent implements OnInit{
     }
   }
 
-  loadMainCanvas(round: NewRound): void{
+  loadMainCanvas(round: Round): void{
     this.mainCanvas.clear();
     this.mainCanvas.setHeight(round.canvasHeight);
     this.mainCanvas.setWidth(round.canvasWidth);
@@ -140,7 +141,7 @@ export class ExperimentComponent implements OnInit{
 
   }
 
-  loadHiddenCanvas(round: NewRound): void{
+  loadHiddenCanvas(round: Round): void{
     this.hiddenCanvas.isDrawingMode = false;
     this.hiddenCanvas.clear();
 
@@ -165,12 +166,11 @@ export class ExperimentComponent implements OnInit{
   }
 
   handleBaseShapeClick(): void {
-    if (this.clicked) {
+    if (this.targetClicked) {
       if(!this.demoMode){
         this.saveResults(this.counter);
       }
 
-      this.clicked = false;
       this.counter++;
 
       if (this.counter < this.maxCount) {
@@ -184,7 +184,7 @@ export class ExperimentComponent implements OnInit{
   }
 
   handleTargetShapeClick(): void {
-    this.clicked = true;
+    this.targetClicked = true;
     if(this.startTime != undefined){
       this.timeNeeded = new Date().getTime() - this.startTime;
     }
@@ -200,18 +200,16 @@ export class ExperimentComponent implements OnInit{
   }
 
   handleBaseShapeHover(): void {
-    if(!this.clicked){
+    if(!this.targetClicked){
       if(this.cursorImageMode && !this.hiddenCanvas.isDrawingMode){
         this.hiddenCanvas.isDrawingMode = true;
         this.hiddenCanvas.freeDrawingBrush = new fabric.PencilBrush(this.hiddenCanvas);
       }
-      if(this.startTime == undefined)
-        this.startTime = new Date().getTime();
     }
   }
 
   handleBaseShapeLeave(): void {
-    if(!this.clicked && !this.controlMode){
+    if(!this.targetClicked && !this.controlMode){
       if(this.rounds[this.counter].backgroundDistraction && this.backgroundDistractionOn == undefined){
         this.backgroundDistractionOn = true;
         this.mainCanvas.backgroundColor = this.distractingBackground;
@@ -258,7 +256,7 @@ export class ExperimentComponent implements OnInit{
       this.hiddenCanvas.freeDrawingBrush.color = this.background == 'red' ? 'blue' : 'red';
       this.hiddenCanvas.freeDrawingBrush.onMouseMove(pointer,{e: true});
     }
-    if(!this.clicked && this.trackable){
+    if(!this.targetClicked && this.trackable){
       this.trackable = false;
       const cursorPosition = this.mainCanvas.getPointer(event);
 
@@ -274,11 +272,11 @@ export class ExperimentComponent implements OnInit{
   }
 
   handleMouseDown(event: MouseEvent): void {
-    if(this.startTime != undefined && !this.clicked){
+    if(this.startTime != undefined && !this.targetClicked){
       const timestamp = new Date().getTime() - this.startTime;;
       const position = this.mainCanvas.getPointer(event);
-      const shape = this.mainCanvas.findTarget(event, false);
-      const misclick = !(!!shape);
+      const shape = this.mainCanvas.findTarget(event, false) as FabricShape;
+      const misclick = !(!!shape) || (shape && !shape.target && !this.targetClicked);
       if(misclick){
         this.misclickCount++;
       }
@@ -347,8 +345,4 @@ export class ExperimentComponent implements OnInit{
     const dy = position2.y - position1.y;
     return Math.sqrt(dx * dx + dy * dy);
   }
-
-  //TODO: implement rest times
-  //TODO: implement practice rounds
-
 }

@@ -2,12 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ParticipantViewComponent } from './participant-view/participant-view.component';
 import { AuthComponent } from './researcher-view/auth/auth.component';
-import { AuthActivatorService } from './common/services/route-guards/auth-activator.service';
-import { ResearcherActivatorService } from './common/services/route-guards/researcher-activator.service';
+import { AuthActivatorService, ResearcherActivatorService, participantDeactivator } from './common/services/route-guards';
 import { Error404Component } from './error404/error404.component';
-import { ParticipantActivatorService } from './common/services/route-guards/participant-activator.service';
-import { participantDeactivator } from './common/services/route-guards/participant-deactivator';
-//TODO: clean up imports
 
 const routes: Routes = [
   {

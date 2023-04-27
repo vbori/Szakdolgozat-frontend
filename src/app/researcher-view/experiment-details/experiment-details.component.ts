@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
+import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-experiment-details',
   templateUrl: './experiment-details.component.html',
@@ -57,4 +58,15 @@ export class ExperimentDetailsComponent implements OnInit {
     this.experiment.closedAt = this.experiment.closedAt?.split('T')[0];
     this.experiment.openedAt = this.experiment.openedAt?.split('T')[0];
   }
+
+  shareExperiment(): void {
+    const url = `${environment.frontendBaseUrl}/participant/${this.experiment._id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      console.log('URL copied to clipboard'); //TODO: display messages
+    }).catch((error) => {
+      console.log(error);
+    });
+  }
 }
+
+//TODO: add result saving

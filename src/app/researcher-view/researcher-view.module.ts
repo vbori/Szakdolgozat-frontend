@@ -9,15 +9,11 @@ import { AuthComponent, LoginComponent, RegisterComponent } from './auth';
 import { PasswordChangeComponent } from './password-change/password-change.component';
 import { ResearcherOverviewComponent, ExperimentListComponent, ExperimentCardComponent } from './researcher-overview';
 import { ExperimentDetailsComponent, RoundsTableComponent } from './experiment-details';
-import { CreateExperimentComponent, ExperimentBasicsComponent, ParticipantDescriptionEditorComponent, RoundCreationComponent, RoundsGeneratorComponent, ManualConfigurationComponent } from './create-experiment';
+import { CreateExperimentComponent, ExperimentBasicsComponent, ParticipantDescriptionEditorComponent, RoundCreationComponent, RoundsGeneratorComponent, ManualConfigurationComponent, FabricCanvasComponent, ShapeFormComponent, ParticipantFormEditorComponent, QuestionCreationComponent } from './create-experiment';
 import { researchRoutes } from './researcher-view.routes';
 
-import { ColorPickerModule } from 'ngx-color-picker';
 import { MATERIAL_MODULES } from './material-index';
-import { ParticipantFormEditorComponent } from './create-experiment/participant-form-editor/participant-form-editor.component';
-import { QuestionCreationComponent } from './create-experiment/participant-form-editor/question-creation/question-creation.component';
-import { FabricCanvasComponent } from './create-experiment/round-creation/manual-configuration/fabric-canvas/fabric-canvas.component';
-import { ShapeFormComponent } from './create-experiment/round-creation/manual-configuration/fabric-canvas/shape-form/shape-form.component';
+import { ExpandedCanvasComponent } from './experiment-details/rounds-table/expanded-canvas/expanded-canvas.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +36,8 @@ import { ShapeFormComponent } from './create-experiment/round-creation/manual-co
     ParticipantFormEditorComponent,
     QuestionCreationComponent,
     FabricCanvasComponent,
-    ShapeFormComponent
+    ShapeFormComponent,
+    ExpandedCanvasComponent
   ],
   imports: [
     CommonModule,
@@ -48,8 +45,7 @@ import { ShapeFormComponent } from './create-experiment/round-creation/manual-co
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    RouterModule.forChild(researchRoutes),
-    ColorPickerModule
+    RouterModule.forChild(researchRoutes)
   ]
 })
 export class ResearcherViewModule { }

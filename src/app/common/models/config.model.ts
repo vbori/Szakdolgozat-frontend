@@ -1,7 +1,7 @@
 import { Flashing } from "./round.model";
 
 interface BackgroundDistractionConfig {
-    backGroundDistractionColor: string;
+    backgroundDistractionColor: string;
     minDistractionDurationTime: number;
     maxDistractionDurationTime: number;
     flashing?: Flashing;

@@ -1,12 +1,12 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { FabricShape } from 'src/app/common/models/newRound.model';
+import { FabricShape } from 'src/app/common/models/round.model';
 import { fabric } from 'fabric';
 import { MatSelectChange } from '@angular/material/select';
 import { ShapeService } from 'src/app/researcher-view/services/shape.service';
 import { ExperimentCreationConstants } from 'src/app/researcher-view/create-experiment/experiment-creation.constants';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { Flashing } from 'src/app/common/models/newRound.model';
+import { Flashing } from 'src/app/common/models/round.model';
 
 interface ShapeType {
   value: string;

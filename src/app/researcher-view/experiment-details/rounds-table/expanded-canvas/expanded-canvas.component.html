@@ -1,0 +1,54 @@
+<div *ngIf="round?.backgroundDistraction">
+  <h3><b>Background distraction details</b></h3>
+  <p><b>Color:</b>&nbsp;{{round?.backgroundDistraction?.color}}&nbsp;<span class="colorSpan" [style.backgroundColor]="round?.backgroundDistraction?.color"></span></p>
+  <p><b>Duration:</b>&nbsp;{{round?.backgroundDistraction?.duration}}</p>
+  <p *ngIf="round?.backgroundDistraction?.flashing"><b>Flash color:</b>&nbsp;{{round?.backgroundDistraction?.flashing?.color}}&nbsp; <span class="colorSpan" [style.backgroundColor]="round?.backgroundDistraction?.flashing?.color"></span></p>
+  <p *ngIf="round?.backgroundDistraction?.flashing"><b>Flash frequency:</b>&nbsp;{{round?.backgroundDistraction?.flashing?.frequency}}</p>
+</div>
+<div class="container">
+  <canvas class="canvas" [id]="'canvas'+  round?.roundIdx"></canvas>
+  <ng-container *ngIf="shapes" class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Property</th>
+          <th *ngFor="let shape of shapes">{{getLabel(shape)}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>Type</b></td>
+          <td *ngFor="let shape of shapes">{{getType(shape) }}</td>
+        </tr>
+        <tr>
+          <td><b>Distance from left side</b></td>
+          <td *ngFor="let shape of shapes">{{shape.left}}</td>
+        </tr>
+        <tr>
+          <td><b>Distance from top</b></td>
+          <td *ngFor="let shape of shapes">{{shape.top}}</td>
+        </tr>
+        <tr>
+          <td><b>Width</b></td>
+          <td *ngFor="let shape of shapes">{{shape.width}}</td>
+        </tr>
+        <tr>
+          <td><b>Height</b></td>
+          <td *ngFor="let shape of shapes">{{shape.height}}</td>
+        </tr>
+        <tr>
+          <td><b>Color</b></td>
+          <td *ngFor="let shape of shapes">{{shape.fill}}&nbsp;<span class="colorSpan" [style.backgroundColor]="shape.fill"></span></td>
+        </tr>
+        <tr>
+          <td><b>Flash frequency</b></td>
+          <td *ngFor="let shape of shapes">{{shape.flashing ? shape.flashing.frequency : 'none'}}</td>
+        </tr>
+        <tr>
+          <td><b>Flash color</b></td>
+          <td *ngFor="let shape of shapes">{{shape.flashing ? shape.flashing.color : 'none'}}&nbsp;<span class="colorSpan" *ngIf="shape.flashing" [style.backgroundColor]="shape.flashing.color"></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-container>
+</div>

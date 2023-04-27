@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ExperimentCreationConstants } from '../../experiment-creation.constants';
-import { FabricShape, NewRound, NewRoundClass, NewShape } from 'src/app/common/models/newRound.model';
+import { FabricShape, Round, RoundClass, Shape } from 'src/app/common/models/round.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { Router } from '@angular/router';
 import { Experiment } from 'src/app/common/models/experiment.model';
@@ -20,20 +20,20 @@ export class ManualConfigurationComponent implements OnInit{
 
   isRoundValid: Boolean[] = [true];
   canvases: fabric.Canvas[] = [];
-  rounds: NewRound[] = [new NewRoundClass()];
+  rounds: Round[] = [new RoundClass()];
   @Input() experiment: Experiment | undefined;
 
   constructor(public constants: ExperimentCreationConstants, private readonly experimentService: ExperimentService, private router: Router) { }
 
   ngOnInit(): void {
-    if(this.experiment?.rounds){
-      this.rounds = this.experiment.rounds.map((round) => new NewRoundClass(round));
+    if(this.experiment?.rounds && this.experiment.rounds.length > 0){
+      this.rounds = this.experiment.rounds.map((round) => new RoundClass(round));
     }
   }
 
   addRound() {
     this.isRoundValid.push(true);
-    this.rounds.push(new NewRoundClass());
+    this.rounds.push(new RoundClass());
   }
 
   removeRound(index: number) {
@@ -83,8 +83,8 @@ export class ManualConfigurationComponent implements OnInit{
     }
   }
 
-  convertToNewShape(shape: FabricShape): NewShape {
-    const newShape: NewShape = {
+  convertToNewShape(shape: FabricShape): Shape {
+    const newShape: Shape = {
       target: shape.target || false,
       distraction: shape.distraction || false,
       flashing: shape.flashing || undefined,

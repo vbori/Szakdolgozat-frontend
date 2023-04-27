@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import { Column } from 'src/app/researcher-view/models/column.model';
-import { NewRound } from 'src/app/common/models/newRound.model';
+import { Round } from 'src/app/common/models/round.model';
 
 @Component({
   selector: 'app-rounds-table',
@@ -17,13 +17,15 @@ import { NewRound } from 'src/app/common/models/newRound.model';
 })
 
 export class RoundsTableComponent {
-  @Input() dataSource: NewRound[];
-  columnsToDisplay: Column[] = [{header: 'Index', property: 'roundIdx'}, {header: 'Rest Time', property: 'restTime'}, {header: 'Practice Round', property: 'isPractice'}, {header: 'Use Background Distraction', property: 'useBackgroundDistraction'}, {header: 'Use Shape Distractions', property: 'useShapeDistractions'}];
+  @Input() dataSource: Round[];
+  columnsToDisplay: Column[] = [{header: 'Index', property: 'roundIdx'}, {header: 'Using Background Distraction', property: 'backgroundDistraction'}, {header: 'Using Shape Distraction', property: 'shapeDistractionDuration'}];
   headers = this.columnsToDisplay.map(column => column.header);
   columnsToDisplayWithExpand = [...this.headers,'expand'];
-  expandedElement: NewRound | null;
+  expandedElement: Round | null;
 
   ngOnInit(): void {
     console.log(this.dataSource);
   }
 }
+
+//TODO: add canvases and details to the table

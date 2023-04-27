@@ -17,7 +17,7 @@ export class RegisterComponent {
   checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => {
     let pass = group.get('password')?.value;
     let confirmPass = group.get('passwordConfirmation')?.value;
-    return pass === confirmPass ? null : { misMatch: true } //TODO: fix password confirmation
+    return pass === confirmPass ? null : { misMatch: true }
   }
 
   registerForm = new FormGroup({

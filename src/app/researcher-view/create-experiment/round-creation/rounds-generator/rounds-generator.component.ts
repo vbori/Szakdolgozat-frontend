@@ -40,7 +40,7 @@ export class RoundsGeneratorComponent implements OnInit{
     minHeight: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE)]}),
     maxHeight: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE)]}),
     backgroundDistractionConfig : new FormGroup({
-      backGroundDistractionColor: new FormControl<string>('#FF0000',{nonNullable: true, validators: [Validators.required]}),
+      backgroundDistractionColor: new FormControl<string>('#FF0000',{nonNullable: true, validators: [Validators.required]}),
       minDistractionDurationTime: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME)]}),
       maxDistractionDurationTime: new FormControl<number>(5000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME)]}),
       useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
@@ -84,6 +84,7 @@ export class RoundsGeneratorComponent implements OnInit{
 
   //TODO: add refresh guard
 
+  //TODO: add actual round generation
   constructor(private experimentService: ExperimentService, public readonly constants: ExperimentCreationConstants) {
   }
 

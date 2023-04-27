@@ -29,13 +29,12 @@ dialog {
   flex-direction: column;
   border-radius: 10px;
   border:none;
-text-align: center;
+  text-align: center;
   div > button {
     margin: 10px 10px;
   }
-
-
 }
- ng-container {
-  position: relative;
- }
+
+ng-container {
+position: relative;
+}
