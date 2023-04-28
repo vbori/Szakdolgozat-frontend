@@ -27,5 +27,3 @@ export class RoundsTableComponent {
     console.log(this.dataSource);
   }
 }
-
-//TODO: add canvases and details to the table

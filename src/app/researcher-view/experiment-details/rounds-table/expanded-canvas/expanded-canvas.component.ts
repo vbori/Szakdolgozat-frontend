@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { FabricShape, Round, Shape } from 'src/app/common/models/round.model';
+import { Round, Shape } from 'src/app/common/models/round.model';
 import { fabric } from 'fabric';
 
 @Component({

@@ -1,9 +1,9 @@
-import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { environment } from 'src/environments/environment';
+import { saveAs } from 'file-saver';
 @Component({
   selector: 'app-experiment-details',
   templateUrl: './experiment-details.component.html',
@@ -67,6 +67,16 @@ export class ExperimentDetailsComponent implements OnInit {
       console.log(error);
     });
   }
-}
 
-//TODO: add result saving
+  downloadExperiment(format: 'json' | 'csv'): void {
+    this.experimentService.downloadExperiment(this.experiment._id, format).subscribe({
+      next: (data: Blob) => {
+        const blob = new Blob([data], { type: 'application/zip' });
+        saveAs(blob, `experiment-${this.experiment._id}.zip`);
+      },
+      error: (error) => console.log(error) // TODO: display messages
+    });
+  }
+
+  //TODO: disable opening experiment when openExperiment count > max or rounds are not defined
+}

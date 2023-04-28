@@ -4,6 +4,7 @@ import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { ExperimentCreationConstants } from '../experiment-creation.constants';
 import { fabric } from 'fabric';
+import { Round } from 'src/app/common/models/round.model';
 
 @Component({
   selector: 'app-experiment-basics',
@@ -16,10 +17,10 @@ export class ExperimentBasicsComponent implements AfterViewInit{
   @Output() experimentChange = new EventEmitter<Experiment>();
   @Output() nextStep = new EventEmitter<void>();
 
-  outlineCanvas: fabric.Canvas; //FIXME: crooked shape and label display
-  outlineCanvasData: any = {"objects":[{"type":"rect", "originX":"left","originY":"top","left":10,"top":10,"width":50,"height":50},{"type":"circle", "originX":"center","originY":"center","left":100,"top":100,"radius":25}]};
+  outlineCanvas: fabric.Canvas;
+  outlineCanvasData: Round = {"objects":[{"type":"rect", "originX":"left","originY":"top","left":10,"top":10,"width":50,"height":50, "target": false, "distraction": false, "fill": "#fff", "strokeWidth": 1},{"type":"circle", "originX":"left","originY":"top","left":100,"top":100,"radius":25, "target": false, "distraction": false, "fill": "#fff", "strokeWidth": 1, "width":50,"height":50}], canvasHeight:200, canvasWidth:200, "background"  :"#fff"};
   coloredCanvas: fabric.Canvas;
-  coloredCanvasData: any = {"objects":[{"type":"rect", "originX":"left","originY":"top","left":10,"top":10,"width":50,"height":50,"fill":"blue"},{"type":"circle", "originX":"center","originY":"center","left":100,"top":100,"fill":"blue","radius":25}], "background"  :"red"};
+  coloredCanvasData: Round = {"objects":[{"type":"rect", "originX":"left","originY":"top","left":10,"top":10,"width":50,"height":50,"fill":"blue", "target": false, "distraction": false, "strokeWidth": 1},{"type":"circle", "originX":"left","originY":"top","left":100,"top":100,"fill":"blue","radius":25, "target": false, "distraction": false, "strokeWidth": 1, "width":50,"height":50}], canvasHeight:200, canvasWidth:200, "background"  :"red"};
 
   experimentBasicsForm = new FormGroup({
     name: new FormControl<string>('', [Validators.required, Validators.minLength(3)]),
@@ -27,7 +28,7 @@ export class ExperimentBasicsComponent implements AfterViewInit{
     maxParticipantNum: new FormControl<number>(20, [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_PARTICIPANT_NUM)]),
     controlGroupChance: new FormControl<number>(20, [Validators.required, Validators.min(0), Validators.max(100)]),
     cursorPathImageNeeded: new FormControl<boolean>(false),
-    cursorImageMode: new FormControl<string>('Colors included'),
+    cursorImageMode: new FormControl<string>('Outlines only'),
     positionArrayNeeded: new FormControl<boolean>(false),
     positionTrackingFrequency: new FormControl<number>(500, [Validators.min(100),Validators.max(1000)])
   });
@@ -54,22 +55,31 @@ export class ExperimentBasicsComponent implements AfterViewInit{
       this.experimentBasicsForm.controls.positionArrayNeeded.setValue(this.experiment?.positionTrackingFrequency !== undefined);
       this.experimentBasicsForm.controls.positionTrackingFrequency.setValue(this.experiment?.positionTrackingFrequency ?? 500);
       this.experimentBasicsForm.controls.cursorPathImageNeeded.setValue(this.experiment?.cursorImageMode !== undefined);
-      this.experimentBasicsForm.controls.cursorImageMode.setValue(this.experiment?.cursorImageMode ?? 'Colors included');
+      this.experimentBasicsForm.controls.cursorImageMode.setValue(this.experiment?.cursorImageMode ?? 'Outlines only');
     }
   }
 
   createCanvases(): void{
     this.outlineCanvas = new fabric.Canvas('outlineCanvas');
     this.outlineCanvas.selection = false;
+    this.outlineCanvas.hoverCursor = 'default';
+    this.outlineCanvas.setHeight(this.outlineCanvasData.canvasHeight);
+    this.outlineCanvas.setWidth(this.outlineCanvasData.canvasWidth);
     this.coloredCanvas = new fabric.Canvas('coloredCanvas');
     this.coloredCanvas.selection = false;
+    this.coloredCanvas.hoverCursor = 'default';
+    this.coloredCanvas.setHeight(this.coloredCanvasData.canvasHeight);
+    this.coloredCanvas.setWidth(this.coloredCanvasData.canvasWidth);
 
     this.outlineCanvas.loadFromJSON(this.outlineCanvasData, this.outlineCanvas.renderAll.bind(this.outlineCanvas), (o: any, object: any) => {
       object.set('selectable', false);
+      object.set('stroke', '#000000');
     });
     this.coloredCanvas.loadFromJSON(this.coloredCanvasData, this.coloredCanvas.renderAll.bind(this.coloredCanvas), (o: any, object: any) => {
       object.set('selectable', false);
     });
+    console.log(this.outlineCanvas);
+    console.log(this.coloredCanvas);
   }
 
   onSubmit(): void{

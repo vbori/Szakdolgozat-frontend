@@ -8,13 +8,14 @@
     <button mat-raised-button color="primary" [routerLink]="['/participant', experiment._id, 'true']">View demo</button>
     <button mat-raised-button color="warn" *ngIf="experiment.status == 'Active'" (click)="closeExperiment()">Close experiment</button>
     <button mat-raised-button color="primary" *ngIf="experiment.status == 'Active'" (click)="shareExperiment()">Copy invite link</button>
-    <button mat-raised-button color="primary" *ngIf="experiment.status == 'Draft'" (click)="openExperiment()">Open experiment</button>
+    <button mat-raised-button color="primary" *ngIf="experiment.status == 'Draft'" (click)="openExperiment()" [disabled]="experiment.rounds.length == 0">Open experiment</button>
     <button mat-raised-button color="primary" *ngIf="experiment.status == 'Draft'" [routerLink]="['/research/experiment/create', experiment._id]">Edit experiment</button>
-    <button mat-raised-button color="primary" *ngIf="experiment.status == 'Closed'">Download results</button>
+    <button mat-raised-button color="primary" *ngIf="experiment.status == 'Closed'" (click)="downloadExperiment('json')">Download results as JSON</button>
+    <button mat-raised-button color="primary" *ngIf="experiment.status == 'Closed'" (click)="downloadExperiment('csv')">Download results as CSV</button>
     <button mat-raised-button color="warn" *ngIf="experiment.status == 'Closed' || experiment.status =='Draft'" (click)="dialog.showModal()">Delete experiment</button>
   </div>
   <mat-divider></mat-divider>
-  <mat-list>
+  <mat-list> <!--TODO: only display data when it is available-->
     <mat-list-item *ngIf="experiment.status != 'Draft'">
       <span matListItemTitle>Opened at</span>
       <span matListItemLine>{{experiment.openedAt}}</span>
@@ -41,11 +42,11 @@
     </mat-list-item>
     <mat-list-item>
       <span matListItemTitle>Canvas width</span>
-      <span matListItemLine>{{experiment.rounds[0].canvasWidth}}</span>
+      <span matListItemLine>{{experiment.rounds.length > 0 ? experiment.rounds[0].canvasWidth : 'Not defined'}}</span>
     </mat-list-item>
     <mat-list-item>
       <span matListItemTitle>Canvas height</span>
-      <span matListItemLine>{{experiment.rounds[0].canvasHeight}}</span>
+      <span matListItemLine>{{experiment.rounds.length > 0 ? experiment.rounds[0].canvasHeight : 'Not defined'}}</span>
     </mat-list-item>
   </mat-list>
   <h2>Description</h2>

@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Experiment, ExperimentExtract } from '../models/experiment.model';
 import { environment } from 'src/environments/environment';
 import { Form } from '../models/form.model';
@@ -71,6 +71,19 @@ export class ExperimentService {
     });
 
     return this.http.delete<{message: string}>(`${environment.baseUrl}/research/deleteExperiment/${experimentId}`, { headers });
+  }
+  
+  public downloadExperiment(experimentId: string, format: 'json' | 'csv'): Observable<Blob> {
+    let headers = new HttpHeaders({
+      "Authorization": 'Bearer ' + localStorage.getItem('accessToken'),
+      "responseType": "arraybuffer"
+    });
+  
+    return this.http.get(`${environment.baseUrl}/research/downloadResults/${experimentId}/${format}`, { headers, responseType: 'arraybuffer' }).pipe(
+      map((response: ArrayBuffer) => {
+        return new Blob([response], { type: 'application/zip' });
+      })
+    );
   }
 
   public getDescription(experimentId: string, demoMode: boolean = false ): Observable<string> {
