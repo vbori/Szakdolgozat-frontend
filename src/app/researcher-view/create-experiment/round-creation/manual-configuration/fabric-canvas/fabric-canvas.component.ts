@@ -4,6 +4,7 @@ import { fabric } from 'fabric';
 import { FabricShape, Round } from 'src/app/common/models/round.model';
 import { ExperimentCreationConstants } from '../../../experiment-creation.constants';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import { MatTabChangeEvent } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-fabric-canvas',
@@ -12,34 +13,35 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 })
 
 export class FabricCanvasComponent implements AfterViewInit, OnChanges{
-  canvas: fabric.Canvas ;
   @Input() canvasWidth: number;
   @Input() canvasHeight: number;
   @Input() roundIdx: number;
   @Input() round: Round;
 
   @Output() validityChange = new EventEmitter<boolean>();
-  @Output() questionChange = new EventEmitter<void>();
   @Output() canvasCreated = new EventEmitter<fabric.Canvas>();
 
-  selectedTabIndex = 0;
+  canvas: fabric.Canvas;
   distractingShape: FabricShape | undefined = undefined;
   targetShape: FabricShape | undefined = undefined;
   baseShape: FabricShape | undefined = undefined;
+  shapesIntersect = false;
   validities = {targetShape: true, distractingShape: true, baseShape: true};
+  tabLabels = ['Base Shape', 'Target Shape', 'Distracting Shape'];
+  selectedTabIndex = 0;
 
   distractionForm = new FormGroup({
     backgroundColor: new FormControl<string>('#FFFFFF', {nonNullable: true, validators: [Validators.required]}),
     useBackgroundDistraction: new FormControl<boolean>(false, {nonNullable: true}),
     useShapeDistraction: new FormControl<boolean>(false, {nonNullable: true}),
-    shapeDistractionDuration: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME)]}),
+    shapeDistractionDuration: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME),Validators.pattern("^[0-9]*$")]}),
     backgroundDistraction : new FormGroup({
       color: new FormControl<string>('#FF0000',{nonNullable: true, validators: [Validators.required]}),
-      duration: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME)]}),
+      duration: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME), Validators.pattern("^[0-9]*$")]}),
       useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
       flashing: new FormGroup({
         color: new FormControl<string>('#000000',{nonNullable: true, validators: [Validators.required]}),
-        frequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_FLASHING_FREQUENCY), Validators.max(this.constants.MAX_FLASHING_FREQUENCY)]}),
+        frequency: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_FLASHING_FREQUENCY), Validators.max(this.constants.MAX_FLASHING_FREQUENCY),Validators.pattern("^[0-9]*$")]}),
       })
     })
   });
@@ -48,14 +50,20 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
 
   ngAfterViewInit(): void {
     this.distractionForm.statusChanges?.subscribe((status) => {
-      console.log("status changed", status);
       let allValid = status === 'VALID' && this.validities.baseShape && this.validities.targetShape && (this.distractionForm.value.useShapeDistraction ? this.validities.distractingShape : true);
-      console.log("allValid", allValid)
       this.validityChange.emit(allValid);
     });
 
     this.initializeCanvas();
+    this.initializeForm();
+    console.log(this.round);
     if(this.round.objects.length > 0){
+      let distractingShape = this.round.objects.filter((obj) => obj.distraction).at(0);
+      if(!distractingShape){
+        distractingShape = this.CANVASDATA.objects.filter((obj) => obj.distraction).at(0);
+        if(distractingShape)
+          this.round.objects.push(distractingShape);
+      }
       this.loadCanvasData(this.round);
     }else{
       this.loadCanvasData(this.CANVASDATA);
@@ -84,7 +92,12 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     this.canvas.backgroundColor =  this.distractionForm.controls.backgroundColor.value;
     this.canvas.selection = false;
     this.canvasCreated.emit(this.canvas);
-    fabric.Object.NUM_FRACTION_DIGITS = 2;
+  }
+
+  initializeForm(): void{
+    this.distractionForm.patchValue(this.round);
+    this.distractionForm.controls.useBackgroundDistraction.setValue(!!this.round.backgroundDistraction);
+    this.distractionForm.controls.useShapeDistraction.setValue(!!this.round.shapeDistractionDuration);
   }
 
   loadCanvasData(round: Round): void{
@@ -96,6 +109,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
         shape.setControlsVisibility({mr: false, ml: false, mt: false, mb: false});
       }
       if(shape.distraction) {
+        if(this.round.shapeDistractionDuration == undefined)
         shape.set('visible', false);
         this.distractingShape = shape;
       }else  if(shape.target) {
@@ -164,17 +178,38 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     }
   }
 
-  setShapeDistraction(event: MatCheckboxChange): void{
+  setShapeDistraction(event: MatCheckboxChange): void{ 
     if(event.checked){
       this.distractionForm.controls.shapeDistractionDuration.enable();
       this.round.shapeDistractionDuration = this.distractionForm.controls.shapeDistractionDuration.value;
       this.distractingShape?.set('visible', true);
+      if(this.distractingShape){
+        this.canvas.setActiveObject(this.distractingShape);
+        this.distractingShape.setCoords();
+        this.selectedTabIndex = 2;
+      }
     }else{
       this.distractionForm.controls.shapeDistractionDuration.disable();
       this.round.shapeDistractionDuration = undefined;
+      this.canvas.discardActiveObject(); 
       this.distractingShape?.set('visible', false);
     }
+    this.checkIntersection();
     this.canvas.renderAll();
+  }
+
+  checkIntersection() {
+    if(this.distractingShape){
+      this.shapesIntersect = false;
+      let comparisonShape = this.distractingShape.visible ? this.distractingShape : this.targetShape;
+      this.canvas.forEachObject( (obj) => {
+        if (obj === comparisonShape || !obj.visible) return;
+        if(comparisonShape?.intersectsWithObject(obj)){
+          this.shapesIntersect = true;
+          this.validityChange.emit(false); 
+        }
+      });
+    }
   }
 
   onBackgroundChange(): void{
@@ -216,11 +251,28 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     console.log(this.round);
   }
 
+  changeSelectedObject(event: MatTabChangeEvent){
+    if(event.tab.textLabel == this.tabLabels[0] && this.baseShape){
+      this.canvas.setActiveObject(this.baseShape);
+    }else if(event.tab.textLabel == this.tabLabels[1] && this.targetShape){
+      this.canvas.setActiveObject(this.targetShape);
+    }else if(event.tab.textLabel == this.tabLabels[2] && this.distractingShape){
+      this.canvas.setActiveObject(this.distractingShape);
+    }
+
+    this.canvas.renderAll();
+  }
+
   onValidityChange(valid: boolean, shapeName: 'baseShape' | 'targetShape' | 'distractingShape'): void{
     this.validities[shapeName] = valid;
-    let allValid = this.validities.baseShape && this.validities.targetShape && (this.distractionForm.value.useShapeDistraction ? this.validities.distractingShape : true);
+    let allValid = !this.shapesIntersect && this.validities.baseShape && this.validities.targetShape && (this.distractionForm.value.useShapeDistraction ? this.validities.distractingShape : true);
     this.validityChange.emit(allValid);
-    console.log("validity change in middle", allValid, this.validities);
+  }
+
+  onIntersectChange(intersect: boolean){
+    this.shapesIntersect = intersect;
+    let allValid = !this.shapesIntersect && this.validities.baseShape && this.validities.targetShape && (this.distractionForm.value.useShapeDistraction ? this.validities.distractingShape : true);
+    this.validityChange.emit(allValid);
   }
 
   readonly CANVASDATA: Round = {

@@ -2,7 +2,7 @@
 <mat-tab-group animationDuration="1000ms" [(selectedIndex)]="selectedTabIndex" dynamicHeight>
   <mat-tab label="Generate rounds">
     <ng-template matTabContent>
-      <app-rounds-generator [experiment] = "experiment" (experimentChange)= "onExperimentChange($event)"></app-rounds-generator>
+      <app-rounds-generator [experiment] = "experiment" (experimentChange)="onExperimentChange($event)" (nextStep)="selectedTabIndex = 1"></app-rounds-generator>
     </ng-template>
   </mat-tab>
   <mat-tab label="Configure rounds manually">

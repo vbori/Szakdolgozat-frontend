@@ -77,6 +77,4 @@ export class ExperimentDetailsComponent implements OnInit {
       error: (error) => console.log(error) // TODO: display messages
     });
   }
-
-  //TODO: disable opening experiment when openExperiment count > max or rounds are not defined
 }

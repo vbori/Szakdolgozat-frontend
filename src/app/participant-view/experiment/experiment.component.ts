@@ -113,29 +113,29 @@ export class ExperimentComponent implements OnInit{
     this.mainCanvas.setHeight(round.canvasHeight);
     this.mainCanvas.setWidth(round.canvasWidth);
 
-    this.mainCanvas.loadFromJSON(round, this.mainCanvas.renderAll.bind(this.mainCanvas), (o: any, object: any) => {
-      object.set('selectable', false);
-      object.set('perPixelTargetFind',true);
+    this.mainCanvas.loadFromJSON(round, this.mainCanvas.renderAll.bind(this.mainCanvas), (o: any, shape: any) => {
+      shape.set('selectable', false);
+      shape.set('perPixelTargetFind',true);
 
-      if(object.distraction){
-        object.set('visible', false);
-        object.set('evented', false);
-        this.distractingShape = object;
+      if(shape.distraction){
+        shape.set('visible', false);
+        shape.set('evented', false);
+        this.distractingShape = shape;
       }else{
-        if(object.target){
-          object.on('mousedown', this.handleTargetShapeClick.bind(this));
+        if(shape.target){
+          shape.on('mousedown', this.handleTargetShapeClick.bind(this));
         }else{
-          object.on('mousedown', this.handleBaseShapeClick.bind(this));
-          object.on('mouseover', this.handleBaseShapeHover.bind(this));
-          object.on('mouseout', this.handleBaseShapeLeave.bind(this));
+          shape.on('mousedown', this.handleBaseShapeClick.bind(this));
+          shape.on('mouseover', this.handleBaseShapeHover.bind(this));
+          shape.on('mouseout', this.handleBaseShapeLeave.bind(this));
         }
       }
 
-      if(object.flashing){
+      if(shape.flashing){
         setInterval(() => {
-          object.set('fill', object.fill == object.baseColor ? object.flashing.color : object.baseColor);
+          shape.set('fill', shape.fill == shape.baseColor ? shape.flashing.color : shape.baseColor);
           this.mainCanvas.renderAll();
-        }, object.flashing.frequency);
+        }, shape.flashing.frequency);
       }
     });
 

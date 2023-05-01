@@ -1,4 +1,4 @@
-import { Configuration } from "./config.model";
+import { ExperimentConfiguration } from "./config.model";
 import { Round } from "./round.model";
 
 export interface ExperimentExtract{
@@ -19,7 +19,7 @@ export interface Experiment extends ExperimentExtract {
   positionTrackingFrequency?: number;
   participantDescription: string;
   rounds: Round[];
-  experimentConfiguration?: Configuration;
+  experimentConfiguration?: ExperimentConfiguration;
 }
 
 export type ExperimentStatus = 'Active' | 'Draft' | 'Closed';

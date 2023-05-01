@@ -18,4 +18,6 @@ export class ExperimentCreationConstants {
     public readonly MAX_DISTRACTION_DURATION_TIME = 5000
     public readonly MIN_FLASHING_FREQUENCY = 100;
     public readonly MAX_FLASHING_FREQUENCY = 1000;
+    public readonly MIN_TRACKING_FREQUENCY = 100;
+    public readonly MAX_TRACKING_FREQUENCY = 1000;
 }

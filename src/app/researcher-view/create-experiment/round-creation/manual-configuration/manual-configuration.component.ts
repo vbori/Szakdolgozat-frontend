@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ExperimentCreationConstants } from '../../experiment-creation.constants';
-import { FabricShape, Round, RoundClass, Shape } from 'src/app/common/models/round.model';
+import { FabricShape, Round, RoundClass, Shape, ShapeType } from 'src/app/common/models/round.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { Router } from '@angular/router';
 import { Experiment } from 'src/app/common/models/experiment.model';
@@ -23,11 +23,12 @@ export class ManualConfigurationComponent implements OnInit{
   rounds: Round[] = [new RoundClass()];
   @Input() experiment: Experiment | undefined;
 
-  constructor(public constants: ExperimentCreationConstants, private readonly experimentService: ExperimentService, private router: Router) { }
+  constructor(public constants: ExperimentCreationConstants, private readonly experimentService: ExperimentService, private router: Router, private changeDetector: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     if(this.experiment?.rounds && this.experiment.rounds.length > 0){
       this.rounds = this.experiment.rounds.map((round) => new RoundClass(round));
+      this.changeDetector.detectChanges();
     }
   }
 
@@ -59,15 +60,17 @@ export class ManualConfigurationComponent implements OnInit{
     for (let i = 0; i < this.rounds.length; i++){
       this.syncRoundAndCanvas(i);
     }
-    if(this.experiment)
-    this.experimentService.updateExperiment({experimentId: this.experiment._id ,updatedExperiment: {rounds: this.rounds}}).subscribe({
-      next: (experiment) => {
-        this.router.navigate(['/research/experiment/details/', this.experiment?._id]);
-      },
-      error: (error) => {
-        console.log(error); //TODO: display error message
-      }
-    });
+    if(this.experiment){
+      console.log("mar az ifben")
+      this.experimentService.updateExperiment({experimentId: this.experiment._id ,updatedExperiment: {rounds: this.rounds}}).subscribe({
+        next: (experiment) => {
+          this.router.navigate(['/research/experiment/details/', this.experiment?._id]);
+        },
+        error: (error) => {
+          console.log(error); //TODO: display error message
+        }
+      });
+    }
   }
 
   syncRoundAndCanvas(index: number): void {
@@ -89,17 +92,19 @@ export class ManualConfigurationComponent implements OnInit{
       distraction: shape.distraction || false,
       flashing: shape.flashing || undefined,
       baseColor: shape.fill as string || undefined,
-      type: shape.type ?? 'rect',
-      radius: shape.radius || undefined,
+      type: shape.type  as ShapeType ?? 'rect',
+      radius: shape.radius ? Math.round(shape.getScaledWidth()/2) : undefined,
       originX: shape.originX ?? 'left',
       originY: shape.originY ?? 'top',
-      left: shape.left ?? 0,
-      top: shape.top ?? 0,
-      width: shape.getScaledWidth() ?? 0,
-      height: shape.getScaledHeight() ?? 0,
+      left: shape.left ? Math.floor(shape.left) : 0,
+      top: shape.top ? Math.floor(shape.top) : 0,
+      width: Math.round(shape.getScaledWidth()) ?? 0,
+      height: Math.round(shape.getScaledHeight()) ?? 0,
       fill: shape.fill as string ?? '#000000',
       strokeWidth: 0
     };
+    console.log('convert to new shape')
+    console.log(newShape);
     return newShape;
   }
 }

@@ -2,7 +2,7 @@
   <mat-form-field>
     <mat-label>Shape</mat-label>
     <mat-select formControlName="type" (selectionChange)="onTypeChange($event)">
-      <mat-option *ngFor="let shape of shapeTypes" [value]="shape.value">
+      <mat-option *ngFor="let shape of shapeOptions" [value]="shape.value">
         {{shape.viewValue}}
       </mat-option>
     </mat-select>
@@ -17,7 +17,8 @@
     <input matInput formControlName="top" type="number" #top (input)="setObjectAttribute('top', top.value)">
     <span matSuffix>px &nbsp;</span>
     <mat-error>
-      <span *ngIf="shapeConfigForm.controls.top.hasError('required')">Distance from the top of the canvas is required</span>
+      <span *ngIf="shapeConfigForm.controls.top.hasError('required')">This field is required</span>
+      <span *ngIf="!shapeConfigForm.controls.top.hasError('required') && shapeConfigForm.controls.top.hasError('pattern')">Give a whole number!</span>
       <span *ngIf="!shapeConfigForm.controls.top.hasError('required') && (shapeConfigForm.controls.top.hasError('min') || shapeConfigForm.controls.top.hasError('overLimit'))">The shape can not leave the canvas!</span>
     </mat-error>
   </mat-form-field>
@@ -26,17 +27,19 @@
     <input matInput formControlName="left" type="number" #left (input)="setObjectAttribute('left', left.value)">
     <span matSuffix>px &nbsp;</span>
     <mat-error>
-      <span *ngIf="shapeConfigForm.controls.left.hasError('required')">Distance from the top of the canvas is required</span>
+      <span *ngIf="shapeConfigForm.controls.left.hasError('required')">This field is required</span>
+      <span *ngIf="!shapeConfigForm.controls.left.hasError('required') && shapeConfigForm.controls.left.hasError('pattern')">Give a whole number!</span>
       <span *ngIf="!shapeConfigForm.controls.left.hasError('required') && (shapeConfigForm.controls.left.hasError('min') || shapeConfigForm.controls.left.hasError('overLimit'))">The shape can not leave the canvas!</span>
     </mat-error>
   </mat-form-field>
   <h3>Size</h3>
   <mat-form-field *ngIf="shape.type == 'circle'">
     <mat-label>Radius</mat-label>
-    <input matInput formControlName="radius" (ngModelChange)="onRadiusChange($event)" type="number">
+    <input matInput formControlName="radius" (input)="onRadiusChange($event)" type="number">
     <span matSuffix>px &nbsp;</span>
     <mat-error>
-      <span *ngIf="shapeConfigForm.controls.radius.hasError('required')">Radius is required</span>
+      <span *ngIf="shapeConfigForm.controls.radius.hasError('required')">This field is required</span>
+      <span *ngIf="!shapeConfigForm.controls.radius.hasError('required') && shapeConfigForm.controls.radius.hasError('pattern')">Give a whole number!</span>
       <span *ngIf="!shapeConfigForm.controls.radius.hasError('required') && (shapeConfigForm.controls.radius.hasError('min') || shapeConfigForm.controls.radius.hasError('max'))">Radius must be between {{constants.MIN_SHAPE_SIZE /2}} and {{constants.MAX_SHAPE_SIZE /2}}</span>
     </mat-error>
     <mat-hint>
@@ -48,7 +51,8 @@
     <input matInput formControlName="height" type="number" #height (input)="setObjectAttribute('height', height.value)">
     <span matSuffix>px &nbsp;</span>
     <mat-error>
-      <span *ngIf="shapeConfigForm.controls.height.hasError('required')">Distance from the height of the canvas is required</span>
+      <span *ngIf="shapeConfigForm.controls.height.hasError('required')">This field is required</span>
+      <span *ngIf="!shapeConfigForm.controls.height.hasError('required') && shapeConfigForm.controls.height.hasError('pattern')">Give a whole number!</span>
       <span *ngIf="!shapeConfigForm.controls.height.hasError('required') && (shapeConfigForm.controls.height.hasError('min') || shapeConfigForm.controls.height.hasError('max'))">Height must be between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!</span>
     </mat-error>
     <mat-hint>
@@ -60,7 +64,8 @@
     <input matInput formControlName="width" type="number" #width (input)="setObjectAttribute('width', width.value)">
     <span matSuffix>px &nbsp;</span>
     <mat-error>
-      <span *ngIf="shapeConfigForm.controls.width.hasError('required')">Distance from the top of the canvas is required</span>
+      <span *ngIf="shapeConfigForm.controls.width.hasError('required')">This field is required</span>
+      <span *ngIf="!shapeConfigForm.controls.width.hasError('required') && shapeConfigForm.controls.width.hasError('pattern')">Give a whole number!</span>
       <span *ngIf="!shapeConfigForm.controls.width.hasError('required') && (shapeConfigForm.controls.width.hasError('min') || shapeConfigForm.controls.width.hasError('max'))">Width must be between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!</span>
     </mat-error>
     <mat-hint>
@@ -75,6 +80,7 @@
       <span matSuffix>ms &nbsp;</span>
       <mat-error *ngIf="shapeConfigForm.controls.flashing.controls.frequency.invalid">
         Flash frequency must be between {{constants.MIN_FLASHING_FREQUENCY}} and {{constants.MAX_FLASHING_FREQUENCY}} milliseconds!
+        <span *ngIf="!shapeConfigForm.controls.flashing.controls.frequency.hasError('required') && shapeConfigForm.controls.flashing.controls.frequency.hasError('pattern')">Give a whole number!</span>
       </mat-error>
     </mat-form-field>
     <mat-form-field >
@@ -82,4 +88,5 @@
       <input matInput formControlName="color" type="color" #color (change)="changeFlashing('color', color.value)">
     </mat-form-field>
   </div>
+  <p *ngIf="shapesIntersect" class="red"><b>The bounding boxes of the shapes can not intersect!</b></p>
 </form>

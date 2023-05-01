@@ -19,7 +19,7 @@
     <mat-label>Maximum number of participants</mat-label>
     <input type="number" matInput formControlName="maxParticipantNum">
     <mat-error *ngIf="experimentBasicsForm.controls.maxParticipantNum.invalid">
-      Number of participants must be between 1 and 100!
+      Number of participants must be a whole number between 1 and {{constants.MAX_PARTICIPANT_NUM}}!
     </mat-error>
   </mat-form-field>
   <mat-form-field>
@@ -27,7 +27,7 @@
     <input type="number" matInput formControlName="controlGroupChance">
     <span matSuffix>% &nbsp;</span>
     <mat-error *ngIf="experimentBasicsForm.controls.controlGroupChance.invalid">
-      The control group chance must be between 0% and 100%!
+      The control group chance must be a whole number between 0% and 100%!
     </mat-error>
   </mat-form-field>
   <mat-checkbox formControlName="positionArrayNeeded">Track cursor positions periodically</mat-checkbox>
@@ -35,7 +35,7 @@
     <mat-label>Position tracking frequency</mat-label>
     <input matInput type="number" formControlName="positionTrackingFrequency">
     <span matSuffix>ms &nbsp;</span>
-    <mat-hint>Give a value between 100 and 1000 milliseconds</mat-hint>
+    <mat-hint>Give a whole number between {{constants.MIN_TRACKING_FREQUENCY}} and {{constants.MAX_TRACKING_FREQUENCY}} milliseconds</mat-hint>
   </mat-form-field>
   <mat-checkbox formControlName="cursorPathImageNeeded">Save the path of the participant's cursor as an image</mat-checkbox>
   <div [hidden]="!experimentBasicsForm.value.cursorPathImageNeeded">

@@ -7,17 +7,20 @@ import { ValidationErrors } from '@angular/forms';
 })
 export class ExperimentRoundsValidator
 {
-  public static conflictingValuesValidator(minControlName: string, maxControlName: string): ValidatorFn {
+  public static conflictingValuesValidator(minControlName: string, maxControlName: string, minControlSubForm: string | undefined = undefined): ValidatorFn {
     return (formGroup: AbstractControl): ValidationErrors | null => {
-      const minControl = formGroup.get(minControlName);
+      let minControl: AbstractControl | null | undefined;
       const maxControl = formGroup.get(maxControlName);
-
+      if(minControlSubForm) {
+        minControl = formGroup.get(minControlSubForm)?.get(minControlName);
+      }else{
+        minControl = formGroup.get(minControlName);
+      }
       if (minControl && maxControl && minControl.value > maxControl.value) {
         const errorLabel = `conflictingValues${minControlName}${maxControlName}`;
         const errors: any = {};
         errors[errorLabel] = true;
         return errors;
-        //return { conflictingValues: true };
       }
 
       return null;
@@ -45,6 +48,29 @@ export class ExperimentRoundsValidator
 
       if (roundNumControl && setNumControl && roundNumControl.value*setNumControl.value > maxRoundNum) {
         return { tooManyTotalRounds: true };
+      }
+
+      return null;
+    }
+  }
+
+  public static shapesOverlapValidator(canvasWidthControlName: string, normalMinWidthControlName: string, distractionMinWidthControlName: string | undefined = undefined): ValidatorFn {
+    return (formGroup: AbstractControl): ValidationErrors | null => {
+      const canvasWidth = formGroup.get(canvasWidthControlName)?.value;
+      const normalMinWidth = formGroup.get(normalMinWidthControlName)?.value;
+      let distractionMinWidth: number | undefined;
+      if(distractionMinWidthControlName) {
+        distractionMinWidth = formGroup.get(distractionMinWidthControlName)?.value;
+      }
+
+      if (canvasWidth && normalMinWidth) {
+        if(distractionMinWidth) {
+          if(2*normalMinWidth + distractionMinWidth > canvasWidth) {
+            return { shapesOverlap: true };
+          }
+        }else if(2*normalMinWidth > canvasWidth){
+          return { shapesOverlap: true };
+        }
       }
 
       return null;

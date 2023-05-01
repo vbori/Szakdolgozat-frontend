@@ -16,7 +16,7 @@ export interface Shape{
   distraction: boolean;
   flashing?: Flashing;
   baseColor?: string;
-  type: string;  //TODO: try to refactor to ShapeType
+  type: ShapeType; 
   radius?: number;
   originX: string;
   originY: string;
@@ -33,7 +33,7 @@ export class ShapeModel implements Shape{
   distraction: boolean;
   flashing?: Flashing;
   baseColor?: string;
-  type: string; //TODO: try to refactor to ShapeType
+  type: ShapeType;
   radius?: number;
   originX: string;
   originY: string;
@@ -80,22 +80,6 @@ export interface Round {
 }
 
 export class RoundClass implements Round{
-  /*roundIdx?: number;
-  _id?: string;
-  objects: NewShape[];
-  canvasHeight: number;
-  canvasWidth: number;
-  background: string;
-  shapeDistractionDuration?: number;
-  backgroundDistraction?: BackgroundDistraction;
-
-  constructor(objects: NewShape[] =  [], canvasHeight: number = 500, canvasWidth: number = 500, background: string = '#fff'){
-    this.objects = objects;
-    this.canvasHeight = canvasHeight;
-    this.canvasWidth = canvasWidth;
-    this.background = background;
-  }*/
-
   roundIdx?: number;
   _id?: string;
   objects: Shape[] = [];
@@ -115,4 +99,4 @@ export class RoundClass implements Round{
   }
 }
 
-type ShapeType = 'rect' | 'circle'
+ export type ShapeType = 'rect' | 'circle'

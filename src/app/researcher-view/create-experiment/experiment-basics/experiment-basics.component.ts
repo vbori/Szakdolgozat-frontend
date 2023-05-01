@@ -25,16 +25,16 @@ export class ExperimentBasicsComponent implements AfterViewInit{
   experimentBasicsForm = new FormGroup({
     name: new FormControl<string>('', [Validators.required, Validators.minLength(3)]),
     researcherDescription: new FormControl<string>('', [Validators.required, Validators.minLength(6)]),
-    maxParticipantNum: new FormControl<number>(20, [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_PARTICIPANT_NUM)]),
-    controlGroupChance: new FormControl<number>(20, [Validators.required, Validators.min(0), Validators.max(100)]),
+    maxParticipantNum: new FormControl<number>(20, [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_PARTICIPANT_NUM),Validators.pattern("^[0-9]*$")]),
+    controlGroupChance: new FormControl<number>(20, [Validators.required, Validators.min(0), Validators.max(100),Validators.pattern("^[0-9]*$")]),
     cursorPathImageNeeded: new FormControl<boolean>(false),
     cursorImageMode: new FormControl<string>('Outlines only'),
     positionArrayNeeded: new FormControl<boolean>(false),
-    positionTrackingFrequency: new FormControl<number>(500, [Validators.min(100),Validators.max(1000)])
+    positionTrackingFrequency: new FormControl<number>(500, [Validators.min(this.constants.MIN_TRACKING_FREQUENCY),Validators.max(this.constants.MAX_TRACKING_FREQUENCY),Validators.pattern("^[0-9]*$")])
   });
 
   constructor(private experimentService: ExperimentService,
-              private constants: ExperimentCreationConstants,
+              public constants: ExperimentCreationConstants,
               private changeDetector: ChangeDetectorRef) { }
 
   ngAfterViewInit(): void {

@@ -38,3 +38,7 @@ dialog {
 ng-container {
 position: relative;
 }
+
+.openExp:disabled {
+  pointer-events: auto;
+}

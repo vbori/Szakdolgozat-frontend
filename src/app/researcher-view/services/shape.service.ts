@@ -10,8 +10,8 @@ export class ShapeService {
   constructor() { }
   changeShapeType(newType: string, currentShape : FabricShape): FabricShape {
     let shape: FabricShape;
-    let width = currentShape.getScaledWidth();
-    let height = currentShape.getScaledHeight();
+    let width = Math.round(currentShape.getScaledWidth());
+    let height = Math.round(currentShape.getScaledHeight());
     let { left, top, fill, target, distraction, originX, originY } = currentShape;
     switch (newType) {
       case 'circle':
@@ -28,12 +28,12 @@ export class ShapeService {
 
         shape = new fabric.Circle({
           type: 'circle',
-          left: left,
-          top: top,
+          left: left ? Math.floor(left): 0,
+          top: top ? Math.floor(top): 0,
           height: newSize,
           width: newSize,
           fill: fill,
-          radius: parseFloat((newSize / 2.0).toFixed(2)),
+          radius: Math.round((newSize / 2.0)),
           originX: originX,
           originY: originY
         }) as FabricShape;
@@ -42,8 +42,8 @@ export class ShapeService {
       case 'rect':
         shape = new fabric.Rect({
           type: 'rect',
-          left: left,
-          top: top,
+          left: left ? Math.floor(left): 0,
+          top: top ? Math.floor(top): 0,
           height: height,
           width: width,
           fill: fill,
@@ -59,6 +59,7 @@ export class ShapeService {
     shape.set("strokeWidth", 0);
     shape.target = target;
     shape.distraction = distraction;
+    console.log(shape)
     return shape;
   }
 
