@@ -10,7 +10,7 @@ import { ExperimentService } from 'src/app/common/services/experiment.service';
 })
 export class ParticipantDescriptionComponent implements OnInit{
   @Input() experimentId: string;
-  @Output() nextStep = new EventEmitter<any>();
+  @Output() nextStep = new EventEmitter();
   @Input() demoMode: boolean;
   description: string;
 

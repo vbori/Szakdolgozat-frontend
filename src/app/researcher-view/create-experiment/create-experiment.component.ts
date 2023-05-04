@@ -26,14 +26,18 @@ export class CreateExperimentComponent implements OnInit{
         next: (experiment) => {
           this.experiment = experiment;
           this.experimentChecked = true;
-          console.log("Experiment loaded in main component");
-          console.log(this.experiment);
         },
         error: () => console.log("Error loading experiment")
       });
     }else{
       this.experimentChecked = true;
     }
+
+    window.onbeforeunload = (event) => {
+      event.preventDefault();
+      event.returnValue = '';
+      return true;
+    };
   }
 
   createExperiment(): void{
@@ -41,7 +45,7 @@ export class CreateExperimentComponent implements OnInit{
     console.log("Create Experiment")
   }
 
-  onStepChange(event: StepperSelectionEvent): void{ 
+  onStepChange(event: StepperSelectionEvent): void{
     this.stepCount = event.selectedIndex;
   }
 

@@ -16,7 +16,7 @@ export class ParticipantService {
     return this.http.get<Participant>(`${environment.baseUrl}/register/participant/${id}`);
   }
 
-  public addResponses(body: any): Observable<any> {
-    return this.http.patch(`${environment.baseUrl}/participant/addResponses`, body);
+  public addResponses(body: unknown): Observable<string> {
+    return this.http.patch<string>(`${environment.baseUrl}/participant/addResponses`, body);
   }
 }

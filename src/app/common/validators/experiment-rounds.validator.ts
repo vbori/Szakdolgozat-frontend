@@ -18,7 +18,7 @@ export class ExperimentRoundsValidator
       }
       if (minControl && maxControl && minControl.value > maxControl.value) {
         const errorLabel = `conflictingValues${minControlSubForm ?? ''}${minControlName}${maxControlName}`;
-        const errors: any = {};
+        const errors: ValidationErrors = {};
         errors[errorLabel] = true;
         return errors;
       }

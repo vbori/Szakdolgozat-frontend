@@ -3,29 +3,41 @@
     <span class="navbar-title" [routerLink]="['/research/dashboard']">
       Fitts
     </span>
-    <ul class="navbar-nav">
-      <!-- Avatar -->
-      <li mdbDropdown class="nav-item dropdown">
-        <a
-          *ngIf="isLoggedIn"
-          class="nav-link dropdown-toggle d-flex align-items-center"
-          id="navbarDropdownMenuLink"
-          role="button"
-          mdbDropdownToggle
-          aria-expanded="false"
-          (click)="isToggled = !isToggled"
-        >
-          <mat-icon fontIcon="account_circle"></mat-icon>
-        </a>
-        <ul mdbDropdownMenu class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" *ngIf="isToggled">
-          <li>
-            <a class="dropdown-item" [routerLink]="['/research/password']">Change password</a>
-          </li>
-          <li>
-            <a class="dropdown-item" (click)="logout()">Logout</a>
-          </li>
-        </ul>
-      </li>
-    </ul>
+    <div class="flexContainer">
+      <a id="info" (click)="dialog.showModal()"><mat-icon fontIcon="info"></mat-icon></a>
+      <ul class="navbar-nav">
+        <!-- Avatar -->
+        <li mdbDropdown class="nav-item dropdown">
+          <a
+            *ngIf="isLoggedIn"
+            class="nav-link dropdown-toggle d-flex align-items-center"
+            id="navbarDropdownMenuLink"
+            role="button"
+            mdbDropdownToggle
+            aria-expanded="false"
+            (click)="isToggled = !isToggled"
+          >
+            <mat-icon fontIcon="account_circle"></mat-icon>
+          </a>
+          <ul mdbDropdownMenu class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" *ngIf="isToggled">
+            <li>
+              <a class="dropdown-item" [routerLink]="['/research/password']">Change password</a>
+            </li>
+            <li>
+              <a class="dropdown-item" (click)="logout()">Logout</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
   </div>
 </nav>
+<dialog #dialog [hidden]="!dialog.open">
+  <h1>Info</h1>
+  <p>Welcome to our web application designed for researchers interested in conducting experiments based on Fitts' law.</p>
+  <p>With our user-friendly interface, researchers can easily configure and customize their experiments, invite participants, and collect data on their cursor movements. Our application tracks the participant's performance metrics and allows for easy data exporting in CSV or JSON formats for further analysis.</p>
+  <p>Our goal is to provide a reliable and efficient platform for researchers to conduct experiments, ultimately advancing our understanding of human-computer interaction.</p>
+  <div>
+    <button mat-raised-button color="primary" (click)="dialog.close()">Okay</button>
+  </div>
+</dialog>

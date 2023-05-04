@@ -1,7 +1,4 @@
 .canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
   cursor: default;
   user-select: none;
   border: 1px solid black;
@@ -14,4 +11,7 @@
 
 #container {
   position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }

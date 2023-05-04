@@ -1,15 +1,17 @@
 <div>
   <h1>Create a custom form to collect information about the participants!</h1>
   <ng-container *ngFor="let question of questions; let i=index;">
-    <h3>Question {{i+1}}</h3>
+    <div class="flexContainer">
+      <h3><b>Question {{i+1}}</b></h3>
+      <button mat-raised-button color="warn" (click)="removeQuestion(i)" [disabled]="questions.length == 1">Remove Question</button>
+    </div>
     <app-question-creation [question]="question" (questionChange)="onQuestionChange()"  (validityChange)="onValidityChange(i, $event)"></app-question-creation>
-    <button mat-raised-button color="primary" (click)="removeQuestion(i)" [disabled]="questions.length == 1">Remove Question</button>
     <mat-divider></mat-divider>
   </ng-container>
 
   <div class="buttonsContainer">
     <button mat-raised-button color="primary" (click)="addQuestion()">Add Question</button>
     <button mat-raised-button color="primary" (click)="saveForm()" [disabled]="isSubmitDisabled()">Create and Save Form</button>
-    <button mat-raised-button color="primary" (click)="formNotNeeded()">I don't need a form</button>
+    <button mat-raised-button color="warn" (click)="formNotNeeded()">Remove form</button>
   </div>
 </div>

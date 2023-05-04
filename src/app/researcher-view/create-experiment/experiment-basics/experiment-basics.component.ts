@@ -4,7 +4,7 @@ import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { ExperimentCreationConstants } from '../experiment-creation.constants';
 import { fabric } from 'fabric';
-import { Round } from 'src/app/common/models/round.model';
+import { FabricShape, Round } from 'src/app/common/models/round.model';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -54,9 +54,9 @@ export class ExperimentBasicsComponent implements AfterViewInit{
       this.experimentBasicsForm.controls.researcherDescription.setValue(this.experiment?.researcherDescription);
       this.experimentBasicsForm.controls.maxParticipantNum.setValue(this.experiment?.maxParticipantNum);
       this.experimentBasicsForm.controls.controlGroupChance.setValue(this.experiment?.controlGroupChance);
-      this.experimentBasicsForm.controls.positionArrayNeeded.setValue(this.experiment?.positionTrackingFrequency !== undefined);
+      this.experimentBasicsForm.controls.positionArrayNeeded.setValue(!!this.experiment?.positionTrackingFrequency);
       this.experimentBasicsForm.controls.positionTrackingFrequency.setValue(this.experiment?.positionTrackingFrequency ?? 500);
-      this.experimentBasicsForm.controls.cursorPathImageNeeded.setValue(this.experiment?.cursorImageMode !== undefined);
+      this.experimentBasicsForm.controls.cursorPathImageNeeded.setValue(!!this.experiment?.cursorImageMode);
       this.experimentBasicsForm.controls.cursorImageMode.setValue(this.experiment?.cursorImageMode ?? 'Outlines only');
     }
   }
@@ -73,15 +73,13 @@ export class ExperimentBasicsComponent implements AfterViewInit{
     this.coloredCanvas.setHeight(this.coloredCanvasData.canvasHeight);
     this.coloredCanvas.setWidth(this.coloredCanvasData.canvasWidth);
 
-    this.outlineCanvas.loadFromJSON(this.outlineCanvasData, this.outlineCanvas.renderAll.bind(this.outlineCanvas), (o: any, object: any) => {
+    this.outlineCanvas.loadFromJSON(this.outlineCanvasData, this.outlineCanvas.renderAll.bind(this.outlineCanvas), (o: any, object: FabricShape) => {
       object.set('selectable', false);
       object.set('stroke', '#000000');
     });
-    this.coloredCanvas.loadFromJSON(this.coloredCanvasData, this.coloredCanvas.renderAll.bind(this.coloredCanvas), (o: any, object: any) => {
+    this.coloredCanvas.loadFromJSON(this.coloredCanvasData, this.coloredCanvas.renderAll.bind(this.coloredCanvas), (o: any, object: FabricShape) => {
       object.set('selectable', false);
     });
-    console.log(this.outlineCanvas);
-    console.log(this.coloredCanvas);
   }
 
   onSubmit(): void{
@@ -117,15 +115,26 @@ export class ExperimentBasicsComponent implements AfterViewInit{
   }
 
   updateExperiment(): void{
-    console.log(this.experimentBasicsForm.value)
-    this.experimentService.updateExperiment({experimentId: this.experiment?._id, updatedExperiment: this.experimentBasicsForm.value}).subscribe({
-      next: (experiment) => {
-        this.handleExperimentChange(experiment);
-      },
-      error: (error) => {
-        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
-      }
-    });
+    let {name, researcherDescription, maxParticipantNum, controlGroupChance} = this.experimentBasicsForm.value;
+    let positionTrackingFrequency: number | null = null;
+    let cursorImageMode: string | null = null;
+
+    if(this.experimentBasicsForm.value.positionArrayNeeded)
+      positionTrackingFrequency = this.experimentBasicsForm.controls.positionTrackingFrequency.value ?? null;
+    if(this.experimentBasicsForm.value.cursorPathImageNeeded)
+      cursorImageMode = this.experimentBasicsForm.controls.cursorImageMode.value ?? null;
+
+    if(name && researcherDescription && maxParticipantNum && controlGroupChance){
+      const updatedExperiment = { name, researcherDescription, maxParticipantNum, controlGroupChance, cursorImageMode, positionTrackingFrequency}
+      this.experimentService.updateExperiment({experimentId: this.experiment?._id, updatedExperiment: updatedExperiment}).subscribe({
+        next: (experiment) => {
+          this.handleExperimentChange(experiment);
+        },
+        error: (error) => {
+          this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+        }
+      });
+    }
   }
 
   handleExperimentChange(experiment: Experiment): void {

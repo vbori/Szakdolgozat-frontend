@@ -1,3 +1,15 @@
-.buttonsContainer button {
-  margin: 0 10px;
+.buttonsContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+
+  button {
+    margin: 0 10px;
+  }
+}
+
+.flexContainer {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
 }

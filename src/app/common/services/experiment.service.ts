@@ -41,7 +41,7 @@ export class ExperimentService {
     return this.http.post<Experiment>(`${environment.baseUrl}/research/addExperiment`, experimentBasics, { headers });
   }
 
-  public updateExperiment(updatedData: any): Observable<Experiment> { //TODO: type parameter?
+  public updateExperiment(updatedData: unknown): Observable<Experiment> {
     let headers = new HttpHeaders({
       "Authorization": 'Bearer ' + localStorage.getItem('accessToken'),
     });
@@ -57,7 +57,7 @@ export class ExperimentService {
     return this.http.patch<{message: string, experiment: Experiment, activeExperimentCount:number}>(`${environment.baseUrl}/research/openExperiment`, { experimentId: experimentId }, { headers });
   }
 
-  public closeExperiment(experimentId: string): Observable<{message: string, experiment: Experiment, activeExperimentCount: number}> { //any is message, experiment, researcher
+  public closeExperiment(experimentId: string): Observable<{message: string, experiment: Experiment, activeExperimentCount: number}> {
     let headers = new HttpHeaders({
       "Authorization": 'Bearer ' + localStorage.getItem('accessToken'),
     });
@@ -72,13 +72,13 @@ export class ExperimentService {
 
     return this.http.delete<{message: string}>(`${environment.baseUrl}/research/deleteExperiment/${experimentId}`, { headers });
   }
-  
+
   public downloadExperiment(experimentId: string, format: 'json' | 'csv'): Observable<Blob> {
     let headers = new HttpHeaders({
       "Authorization": 'Bearer ' + localStorage.getItem('accessToken'),
       "responseType": "arraybuffer"
     });
-  
+
     return this.http.get(`${environment.baseUrl}/research/downloadResults/${experimentId}/${format}`, { headers, responseType: 'arraybuffer' }).pipe(
       map((response: ArrayBuffer) => {
         return new Blob([response], { type: 'application/zip' });

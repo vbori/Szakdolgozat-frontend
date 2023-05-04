@@ -13,8 +13,8 @@ import { ToastrService } from 'ngx-toastr';
 export class ParticipantFormEditorComponent implements OnInit{
   @Input() experiment: Experiment | undefined;
   @Input() isDirty: boolean = false;
-  @Output() nextStep = new EventEmitter<any>();
-  @Output() experimentChange = new EventEmitter<any>();
+  @Output() nextStep = new EventEmitter();
+  @Output() experimentChange = new EventEmitter<Experiment>();
   questions: Question[] = [new QuestionClass('question1', 'Question 1')];
   isQuestionValid: Boolean[] = [true];
 
@@ -110,6 +110,7 @@ export class ParticipantFormEditorComponent implements OnInit{
     this.formService.updateForm(this.experiment._id, this.questions).subscribe({
       next: () => {
         this.toastr.success('Form updated', 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
+        this.nextStep.emit();
       },
       error: (error) => {
         this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });

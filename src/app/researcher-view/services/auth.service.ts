@@ -17,7 +17,13 @@ export class AuthService {
     const token = localStorage.getItem('accessToken');
     this._isLoggedIn$.next(!!token);
     if(localStorage.getItem('accessToken')){
-      this.startRefreshTokenTimer();
+      const jwtBase64 = localStorage.getItem('accessToken')?.split('.')[1];
+      const jwtToken = jwtBase64 ? JSON.parse(window.atob(jwtBase64)) : undefined;
+      if(jwtToken.exp * 1000 <= Date.now()){
+        this.refreshToken().subscribe();
+      }else{
+        this.startRefreshTokenTimer();
+      }
     }
   }
 
@@ -48,7 +54,7 @@ export class AuthService {
   private refreshTokenTimeout?:  ReturnType<typeof setTimeout>;
 
   refreshToken() {
-    return this.http.post<any>(`${environment.baseUrl}/auth/token`, {}, { withCredentials: true })
+    return this.http.post<ResearcherToken>(`${environment.baseUrl}/auth/token`, {}, { withCredentials: true })
       .pipe(map((token) => {
         localStorage.setItem('accessToken', token.accessToken);
         this.startRefreshTokenTimer();
@@ -66,7 +72,7 @@ export class AuthService {
       }));
   }
 
-  private startRefreshTokenTimer() {
+  private startRefreshTokenTimer(): void {
     const jwtBase64 = localStorage.getItem('accessToken')?.split('.')[1];
     const jwtToken = jwtBase64 ? JSON.parse(window.atob(jwtBase64)) : undefined;
 
@@ -76,7 +82,7 @@ export class AuthService {
     this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), timeout > 60*1000 ? timeout - 60*1000 : timeout);
   }
 
-  private stopRefreshTokenTimer() {
+  private stopRefreshTokenTimer(): void {
     clearTimeout(this.refreshTokenTimeout);
   }
 }

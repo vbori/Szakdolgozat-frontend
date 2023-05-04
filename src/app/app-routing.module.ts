@@ -2,7 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ParticipantViewComponent } from './participant-view/participant-view.component';
 import { AuthComponent } from './researcher-view/auth/auth.component';
-import { AuthActivatorService, ResearcherActivatorService, participantDeactivator } from './common/services/route-guards';
+import { AuthActivatorService, ResearcherActivatorService} from './common/services/route-guards';
+import { participantDeactivator } from './participant-view/services/participant-deactivator';
 import { Error404Component } from './error404/error404.component';
 
 const routes: Routes = [

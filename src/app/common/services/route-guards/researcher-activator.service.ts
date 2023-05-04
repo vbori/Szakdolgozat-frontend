@@ -15,7 +15,6 @@ export class ResearcherActivatorService implements CanActivate {
   }
 
   canActivate(){
-    console.log("in canActivate researcher")
     if(!this.isLoggedIn){
       this.router.navigate(['/login']);
     }

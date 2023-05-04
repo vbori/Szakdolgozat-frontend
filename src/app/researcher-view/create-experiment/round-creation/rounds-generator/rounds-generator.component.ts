@@ -101,8 +101,6 @@ export class RoundsGeneratorComponent implements OnInit{
     ]}
   );
 
-  //TODO: add refresh guard
-
   constructor(private experimentService: ExperimentService,
               public readonly constants: ExperimentCreationConstants,
               private toastr: ToastrService) {}
@@ -114,6 +112,8 @@ export class RoundsGeneratorComponent implements OnInit{
       this.initializeForm();
     }
   }
+
+  //TODO: add loading animation when generating rounds
 
   restoreForm(): void{
     if(this.experiment?.experimentConfiguration){

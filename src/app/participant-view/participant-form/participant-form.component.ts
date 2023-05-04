@@ -17,7 +17,7 @@ export class ParticipantFormComponent implements OnInit{
   @Input() experimentId: string
   @Input() participantId: string;
   @Input() demoMode: boolean;
-  @Output() nextStep = new EventEmitter<any>();
+  @Output() nextStep = new EventEmitter();
 
   constructor(private readonly experimentService: ExperimentService,
               private readonly participantService: ParticipantService,

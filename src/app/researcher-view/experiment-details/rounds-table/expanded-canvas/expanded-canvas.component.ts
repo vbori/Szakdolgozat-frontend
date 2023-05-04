@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { Round, Shape } from 'src/app/common/models/round.model';
+import { FabricShape, Round, Shape } from 'src/app/common/models/round.model';
 import { fabric } from 'fabric';
 
 @Component({
@@ -30,7 +30,7 @@ export class ExpandedCanvasComponent implements AfterViewInit, OnInit{
     this.canvas.backgroundColor = this.round?.background ?? 'white';
     this.canvas.selection = false;
     this.canvas.hoverCursor = 'default';
-    this.canvas.loadFromJSON(this.round, this.canvas.renderAll.bind(this.canvas), (o: any, shape: any) => {
+    this.canvas.loadFromJSON(this.round, this.canvas.renderAll.bind(this.canvas), (o: any, shape: FabricShape) => {
       shape.set('selectable', false);
     });
     this.canvas.renderAll();

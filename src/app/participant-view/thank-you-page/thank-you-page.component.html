@@ -1,5 +1,8 @@
-<h1>Thank you!</h1>
-<p>
-  Thank you for participating in this experiment. Your results have been saved, and your participation is greatly appreciated!
-</p>
-<button *ngIf="demoMode" mat-button [routerLink]="['/research/experiment/details', experimentId]">Back to experiment overview</button>
+<div>
+  <h1>Thank you!</h1>
+  <p>
+    Thank you for participating in this experiment. Your results have been saved, and your participation is greatly appreciated!
+  </p>
+  <button *ngIf="demoMode" mat-raised-button color="primary" [routerLink]="['/research/experiment/details', experimentId]">Back to experiment overview</button>
+</div>
+<!--TODO: add svg-->

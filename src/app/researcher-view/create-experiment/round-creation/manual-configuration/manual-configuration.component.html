@@ -20,11 +20,15 @@
 <h2>Round settings</h2>
 <ng-container *ngFor="let round of rounds; let i=index;">
   <div class="roundContainer">
-    <h2><u>Round {{i+1}}</u></h2>
-    <button mat-raised-button color="primary" (click)="removeRound(i)" [disabled]="isRoundValid.length == 1">Remove round</button>
+    <div class="flexContainer">
+      <h2><u>Round {{i+1}}</u></h2>
+      <button mat-raised-button color="warn" (click)="removeRound(i)" [disabled]="isRoundValid.length == 1">Remove round</button>
+    </div>
     <app-fabric-canvas [roundIdx]="i" [round]="rounds[i]" [canvasHeight]="canvasForm.value.canvasHeight ?? 500" [canvasWidth]="canvasForm.value.canvasWidth ?? 500" (validityChange)="onValidityChange(i, $event)" (canvasCreated)="onCanvasCreated($event)"></app-fabric-canvas>
   </div>
 </ng-container>
 
-<button mat-raised-button color="primary" (click)="addRound()">Add round</button>
-<button mat-raised-button color="primary" [disabled]="isSubmitDisabled()" (click)="createExperiment()">Create experiment</button>
+<div class ="buttonsContainer">
+  <button mat-raised-button color="primary" (click)="addRound()">Add round</button>
+  <button mat-raised-button color="primary" [disabled]="isSubmitDisabled()" (click)="createExperiment()">Create experiment</button>
+</div>

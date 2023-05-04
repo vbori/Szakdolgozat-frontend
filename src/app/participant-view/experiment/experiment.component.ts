@@ -123,7 +123,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     this.mainCanvas.setHeight(round.canvasHeight);
     this.mainCanvas.setWidth(round.canvasWidth);
 
-    this.mainCanvas.loadFromJSON(round, this.mainCanvas.renderAll.bind(this.mainCanvas), (o: any, shape: any) => {
+    this.mainCanvas.loadFromJSON(round, this.mainCanvas.renderAll.bind(this.mainCanvas), (o: any, shape: FabricShape) => {
       shape.set('selectable', false);
       shape.set('perPixelTargetFind',true);
 
@@ -143,7 +143,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
 
       if(shape.flashing){
         let timer = setInterval(() => {
-          shape.set('fill', shape.fill == shape.baseColor ? shape.flashing.color : shape.baseColor);
+          shape.set('fill', shape.fill == shape.baseColor ? shape.flashing?.color : shape.baseColor);
           this.mainCanvas.renderAll();
         }, shape.flashing.frequency);
 
@@ -160,7 +160,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     this.hiddenCanvas.setHeight(this.mainCanvas.getHeight());
     this.hiddenCanvas.setWidth(this.mainCanvas.getWidth());
 
-    this.hiddenCanvas.loadFromJSON(round, this.hiddenCanvas.renderAll.bind(this.hiddenCanvas), (o: any, object: any) => {
+    this.hiddenCanvas.loadFromJSON(round, this.hiddenCanvas.renderAll.bind(this.hiddenCanvas), (o: any, object: FabricShape) => {
       object.set('selectable', false);
       if(!object.distraction){
         if(this.cursorImageMode == 'Outlines only'){

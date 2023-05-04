@@ -101,7 +101,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
 
   loadCanvasData(round: Round): void{
     if(this.canvas)
-    this.canvas.loadFromJSON(round, this.canvas.renderAll.bind(this.canvas), (o: any, shape: any) => {
+    this.canvas.loadFromJSON(round, this.canvas.renderAll.bind(this.canvas), (o: any, shape: FabricShape) => {
       shape.setControlsVisibility({ mtr: false });
       shape.set('noScaleCache', false);
       if(shape.type === 'circle') {

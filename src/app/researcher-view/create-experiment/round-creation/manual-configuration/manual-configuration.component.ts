@@ -37,6 +37,8 @@ export class ManualConfigurationComponent implements OnInit{
     }
   }
 
+  //TODO: add resolver to get rounds
+
   addRound(): void {
     this.isRoundValid.push(true);
     this.rounds.push(new RoundClass());

@@ -34,6 +34,36 @@
   color: #fff;
 }
 
+.flexContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+
+#info {
+  height: 24px;
+}
+
 a {
   cursor: pointer;
+  align-items: center;
+}
+
+dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-radius: 10px;
+  border:none;
+  text-align: justify;
+  div > button {
+    margin: 10px 10px;
+  }
 }

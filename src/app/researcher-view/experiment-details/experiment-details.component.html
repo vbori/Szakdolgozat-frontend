@@ -1,63 +1,75 @@
 <ng-container *ngIf="experiment">
-  <h1><b>{{ experiment.name }}</b></h1>
-  <div>
-    <span [ngClass]="{green: experiment.status === 'Active', orange: experiment.status === 'Draft', red: experiment.status === 'Closed'}"><b>{{experiment.status}}</b></span>
-    <span *ngIf="experiment.status != 'Draft'"> &#9679; {{experiment.participantNum}} completed</span>
-  </div>
-  <div class="buttonsContainer">
-    <button mat-raised-button color="primary" [routerLink]="['/participant', experiment._id, 'true']">View demo</button>
-    <button mat-raised-button color="warn" *ngIf="experiment.status == 'Active'" (click)="closeExperiment()">Close experiment</button>
-    <button mat-raised-button color="primary" *ngIf="experiment.status == 'Active'" (click)="shareExperiment()">Copy invite link</button>
-    <button mat-raised-button color="primary" *ngIf="experiment.status == 'Draft'" title="Please create some rounds first!" (click)="openExperiment()" [disabled]="experiment.rounds.length == 0" class="openExp">Open experiment</button>
-    <button mat-raised-button color="primary" *ngIf="experiment.status == 'Draft'" [routerLink]="['/research/experiment/create', experiment._id]">Edit experiment</button>
-    <button mat-raised-button color="primary" *ngIf="experiment.status == 'Closed'" (click)="downloadExperiment('json')">Download results as JSON</button>
-    <button mat-raised-button color="primary" *ngIf="experiment.status == 'Closed'" (click)="downloadExperiment('csv')">Download results as CSV</button>
-    <button mat-raised-button color="warn" *ngIf="experiment.status == 'Closed' || experiment.status =='Draft'" (click)="dialog.showModal()">Delete experiment</button>
-  </div>
-  <mat-divider></mat-divider>
-  <mat-list>
-    <mat-list-item *ngIf="experiment.status != 'Draft'">
-      <span matListItemTitle>Opened at</span>
-      <span matListItemLine>{{experiment.openedAt}}</span>
-    </mat-list-item>
-    <mat-list-item *ngIf="experiment.status == 'Closed'">
-      <span matListItemTitle>Closed at</span>
-      <span matListItemLine>{{experiment.closedAt}}</span>
-    </mat-list-item>
-    <mat-list-item>
-      <span matListItemTitle>Maximum number of participants</span>
-      <span matListItemLine>{{experiment.maxParticipantNum}}</span>
-    </mat-list-item>
-    <mat-list-item>
-      <span matListItemTitle>Control group chance</span>
-      <span matListItemLine>{{experiment.controlGroupChance}}</span>
-    </mat-list-item>
-    <mat-list-item>
-      <span matListItemTitle>Saving cursor path</span>
-      <span matListItemLine>{{experiment.cursorImageMode ?? 'No'}}</span>
-    </mat-list-item>
-    <mat-list-item>
-      <span matListItemTitle>Cursor position tracking frequency</span>
-      <span matListItemLine>{{experiment.positionTrackingFrequency ?? 'None'}}</span>
-    </mat-list-item>
-    <mat-list-item>
-      <span matListItemTitle>Canvas width</span>
-      <span matListItemLine>{{experiment.rounds.length > 0 ? experiment.rounds[0].canvasWidth : 'Missing'}}</span>
-    </mat-list-item>
-    <mat-list-item>
-      <span matListItemTitle>Canvas height</span>
-      <span matListItemLine>{{experiment.rounds.length > 0 ? experiment.rounds[0].canvasHeight : 'Missing'}}</span>
-    </mat-list-item>
-  </mat-list>
-  <h2>Description</h2>
-  <p>{{ experiment.researcherDescription }}</p>
-  <h2>Participant description</h2>
-  <p>{{ experiment.participantDescription }}</p>
+  <div class="paddedContainer">
+    <h1><b>{{ experiment.name }}</b></h1>
+    <div>
+      <span [ngClass]="{green: experiment.status === 'Active', orange: experiment.status === 'Draft', red: experiment.status === 'Closed'}"><b>{{experiment.status}}</b></span>
+      <span *ngIf="experiment.status != 'Draft'"> &#9679; {{experiment.participantNum}} completed</span>
+    </div>
+    <div class="buttonFlexContainer">
+      <div class="buttonsContainer" >
+        <button mat-raised-button color="primary" [routerLink]="['/participant', experiment._id, 'true']">View demo</button>
+        <button mat-raised-button color="primary" *ngIf="experiment.status == 'Active'" (click)="shareExperiment()">Copy invite link</button>
+        <button mat-raised-button color="primary" *ngIf="experiment.status == 'Draft'" title="Please create some rounds first!" (click)="openExperiment()" [disabled]="experiment.rounds.length == 0" class="openExp">Open experiment</button>
+        <button mat-raised-button color="primary" *ngIf="experiment.status == 'Draft'" [routerLink]="['/research/experiment/create', experiment._id]">Edit experiment</button>
+        <button mat-raised-button color="primary" *ngIf="experiment.status == 'Closed'" (click)="downloadExperiment('json')">Download results as JSON</button>
+        <button mat-raised-button color="primary" *ngIf="experiment.status == 'Closed'" (click)="downloadExperiment('csv')">Download results as CSV</button>
+      </div>
+      <div class="buttonsContainer">
+        <button mat-raised-button color="warn" *ngIf="experiment.status == 'Active'" (click)="closeExperiment()">Close experiment</button>
+        <button mat-raised-button color="warn" *ngIf="experiment.status == 'Closed' || experiment.status =='Draft'" (click)="dialog.showModal()">Delete experiment</button>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+    <mat-list>
+      <div class="flexContainer" *ngIf="experiment.status != 'Draft'">
+        <mat-list-item>
+          <span matListItemTitle>Opened at</span>
+          <span matListItemLine>{{experiment.openedAt}}</span>
+        </mat-list-item>
+        <mat-list-item *ngIf="experiment.status == 'Closed'">
+          <span matListItemTitle>Closed at</span>
+          <span matListItemLine>{{experiment.closedAt}}</span>
+        </mat-list-item>
+      </div>
+      <div class="flexContainer">
+        <mat-list-item>
+          <span matListItemTitle>Maximum number of participants</span>
+          <span matListItemLine>{{experiment.maxParticipantNum}}</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span matListItemTitle>Control group chance</span>
+          <span matListItemLine>{{experiment.controlGroupChance}}</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span matListItemTitle>Saving cursor path</span>
+          <span matListItemLine>{{experiment.cursorImageMode ?? 'No'}}</span>
+        </mat-list-item>
+      </div>
+      <div class="flexContainer">
+        <mat-list-item>
+          <span matListItemTitle>Cursor position tracking frequency</span>
+          <span matListItemLine>{{experiment.positionTrackingFrequency ?? 'None'}}</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span matListItemTitle>Canvas width</span>
+          <span matListItemLine>{{experiment.rounds.length > 0 ? experiment.rounds[0].canvasWidth : 'Missing'}}</span>
+        </mat-list-item>
+        <mat-list-item>
+          <span matListItemTitle>Canvas height</span>
+          <span matListItemLine>{{experiment.rounds.length > 0 ? experiment.rounds[0].canvasHeight : 'Missing'}}</span>
+        </mat-list-item>
+      </div>
+    </mat-list>
+    <mat-divider></mat-divider>
+    <h2>Description</h2>
+    <p>{{ experiment.researcherDescription }}</p>
+    <h2>Participant description</h2>
+    <p>{{ experiment.participantDescription }}</p>
 
-  <h2>Rounds</h2>
-  <app-rounds-table *ngIf="experiment.rounds.length > 0" [dataSource]="experiment.rounds"></app-rounds-table>
-  <p *ngIf="experiment.rounds.length == 0"><i>No rounds created yet.</i></p>
-
+    <h2>Rounds</h2>
+    <app-rounds-table *ngIf="experiment.rounds.length > 0" [dataSource]="experiment.rounds"></app-rounds-table>
+    <p *ngIf="experiment.rounds.length == 0"><i>No rounds created yet.</i></p>
+  </div>
 </ng-container>
 <dialog #dialog [hidden]="!dialog.open">
   <h1>Are you sure you want to delete this experiment?</h1>
