@@ -6,7 +6,9 @@ import { ExperimentRoundsValidator } from 'src/app/common/validators/experiment-
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { Round, Shape } from 'src/app/common/models/round.model';
 import { ConfigShapeType, ExperimentConfiguration } from 'src/app/common/models/config.model';
-import { createInitialShape, chooseDistractedRoundIndexes, calculateMaxLimits, createRound } from 'src/app/researcher-view/utils/generatorUtils';
+import { createInitialShape, chooseDistractedRoundIndexes, calculateMaxSpace, createRound } from 'src/app/researcher-view/utils/generatorUtils';
+import { markControlsTouched } from 'src/app/researcher-view/utils/formUtils';
+import { ToastrService } from 'ngx-toastr';
 
 interface ShapeOption {
   value: ConfigShapeType;
@@ -45,8 +47,8 @@ export class RoundsGeneratorComponent implements OnInit{
     twoDimensional: new FormControl<boolean>(false, {nonNullable: true}),
     canvasHeight: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_CANVAS_HEIGHT), Validators.max(this.constants.MAX_CANVAS_HEIGHT),Validators.pattern("^[0-9]*$")]}),
     canvasWidth: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_CANVAS_WIDTH), Validators.max(this.constants.MAX_CANVAS_WIDTH),Validators.pattern("^[0-9]*$")]}),
-    baseShapeTypes: new FormControl<string[]>([], {nonNullable: true, validators: [Validators.required]}),
-    targetShapeTypes: new FormControl<string[]>([], {nonNullable: true, validators: [Validators.required]}),
+    baseShapeTypes: new FormControl<string[]>(['rect'], {nonNullable: true, validators: [Validators.required]}),
+    targetShapeTypes: new FormControl<string[]>(['circle'], {nonNullable: true, validators: [Validators.required]}),
     minWidth: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE),Validators.pattern("^[0-9]*$")]}),
     maxWidth: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE),Validators.pattern("^[0-9]*$")]}),
     minHeight: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE),Validators.pattern("^[0-9]*$")]}),
@@ -69,7 +71,7 @@ export class RoundsGeneratorComponent implements OnInit{
       maxWidth: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE),Validators.pattern("^[0-9]*$")]}),
       minHeight: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE),Validators.pattern("^[0-9]*$")]}),
       maxHeight: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE),Validators.pattern("^[0-9]*$")]}),
-      distractingShapeTypes: new FormControl<string[]>([], {nonNullable: true, validators: [Validators.required]}),
+      distractingShapeTypes: new FormControl<string[]>(['square'], {nonNullable: true, validators: [Validators.required]}),
       color: new FormControl<string>('#FFA500', {nonNullable: true, validators: [Validators.required]}),
       minDuration: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME),Validators.pattern("^[0-9]*$")]}),
       maxDuration: new FormControl<number>(2000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME),Validators.pattern("^[0-9]*$")]}),
@@ -91,18 +93,19 @@ export class RoundsGeneratorComponent implements OnInit{
       ExperimentRoundsValidator.conflictingValuesValidator('minHeight', 'maxHeight'),
       ExperimentRoundsValidator.conflictingValuesValidator('maxWidth','canvasWidth'),
       ExperimentRoundsValidator.conflictingValuesValidator('maxHeight','canvasHeight'),
-      ExperimentRoundsValidator.conflictingValuesValidator('maxHeight','canvasHeight', 'distractingShapeConfig'), //TODO: handle these better (probably with get forsz.alresz) hogy ne egyezzen meg a tobbi nevevel + uzenetet irni
+      ExperimentRoundsValidator.conflictingValuesValidator('maxHeight','canvasHeight', 'distractingShapeConfig'),
       ExperimentRoundsValidator.conflictingValuesValidator('maxWidth','canvasWidth', 'distractingShapeConfig'),
-      ExperimentRoundsValidator.shapesOverlapValidator('canvasWidth',  'minWidth', 'distractingShapeConfig.minWidth'),
+      ExperimentRoundsValidator.shapesOverlapValidator('canvasWidth',  'minWidth', 'distractingShapeConfig.minWidth', 'useShapeDistraction'),
       ExperimentRoundsValidator.noDistractionSelectedValidator( 'distractedRoundNum','useBackgroundDistraction', 'useShapeDistraction'),
       ExperimentRoundsValidator.tooManyTotalRoundsValidator(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM, 'roundNum', 'setNum'),
-      
     ]}
   );
 
   //TODO: add refresh guard
 
-  constructor(private experimentService: ExperimentService, public readonly constants: ExperimentCreationConstants) {}
+  constructor(private experimentService: ExperimentService,
+              public readonly constants: ExperimentCreationConstants,
+              private toastr: ToastrService) {}
 
   ngOnInit(): void {
     if(this.experiment?.experimentConfiguration){
@@ -115,6 +118,7 @@ export class RoundsGeneratorComponent implements OnInit{
   restoreForm(): void{
     if(this.experiment?.experimentConfiguration){
       this.roundGeneratorForm.patchValue(this.experiment.experimentConfiguration);
+      this.subscribeToChanges();
       this.roundGeneratorForm.get('useBackgroundDistraction')?.setValue(this.experiment.experimentConfiguration.backgroundDistractionConfig !== undefined);
       this.roundGeneratorForm.get('useShapeDistraction')?.setValue(this.experiment.experimentConfiguration.distractingShapeConfig !== undefined);
       this.roundGeneratorForm.get('backgroundDistractionConfig')?.get('useFlashing')?.setValue(this.experiment.experimentConfiguration.backgroundDistractionConfig?.flashing !== undefined);
@@ -125,7 +129,10 @@ export class RoundsGeneratorComponent implements OnInit{
   initializeForm(): void{
     this.roundGeneratorForm.get('backgroundDistractionConfig')?.disable();
     this.roundGeneratorForm.get('distractingShapeConfig')?.disable();
+    this.subscribeToChanges();
+  }
 
+  subscribeToChanges(): void{
     this.subscribeToDistractionChange('useBackgroundDistraction', 'backgroundDistractionConfig');
     this.subscribeToDistractionChange('useShapeDistraction', 'distractingShapeConfig');
 
@@ -155,21 +162,24 @@ export class RoundsGeneratorComponent implements OnInit{
   }
 
   onSubmit(): void{
-    this.setUnnecessaryControlsAvailability(false);
-    const rounds = this.generateRounds(this.roundGeneratorForm.value as ExperimentConfiguration);
-    const updatedExperiment = { experimentConfiguration: this.roundGeneratorForm.value, rounds: rounds};
     if(!this.roundGeneratorForm.pristine){
+      this.setUnnecessaryControlsAvailability(false);
+      const rounds = this.generateRounds(this.roundGeneratorForm.value as ExperimentConfiguration);
+      const updatedExperiment = { experimentConfiguration: this.roundGeneratorForm.value, rounds: rounds};
       this.experimentService.updateExperiment({experimentId: this.experiment?._id, updatedExperiment: updatedExperiment}).subscribe({
         next: (experiment) => {
           this.experiment = experiment;
+          this.toastr.success('Rounds generated', 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
           this.roundGeneratorForm.markAsPristine();
           this.experimentChange.emit(this.experiment);
           this.nextStep.emit();
         },
         error: (error) => {
-          console.log(error); //TODO: display error message
+          this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
         }
       });
+    }else{
+      this.nextStep.emit();
     }
     this.setUnnecessaryControlsAvailability(true);
   }
@@ -189,13 +199,11 @@ export class RoundsGeneratorComponent implements OnInit{
   }
 
   generateRounds(config: ExperimentConfiguration): Round[]{
-    console.log(config);
     let rounds: Round[] = [];
 
-    let {normalMaxLimit, distractionMaxLimit } = calculateMaxLimits(config.canvasWidth, config.minWidth, config.maxWidth, config.distractingShapeConfig?.minWidth, config.distractingShapeConfig?.maxWidth);
-
-    let baseShape: Shape = createInitialShape(config.canvasHeight ,config.baseShapeTypes, config.minWidth, normalMaxLimit, config.minHeight, config.maxHeight, config.baseShapeColor, false, false);
-    baseShape.left = Math.floor(Math.random() * (normalMaxLimit - baseShape.width));
+    let {normalMaxSpace, distractionMaxSpace } = calculateMaxSpace(config.canvasWidth, config.minWidth, config.maxWidth, config.distractingShapeConfig?.minWidth, config.distractingShapeConfig?.maxWidth);
+    let baseShape: Shape = createInitialShape(config.canvasHeight ,config.baseShapeTypes, config.minWidth, Math.min(normalMaxSpace, config.maxWidth), config.minHeight, config.maxHeight, config.baseShapeColor, false, false);
+    baseShape.left = Math.floor(Math.random() * (normalMaxSpace - baseShape.width));
 
     let restrictedHeight = config.twoDimensional ? config.maxHeight : Math.min(config.canvasHeight - baseShape.top, config.maxHeight);
 
@@ -205,8 +213,8 @@ export class RoundsGeneratorComponent implements OnInit{
     let initialTargetTop:number|undefined = undefined;
 
     for(let i = 0; i < config.setNum; i++){
-      let targetShape: Shape = createInitialShape(config.canvasHeight ,config.targetShapeTypes, initialTargetWidth ?? config.minWidth, initialTargetWidth ?? normalMaxLimit, initialTargetHeight ?? config.minHeight, initialTargetHeight ?? restrictedHeight, config.targetShapeColor, true, false);
-      targetShape.left = initialTargetLeft ?? config.canvasWidth - (targetShape.width + Math.floor(Math.random() * (normalMaxLimit- targetShape.width)));
+      let targetShape: Shape = createInitialShape(config.canvasHeight ,config.targetShapeTypes, initialTargetWidth ?? config.minWidth, initialTargetWidth ?? Math.min(normalMaxSpace, config.maxWidth), initialTargetHeight ?? config.minHeight, initialTargetHeight ?? restrictedHeight, config.targetShapeColor, true, false);
+      targetShape.left = initialTargetLeft ?? config.canvasWidth - (targetShape.width + Math.floor(Math.random() * (normalMaxSpace- targetShape.width)));
       targetShape.top = initialTargetTop ?? targetShape.top;
 
       if(config.twoDimensional){
@@ -224,10 +232,19 @@ export class RoundsGeneratorComponent implements OnInit{
       }
 
       const distractedRoundIndexes = chooseDistractedRoundIndexes(config.roundNum, config.distractedRoundNum);
-      
+
       for(let j = 0; j < config.roundNum; j++){
-        let distractionMode = distractedRoundIndexes.includes(j) ? Math.floor(Math.random() * 3) + 1 : 0; //0:no distraction 1: background distraction only, 2: shape distraction only, 3: shape distraction + background distraction
-        let round = createRound(j+1, config, baseShape, targetShape, distractionMode, distractionMaxLimit, restrictedHeight, normalMaxLimit);
+        let distractionMode = 0;
+        if(distractedRoundIndexes.includes(j)){
+          if(config.backgroundDistractionConfig && config.distractingShapeConfig){
+            distractionMode = Math.floor(Math.random() * 3) + 1;
+          }else if(config.backgroundDistractionConfig){
+            distractionMode = 1;
+          }else if(config.distractingShapeConfig){
+            distractionMode = 2;
+          }
+        }  //0:no distraction 1: background distraction only, 2: shape distraction only, 3: shape distraction + background distraction
+        let round = createRound(j+1, config, baseShape, targetShape, distractionMode, distractionMaxSpace, restrictedHeight, normalMaxSpace);
         rounds.push(round);
       }
     }

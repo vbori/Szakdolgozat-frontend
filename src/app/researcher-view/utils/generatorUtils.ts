@@ -61,29 +61,32 @@ export function chooseDistractedRoundIndexes(numRounds: number, distractedRounds
   return distractedRoundIndexes;
 }
 
-export function calculateMaxLimits(canvasSize: number, normalMinSize: number, normalMaxSize: number, distractionMinSize: number | undefined, distractionMaxSize: number | undefined): { normalMaxLimit: number, distractionMaxLimit: number | undefined } {
-  let normalMaxLimit : number = normalMaxSize * 2 <= canvasSize ? normalMaxSize : canvasSize / 2;
-  let distractionMaxLimit: number  | undefined = undefined;
+export function calculateMaxSpace(canvasSize: number, normalMinSize: number, normalMaxSize: number, distractionMinSize: number | undefined, distractionMaxSize: number | undefined): { normalMaxSpace: number, distractionMaxSpace: number | undefined } {
+  let normalMaxSpace  = canvasSize / 2;
+  let distractionMaxSpace: number  | undefined = undefined;
   if(distractionMinSize && distractionMaxSize){
-    distractionMaxLimit = distractionMaxSize;
-    if(distractionMaxLimit + 2* normalMaxLimit > canvasSize){
+    if(canvasSize - distractionMinSize - 2* normalMinSize > 0){
       let dividedFreeSpace = Math.floor((canvasSize - distractionMinSize - 2* normalMinSize) / 3);
-      normalMaxLimit = Math.min(normalMinSize + dividedFreeSpace, normalMaxLimit);
-      distractionMaxLimit = Math.min(distractionMinSize + dividedFreeSpace, distractionMaxLimit);
+      normalMaxSpace = normalMinSize + dividedFreeSpace;
+      distractionMaxSpace = distractionMinSize + dividedFreeSpace;
+    }else{
+      normalMaxSpace = normalMinSize;
+      distractionMaxSpace = distractionMinSize;
     }
-  } 
+  }
 
-  return { normalMaxLimit, distractionMaxLimit };
+  return { normalMaxSpace, distractionMaxSpace };
 }
 
-export function createRound(roundIdx: number, config: ExperimentConfiguration, baseShape: Shape, targetShape: Shape, distractionMode: number, maxWidth: number | undefined, maxHeight: number, normalMaxLimit: number): Round{
+export function createRound(roundIdx: number, config: ExperimentConfiguration, baseShape: Shape, targetShape: Shape, distractionMode: number, distractionMaxSpace: number | undefined, maxHeight: number, normalMaxLimit: number): Round{
   let distractingShape: Shape | undefined = undefined;
   let shapeDistractionDuration: number | undefined = undefined;
   let backgroundDistraction : BackgroundDistraction | undefined = undefined;
 
-  if(config.distractingShapeConfig && (distractionMode > 1) && maxWidth){
-    distractingShape = createInitialShape(config.canvasHeight ,config.distractingShapeConfig.distractingShapeTypes, config.distractingShapeConfig.minWidth, maxWidth, config.distractingShapeConfig.minHeight, maxHeight, config.distractingShapeConfig.color, false, true);
-    distractingShape.left = normalMaxLimit + Math.floor(Math.random() * (maxWidth - distractingShape.width));
+  if(config.distractingShapeConfig && (distractionMode > 1) && distractionMaxSpace){
+    distractingShape = createInitialShape(config.canvasHeight ,config.distractingShapeConfig.distractingShapeTypes, config.distractingShapeConfig.minWidth, Math.min(distractionMaxSpace, config.distractingShapeConfig.maxWidth), config.distractingShapeConfig.minHeight, maxHeight, config.distractingShapeConfig.color, false, true);
+    distractingShape.left = normalMaxLimit + Math.floor(Math.random() * (distractionMaxSpace - distractingShape.width));
+    distractingShape.top = Math.min(Math.floor((baseShape.top + targetShape.top)/2), config.canvasHeight - distractingShape.height);
     if(config.distractingShapeConfig.flashing){
       distractingShape.flashing = {color: config.distractingShapeConfig.flashing?.color, frequency: config.distractingShapeConfig.flashing?.frequency};
     }

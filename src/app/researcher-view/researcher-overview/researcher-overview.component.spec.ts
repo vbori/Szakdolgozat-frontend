@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {MatTabsModule} from '@angular/material/tabs';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ResearcherOverviewComponent } from './researcher-overview.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('ResearcherOverviewComponent', () => {
   let component: ResearcherOverviewComponent;
@@ -8,7 +11,9 @@ describe('ResearcherOverviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ResearcherOverviewComponent ]
+      declarations: [ ResearcherOverviewComponent ],
+      imports: [MatTabsModule, NoopAnimationsModule],
+      schemas: [NO_ERRORS_SCHEMA],
     })
     .compileComponents();
 

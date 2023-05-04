@@ -71,7 +71,7 @@ export class ShapeFormComponent implements OnInit, AfterViewInit{
     this.shapeConfigForm.controls.left.setValue(this.shape.left ? Math.floor(this.shape.left) : 100);
     this.shapeConfigForm.controls.top.setValue(this.shape.top ? Math.floor(this.shape.top) : 100);
     this.shapeConfigForm.controls.fill.setValue(this.shape.fill ? this.shape.fill as string : 'blue');
-    this.shapeConfigForm.controls.radius.setValue(this.shape.radius ? Math.round(this.shape.getScaledWidth()/2) : 25); 
+    this.shapeConfigForm.controls.radius.setValue(this.shape.radius ? Math.round(this.shape.getScaledWidth()/2) : 25);
     this.shapeConfigForm.controls.type.setValue(this.shape.type ? this.shape.type : 'circle');
     this.shapeConfigForm.controls.useFlashing.setValue(this.shape.flashing ? true : false);
     this.shapeConfigForm.controls.flashing.controls.color.setValue(this.shape.flashing ? this.shape.flashing.color : '#000000');
@@ -162,7 +162,7 @@ export class ShapeFormComponent implements OnInit, AfterViewInit{
     this.canvas.renderAll();
     this.checkIntersection();
   }
-  
+
   checkIntersection(): void{
     this.shape.setCoords();
     this.shapesIntersect = false;

@@ -3,6 +3,7 @@ import { FormService } from '../../services/form.service';
 import { Question, QuestionClass } from 'src/app/common/models/form.model';
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-participant-form-editor',
@@ -17,7 +18,9 @@ export class ParticipantFormEditorComponent implements OnInit{
   questions: Question[] = [new QuestionClass('question1', 'Question 1')];
   isQuestionValid: Boolean[] = [true];
 
-  constructor(private readonly formService: FormService, private readonly experimentService: ExperimentService) { }
+  constructor(private readonly formService: FormService,
+              private readonly experimentService: ExperimentService,
+              private toastr: ToastrService) { }
 
   ngOnInit(): void {
     if(this.experiment?.formId){
@@ -27,23 +30,23 @@ export class ParticipantFormEditorComponent implements OnInit{
           this.isQuestionValid = this.questions.map(() => true);
         },
         error: (error) => {
-          console.log(error); //TODO: display error message
+          this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
         }
       });
     }
   }
 
-  addQuestion() {
+  addQuestion(): void{
     this.questions.push(new QuestionClass(`question${this.questions.length + 1}`, `Question ${this.questions.length + 1}`));
     this.isQuestionValid.push(true);
   }
 
-  removeQuestion(index: number) {
+  removeQuestion(index: number): void{
     this.questions.splice(index, 1);
     this.isQuestionValid.splice(index, 1);
   }
 
-  saveForm() {
+  saveForm(): void{
     if(!this.experiment?.formId){
       this.createForm();
     }else if(this.isDirty){
@@ -55,7 +58,7 @@ export class ParticipantFormEditorComponent implements OnInit{
     this.isDirty = false;
   }
 
-  noForm(){
+  formNotNeeded(): void{
     if(this.experiment)
     this.formService.deleteForm(this.experiment._id).subscribe({
       next: () => {
@@ -67,18 +70,18 @@ export class ParticipantFormEditorComponent implements OnInit{
               this.nextStep.emit();
             },
             error: (error) => {
-              console.log(error); //TODO: handle error
+              this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
             }
           });
         }
       },
       error: (error) => {
-        console.log(error); //TODO: handle error
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
   }
 
-  createForm(){
+  createForm(): void{
     if(this.experiment)
     this.formService.addForm(this.experiment._id, this.questions).subscribe({
       next: () => {
@@ -86,29 +89,30 @@ export class ParticipantFormEditorComponent implements OnInit{
           this.experimentService.getExperimentById(this.experiment._id).subscribe({
             next: (experiment) => {
               this.experiment = experiment;
+              this.toastr.success('Form created', 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
               this.experimentChange.emit(this.experiment);
               this.nextStep.emit();
             },
             error: (error) => {
-              console.log(error); //TODO: handle error
+              this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
             }
           });
         }
       },
       error: (error) => {
-        console.log(error); //TODO: handle error
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
   }
 
-  updateForm(){
+  updateForm(): void{
     if(this.experiment)
     this.formService.updateForm(this.experiment._id, this.questions).subscribe({
-      next: (response) => {
-        console.log(response.body?.message) //TODO: display message for user
+      next: () => {
+        this.toastr.success('Form updated', 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
       },
-      error: (response) => {
-        console.log(response.error.message); //TODO: handle error
+      error: (error) => {
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
   }
@@ -117,11 +121,11 @@ export class ParticipantFormEditorComponent implements OnInit{
     return this.isQuestionValid.includes(false);
   }
 
-  onValidityChange(index: number, valid: boolean) {
+  onValidityChange(index: number, valid: boolean): void {
     this.isQuestionValid[index] = valid;
   }
 
-  onQuestionChange() {
+  onQuestionChange(): void {
     this.isDirty = true;
   }
 }

@@ -4,6 +4,7 @@ import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { environment } from 'src/environments/environment';
 import { saveAs } from 'file-saver';
+import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-experiment-details',
   templateUrl: './experiment-details.component.html',
@@ -14,7 +15,8 @@ export class ExperimentDetailsComponent implements OnInit {
 
   constructor(private readonly route: ActivatedRoute,
               private readonly experimentService: ExperimentService,
-              private readonly router: Router) {}
+              private readonly router: Router,
+              private toastr: ToastrService) {}
 
   ngOnInit(): void {
     this.experimentService.getExperimentById(this.route.snapshot.params['id']).subscribe({
@@ -22,7 +24,6 @@ export class ExperimentDetailsComponent implements OnInit {
         this.experiment = experiment;
         this.formatDates();
       },
-
       error: () => this.router.navigate(['/404'])
     });
   }
@@ -31,9 +32,12 @@ export class ExperimentDetailsComponent implements OnInit {
     this.experimentService.closeExperiment(this.experiment._id).subscribe({
       next: (response) => {
         this.experiment = response.experiment;
+        this.toastr.success('Experiment closed', 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
         this.formatDates();
-      },//TODO: display messages
-      error: (error) => console.log(error)
+      },
+      error: (error) => {
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+      }
     });
   }
 
@@ -41,16 +45,24 @@ export class ExperimentDetailsComponent implements OnInit {
     this.experimentService.openExperiment(this.experiment._id).subscribe({
       next: (response) => {
         this.experiment = response.experiment;
+        this.toastr.success('Experiment opened', 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
         this.formatDates();
-      }, //TODO: display messages
-      error: (error) => console.log(error)
+      },
+      error: (error) => {
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+      }
     });
   }
 
   deleteExperiment(): void {
     this.experimentService.deleteExperiment(this.experiment._id).subscribe({
-      next: () => this.router.navigate(['/research']),
-      error: (error) => console.log(error) //TODO: display messages
+      next: () => {
+        this.router.navigate(['/research']);
+        this.toastr.success('Experiment deleted', 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
+      },
+      error: (error) => {
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+      }
     });
   }
 
@@ -62,9 +74,9 @@ export class ExperimentDetailsComponent implements OnInit {
   shareExperiment(): void {
     const url = `${environment.frontendBaseUrl}/participant/${this.experiment._id}`;
     navigator.clipboard.writeText(url).then(() => {
-      console.log('URL copied to clipboard'); //TODO: display messages
+      this.toastr.success('URL copied to clipboard', undefined, { progressBar: true, positionClass: 'toast-bottom-right' });
     }).catch((error) => {
-      console.log(error);
+      this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
     });
   }
 
@@ -74,7 +86,9 @@ export class ExperimentDetailsComponent implements OnInit {
         const blob = new Blob([data], { type: 'application/zip' });
         saveAs(blob, `experiment-${this.experiment._id}.zip`);
       },
-      error: (error) => console.log(error) // TODO: display messages
+      error: (error) => {
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+      }
     });
   }
 }

@@ -20,7 +20,6 @@ const routes: Routes = [
   },
   {
     path: 'participant/:experimentId',
-    //canActivate: [ParticipantActivatorService],
     canDeactivate: [participantDeactivator],
     component: ParticipantViewComponent
   },

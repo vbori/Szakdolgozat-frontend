@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {MatTabsModule} from '@angular/material/tabs';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { RoundCreationComponent } from './round-creation.component';
 
@@ -8,7 +10,8 @@ describe('RoundCreationComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RoundCreationComponent ]
+      declarations: [ RoundCreationComponent ],
+      imports: [MatTabsModule, NoopAnimationsModule]
     })
     .compileComponents();
 

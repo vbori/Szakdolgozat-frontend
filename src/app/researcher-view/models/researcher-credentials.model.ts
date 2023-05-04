@@ -3,7 +3,6 @@ export interface ResearcherCredentials {
   password: string;
 }
 
-export interface ResearcherTokens {
+export interface ResearcherToken {
   accessToken: string;
-  refreshToken: string;
 }

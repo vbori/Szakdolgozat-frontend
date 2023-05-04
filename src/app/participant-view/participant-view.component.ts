@@ -4,6 +4,7 @@ import { ParticipantService } from './services/participant.service';
 import { Participant } from './models/participant.model';
 import { MatStepper } from '@angular/material/stepper';
 import { ExperimentService } from '../common/services/experiment.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-participant-view',
@@ -21,7 +22,8 @@ export class ParticipantViewComponent implements OnInit{
 
   constructor(private readonly participantService: ParticipantService,
               private readonly experimentService: ExperimentService,
-              private route: ActivatedRoute, private router: Router) { }
+              private route: ActivatedRoute, private router: Router,
+              private toastr: ToastrService) { }
 
   ngOnInit(): void {
     window.onbeforeunload = (event) => {
@@ -41,7 +43,7 @@ export class ParticipantViewComponent implements OnInit{
         this.hasForm = hasForm;
       },
       error: (error) => {
-        console.log(error); //TODO: handle error
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
 
@@ -49,8 +51,6 @@ export class ParticipantViewComponent implements OnInit{
       this.participantService.getParticipant(this.experimentId).subscribe({
         next: (participant) => {
           this.participant = participant;
-          console.log("Participant: ")
-          console.log(participant)
         },
         error: () => {
           this.router.navigate(['/404'])
@@ -64,15 +64,14 @@ export class ParticipantViewComponent implements OnInit{
         responses: []
       }
     }
-
   }
 
-  onNextStep(){
+  onNextStep(): void{
     if(this.stepper.selected) this.stepper.selected.completed = true;
     this.stepper.next();
   }
 
-  onFinish(){
+  onFinish(): void{
     this.finished = true;
     if(this.stepper.selected) this.stepper.selected.completed = true;
     this.stepper.next();

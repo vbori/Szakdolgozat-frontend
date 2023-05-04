@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { ActivatedRoute } from '@angular/router';
 
 import { CreateExperimentComponent } from './create-experiment.component';
 
@@ -8,7 +10,16 @@ describe('CreateExperimentComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CreateExperimentComponent ]
+      declarations: [ CreateExperimentComponent ],
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {params:{ id: '1'}}
+          }
+        }
+      ]
     })
     .compileComponents();
 

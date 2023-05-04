@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ValidatorFn, AbstractControl, ValidationErrors, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ResearcherService } from '../services/researcher.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-password-change',
@@ -11,7 +12,7 @@ export class PasswordChangeComponent {
 
   hide = true;
 
-  constructor(private readonly researcherService: ResearcherService) {}
+  constructor(private readonly researcherService: ResearcherService, private toastr: ToastrService) {}
 
   checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => {
     let pass = group.get('newPassword')?.value;
@@ -30,11 +31,10 @@ export class PasswordChangeComponent {
     if(oldPassword && newPassword)
     this.researcherService.changePassword({oldPassword, newPassword}).subscribe({
       next: (response) => {
-        console.log(response.status);
-        console.log(response.body?.message); //TODO: add messages to the user
+        this.toastr.success(response.body?.message, 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
       },
       error: (response) => {
-        console.log(response.error.message);
+        this.toastr.error(response.error.message, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
   }

@@ -17,7 +17,7 @@ export class ExperimentRoundsValidator
         minControl = formGroup.get(minControlName);
       }
       if (minControl && maxControl && minControl.value > maxControl.value) {
-        const errorLabel = `conflictingValues${minControlName}${maxControlName}`;
+        const errorLabel = `conflictingValues${minControlSubForm ?? ''}${minControlName}${maxControlName}`;
         const errors: any = {};
         errors[errorLabel] = true;
         return errors;
@@ -54,19 +54,16 @@ export class ExperimentRoundsValidator
     }
   }
 
-  public static shapesOverlapValidator(canvasWidthControlName: string, normalMinWidthControlName: string, distractionMinWidthControlName: string | undefined = undefined): ValidatorFn {
+  public static shapesOverlapValidator(canvasWidthControlName: string, normalMinWidthControlName: string, distractionMinWidthControlName: string, useShapeDistractionControlName: string): ValidatorFn {
     return (formGroup: AbstractControl): ValidationErrors | null => {
       const canvasWidth = formGroup.get(canvasWidthControlName)?.value;
       const normalMinWidth = formGroup.get(normalMinWidthControlName)?.value;
-      let distractionMinWidth: number | undefined;
-      if(distractionMinWidthControlName) {
-        distractionMinWidth = formGroup.get(distractionMinWidthControlName)?.value;
-      }
+      const distractionMinWidth = formGroup.get(distractionMinWidthControlName)?.value;
 
       if (canvasWidth && normalMinWidth) {
-        if(distractionMinWidth) {
+        if(formGroup.get(useShapeDistractionControlName)?.value) {
           if(2*normalMinWidth + distractionMinWidth > canvasWidth) {
-            return { shapesOverlap: true };
+            return { shapesOverlapWithDistraction: true };
           }
         }else if(2*normalMinWidth > canvasWidth){
           return { shapesOverlap: true };

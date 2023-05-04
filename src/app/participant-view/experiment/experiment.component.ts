@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { fabric } from 'fabric';
 import {Round, FabricShape} from '../../common/models/round.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { Click, Position, Result } from 'src/app/common/models/result.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-experiment',
@@ -10,7 +11,7 @@ import { Click, Position, Result } from 'src/app/common/models/result.model';
   styleUrls: ['./experiment.component.scss']
 })
 
-export class ExperimentComponent implements OnInit{
+export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
   @Input() experimentId: string;
   @Input() demoMode: boolean;
   @Input() participantId: string;
@@ -23,6 +24,7 @@ export class ExperimentComponent implements OnInit{
   mainCanvas: fabric.Canvas;
   hiddenCanvas: any; //TODO: type this
   distractingShape:  FabricShape | undefined = undefined;
+  flashTimers:  ReturnType<typeof setInterval>[] = [];
 
   backgroundDistractionOn: boolean | undefined = undefined;
   shapeDistractionOn: boolean | undefined = undefined;
@@ -34,7 +36,7 @@ export class ExperimentComponent implements OnInit{
   targetClicked: boolean = false;
   startTime: number | undefined = undefined;
   trackable: boolean = false;
-  positionTracker: any = undefined;
+  positionTracker: ReturnType<typeof setInterval> | undefined = undefined;
   previousCursorPosition: Position | undefined = undefined;
 
   clicks: Click[] = [];
@@ -44,21 +46,20 @@ export class ExperimentComponent implements OnInit{
   cursorPathLength: number = 0;
   rounds: Round[];
 
-  constructor(private readonly experimentService: ExperimentService) { }
+  constructor(private readonly experimentService: ExperimentService, private toastr:ToastrService ) { }
 
   ngOnInit(): void {
     this.experimentService.getRoundsAndTrackingInfo(this.experimentId).subscribe({
       next: (response) => {
         console.log(response.rounds);
         this.cursorImageMode = response.cursorImageMode;
-        console.log("cursorImageMode",this.cursorImageMode)
         this.positionTrackingFrequency = response.positionTrackingFrequency;
         this.rounds = response.rounds;
         this.maxCount = this.rounds.length;
         this.playRound(this.rounds[this.counter]);
       },
       error: (error) => {
-        console.log(error); //TODO: display error message
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
   }
@@ -73,6 +74,14 @@ export class ExperimentComponent implements OnInit{
 
     this.mainCanvas.on('mouse:move', ({e}) => this.handleMouseMove(e));
     this.mainCanvas.on('mouse:down', ({e}) => this.handleMouseDown(e));
+  }
+
+  ngOnDestroy(){
+    for(let timer of this.flashTimers){
+      clearInterval(timer);
+    }
+    if(this.positionTracker)
+    clearInterval(this.positionTracker);
   }
 
   playRound(round: Round): void {
@@ -90,6 +99,7 @@ export class ExperimentComponent implements OnInit{
         this.trackable = true;
       }, this.positionTrackingFrequency);
     }
+    this.flashTimers = [];
     this.cursorPathLength = 0;
     this.clicks = [];
     this.targetClicked = false;
@@ -132,10 +142,12 @@ export class ExperimentComponent implements OnInit{
       }
 
       if(shape.flashing){
-        setInterval(() => {
+        let timer = setInterval(() => {
           shape.set('fill', shape.fill == shape.baseColor ? shape.flashing.color : shape.baseColor);
           this.mainCanvas.renderAll();
         }, shape.flashing.frequency);
+
+        this.flashTimers.push(timer);
       }
     });
 
@@ -171,6 +183,10 @@ export class ExperimentComponent implements OnInit{
         this.saveResults(this.counter);
       }
 
+      for(let timer of this.flashTimers){
+        clearInterval(timer);
+      }
+
       this.counter++;
 
       if (this.counter < this.maxCount) {
@@ -193,7 +209,7 @@ export class ExperimentComponent implements OnInit{
       clearInterval(this.positionTracker);
     }
 
-    if(this.cursorImageMode){
+    if(this.cursorImageMode && this.hiddenCanvas.isDrawingMode){
       this.hiddenCanvas.freeDrawingBrush._finalizeAndAddPath();
       this.hiddenCanvas.isDrawingMode = false;
     }
@@ -211,41 +227,11 @@ export class ExperimentComponent implements OnInit{
   handleBaseShapeLeave(): void {
     if(!this.targetClicked && !this.controlMode){
       if(this.rounds[this.counter].backgroundDistraction && this.backgroundDistractionOn == undefined){
-        this.backgroundDistractionOn = true;
-        this.mainCanvas.backgroundColor = this.distractingBackground;
-        this.mainCanvas.renderAll();
-
-        let interval: any = undefined;
-        if(this.rounds[this.counter].backgroundDistraction?.flashing){
-          interval = setInterval(() => {
-            this.mainCanvas.backgroundColor = this.mainCanvas.backgroundColor == this.distractingBackground ? this.backgroundFlashColor : this.distractingBackground;
-            this.mainCanvas.renderAll();
-          }, this.rounds[this.counter].backgroundDistraction?.flashing?.frequency);
-        }
-
-        setTimeout(() => {
-          this.mainCanvas.backgroundColor = this.background;
-          if(interval != null){
-            clearInterval(interval);
-            this.backgroundDistractionOn = false;
-          }
-          this.mainCanvas.renderAll();
-        }, this.rounds[this.counter].backgroundDistraction?.duration);
-
+        this.startBackgroundDistraction();
       }
 
       if(this.rounds[this.counter].shapeDistractionDuration && this.shapeDistractionOn == undefined && this.distractingShape){
-        this.shapeDistractionOn = true;
-        this.distractingShape.set('visible', true);
-        this.mainCanvas.renderAll();
-
-        setTimeout(() => {
-          if(this.distractingShape){
-            this.distractingShape.set('visible', false);
-            this.shapeDistractionOn = false;
-            this.mainCanvas.renderAll();
-          }
-        }, this.rounds[this.counter].shapeDistractionDuration);
+        this.startShapeDistraction();
       }
     }
   }
@@ -286,61 +272,87 @@ export class ExperimentComponent implements OnInit{
     }
   }
 
+  startBackgroundDistraction(): void {
+    this.backgroundDistractionOn = true;
+    this.mainCanvas.backgroundColor = this.distractingBackground;
+    this.mainCanvas.renderAll();
+
+    let interval:  ReturnType<typeof setInterval> | undefined = undefined;
+    if(this.rounds[this.counter].backgroundDistraction?.flashing){
+      interval = setInterval(() => {
+        this.mainCanvas.backgroundColor = this.mainCanvas.backgroundColor == this.distractingBackground ? this.backgroundFlashColor : this.distractingBackground;
+        this.mainCanvas.renderAll();
+      }, this.rounds[this.counter].backgroundDistraction?.flashing?.frequency);
+    }
+
+    setTimeout(() => {
+      this.mainCanvas.backgroundColor = this.background;
+      if(interval != null){
+        clearInterval(interval);
+        this.backgroundDistractionOn = false;
+      }
+      this.mainCanvas.renderAll();
+    }, this.rounds[this.counter].backgroundDistraction?.duration);
+  }
+
+  startShapeDistraction(): void {
+    if(this.distractingShape){
+      this.shapeDistractionOn = true;
+      this.distractingShape.set('visible', true);
+      this.mainCanvas.renderAll();
+
+      setTimeout(() => {
+        if(this.distractingShape){
+          this.distractingShape.set('visible', false);
+          this.shapeDistractionOn = false;
+          this.mainCanvas.renderAll();
+        }
+      }, this.rounds[this.counter].shapeDistractionDuration);
+    }
+  }
+
   saveResults(counter: number): void{
     if(this.cursorImageMode){
-      const imageData = this.hiddenCanvas.toDataURL("image/jpeg", 0.75);
-      this.experimentService.saveImage(imageData, this.experimentId, this.participantId, counter).subscribe({
-        next: (response) => {
-          console.log('Image uploaded to server', response);
-        },
-        error:(error)  => {
-          console.error('Failed to upload image to server', error);
-        }
-      });
-
-      this.hiddenCanvas.clear();
+      this.saveImage(counter);
     }
 
-    let result: Result;
-    console.log("saving result")
-    console.log(this.participantId);
-    if(this.positionTrackingFrequency){
-      result = {
+    const result = {
         experimentId: this.experimentId,
         participantId: this.participantId,
         roundId: this.rounds[counter]._id,
         roundIdx: this.rounds[counter].roundIdx,
         timeNeeded: this.timeNeeded,
-        cursorPathLength: this.cursorPathLength,
-        cursorPositions: this.cursorPositions,
+        cursorPathLength: this.positionTrackingFrequency ? this.cursorPathLength: undefined,
+        cursorPositions: this.positionTrackingFrequency ? this.cursorPositions: undefined,
         clicks: this.clicks,
         misclickCount: this.misclickCount
-      }
-    }else{
-      result = {
-        experimentId: this.experimentId,
-        participantId: this.participantId,
-        roundId: this.rounds[counter]._id,
-        roundIdx: this.rounds[counter].roundIdx,
-        timeNeeded: this.timeNeeded,
-        clicks: this.clicks,
-        misclickCount: this.misclickCount
-      }
-    }
-
-    console.log(result)
+      };
 
     this.experimentService.saveResult(result).subscribe({
-      next: (response) => {
-        console.log('Result uploaded to server', response);
+      next: () => {
+        console.log('Result uploaded to server');
       },
       error:(error)  => {
-        console.error('Failed to upload result to server', error); //TODO: handle error
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
   }
 
-  getDistanceBetweenPositions(position1: Position, position2: Position) {
+  saveImage(counter: number): void {
+    const imageData = this.hiddenCanvas.toDataURL("image/jpeg", 0.75);
+    this.experimentService.saveImage(imageData, this.experimentId, this.participantId, counter).subscribe({
+      next: () => {
+        console.log('Image uploaded to server');
+      },
+      error:(error)  => {
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+      }
+    });
+
+    this.hiddenCanvas.clear();
+  }
+
+  getDistanceBetweenPositions(position1: Position, position2: Position): number {
     const dx = position2.x - position1.x;
     const dy = position2.y - position1.y;
     return Math.sqrt(dx * dx + dy * dy);

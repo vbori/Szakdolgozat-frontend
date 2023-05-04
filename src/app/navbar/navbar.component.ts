@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../researcher-view/services/auth.service';
 
 @Component({
-  selector: 'navbar',
+  selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })

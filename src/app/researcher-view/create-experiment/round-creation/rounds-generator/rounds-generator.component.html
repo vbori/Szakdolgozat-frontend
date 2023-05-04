@@ -1,6 +1,6 @@
 <form [formGroup]="roundGeneratorForm" (ngSubmit)="onSubmit()">
   <div class="groupContainer">
-    <h4>General settings</h4>
+    <h4>Round settings</h4>
     <mat-form-field>
       <mat-label>Number of sets</mat-label>
       <input matInput formControlName="setNum" type="number"/>
@@ -110,6 +110,12 @@
         Minimum width must be a whole number between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!
       </mat-error>
     </mat-form-field>
+    <mat-error *ngIf="roundGeneratorForm.hasError('shapesOverlapWithDistraction')">
+      The minimum width of the distracting shape plus the double of the minimum width of the base and target shape must be smaller than the canvas width!
+    </mat-error>
+    <mat-error *ngIf="roundGeneratorForm.hasError('shapesOverlap') && !roundGeneratorForm.value.useShapeDistraction">
+      The double of the minimum width must be smaller than the canvas width!
+    </mat-error>
     <mat-form-field>
       <mat-label>Maximum width of shapes</mat-label>
       <input matInput formControlName="maxWidth" type="number"/>
@@ -174,7 +180,7 @@
       <input matInput formControlName="color" type="color">
     </mat-form-field>
     <mat-checkbox formControlName="useFlashing">Use flashing</mat-checkbox>
-    <div *ngIf="roundGeneratorForm.value.backgroundDistractionConfig && roundGeneratorForm.value.backgroundDistractionConfig.useFlashing" formGroupName="flashing">
+    <div  class ="verticalContainer" *ngIf="roundGeneratorForm.value.backgroundDistractionConfig && roundGeneratorForm.value.backgroundDistractionConfig.useFlashing" formGroupName="flashing">
       <mat-form-field>
         <mat-label>Flash frequency</mat-label>
         <input matInput type="number" formControlName="frequency" required>
@@ -195,6 +201,19 @@
   <div class="groupContainer" *ngIf="roundGeneratorForm.value.useShapeDistraction" formGroupName="distractingShapeConfig">
     <h4>Shape distraction settings</h4>
     <p>During a shape distraction, a third shape appears on the canvas to distract the participant, optionally with flashing.</p>
+    <mat-form-field >
+      <mat-label>Color of distracting shape</mat-label>
+      <input matInput formControlName="color" type="color">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Distracting shape types</mat-label>
+      <mat-select formControlName="distractingShapeTypes" multiple>
+        <mat-option *ngFor="let option of shapeOptions" [value]="option.value">{{ option.viewValue }}</mat-option>
+      </mat-select>
+      <mat-hint>
+        The distracting shape will be chosen randomly from the selected shape types.
+      </mat-hint>
+    </mat-form-field>
     <mat-form-field>
       <mat-label>Minimum width of distracting shape</mat-label>
       <input matInput type="number" formControlName="minWidth" required>
@@ -206,7 +225,7 @@
         Minimum width must be a whole number between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!
       </mat-error>
     </mat-form-field>
-    <mat-error *ngIf="roundGeneratorForm.hasError('shapesOverlap')">
+    <mat-error *ngIf="roundGeneratorForm.hasError('shapesOverlapWithDistraction')">
       The minimum width of the distracting shape plus the double of the minimum width of the base and target shape must be smaller than the canvas width!
     </mat-error>
     <mat-form-field>
@@ -217,8 +236,8 @@
         The width of the distracting shape will be chosen randomly between the minimum and maximum width.
       </mat-hint>
     </mat-form-field>
-    <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.maxWidth.invalid || roundGeneratorForm.controls.distractingShapeConfig.errors?.['conflictingValuesminWidthmaxWidth']">
-      Maximum width must be a whole number between minimum width and {{constants.MAX_SHAPE_SIZE}}!
+    <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.maxWidth.invalid || roundGeneratorForm.controls.distractingShapeConfig.errors?.['conflictingValuesminWidthmaxWidth'] || roundGeneratorForm.errors?.['conflictingValuesdistractingShapeConfigmaxWidthcanvasWidth']">
+      Maximum width must be a whole number between minimum width and {{constants.MAX_SHAPE_SIZE}}, and can not exceed canvas width!
     </mat-error>
     <mat-form-field>
       <mat-label>Minimum height of distracting shape</mat-label>
@@ -239,22 +258,9 @@
         The height of the distracting shape will be chosen randomly between the minimum and maximum height.
       </mat-hint>
     </mat-form-field>
-    <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.maxHeight.invalid || roundGeneratorForm.controls.distractingShapeConfig.errors?.['conflictingValuesminHeightmaxHeight']">
-      Maximum height must be a whole number between minimum height and {{constants.MAX_SHAPE_SIZE}}!
+    <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.maxHeight.invalid || roundGeneratorForm.controls.distractingShapeConfig.errors?.['conflictingValuesminHeightmaxHeight']|| roundGeneratorForm.errors?.['conflictingValuesdistractingShapeConfigmaxHeightcanvasHeight']">
+      Maximum height must be a whole number between minimum height and {{constants.MAX_SHAPE_SIZE}}, and can not exceed canvas height!
     </mat-error>
-    <mat-form-field>
-      <mat-label>Distracting shape types</mat-label>
-      <mat-select formControlName="distractingShapeTypes" multiple>
-        <mat-option *ngFor="let option of shapeOptions" [value]="option.value">{{ option.viewValue }}</mat-option>
-      </mat-select>
-      <mat-hint>
-        The distracting shape will be chosen randomly from the selected shape types.
-      </mat-hint>
-    </mat-form-field>
-    <mat-form-field >
-      <mat-label>Color of distracting shape</mat-label>
-      <input matInput formControlName="color" type="color">
-    </mat-form-field>
     <mat-form-field>
       <mat-label>Minimum distraction duration time</mat-label>
       <input matInput type="number" formControlName="minDuration" required>
@@ -278,7 +284,7 @@
       Maximum distraction duration time must be a whole number between minimum distraction duration time and {{constants.MAX_DISTRACTION_DURATION_TIME}} milliseconds!
     </mat-error>
     <mat-checkbox formControlName="useFlashing">Use flashing</mat-checkbox>
-    <div *ngIf="roundGeneratorForm.value.distractingShapeConfig && roundGeneratorForm.value.distractingShapeConfig.useFlashing" formGroupName="flashing">
+    <div class ="verticalContainer"  *ngIf="roundGeneratorForm.value.distractingShapeConfig && roundGeneratorForm.value.distractingShapeConfig.useFlashing" formGroupName="flashing">
       <mat-form-field>
         <mat-label>Flash frequency</mat-label>
         <input matInput type="number" formControlName="frequency" required>

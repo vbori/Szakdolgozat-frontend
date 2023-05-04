@@ -5,6 +5,7 @@ import { FabricShape, Round, RoundClass, Shape, ShapeType } from 'src/app/common
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { Router } from '@angular/router';
 import { Experiment } from 'src/app/common/models/experiment.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-manual-configuration',
@@ -23,7 +24,11 @@ export class ManualConfigurationComponent implements OnInit{
   rounds: Round[] = [new RoundClass()];
   @Input() experiment: Experiment | undefined;
 
-  constructor(public constants: ExperimentCreationConstants, private readonly experimentService: ExperimentService, private router: Router, private changeDetector: ChangeDetectorRef) { }
+  constructor(public constants: ExperimentCreationConstants,
+              private readonly experimentService: ExperimentService,
+              private router: Router,
+              private changeDetector: ChangeDetectorRef,
+              private toastr: ToastrService) { }
 
   ngOnInit(): void {
     if(this.experiment?.rounds && this.experiment.rounds.length > 0){
@@ -32,12 +37,12 @@ export class ManualConfigurationComponent implements OnInit{
     }
   }
 
-  addRound() {
+  addRound(): void {
     this.isRoundValid.push(true);
     this.rounds.push(new RoundClass());
   }
 
-  removeRound(index: number) {
+  removeRound(index: number): void {
     this.isRoundValid.splice(index, 1);
     this.canvases.splice(index, 1);
     this.rounds.splice(index, 1);
@@ -47,27 +52,25 @@ export class ManualConfigurationComponent implements OnInit{
     return this.isRoundValid.includes(false);
   }
 
-  onValidityChange(index: number, valid: boolean) {
+  onValidityChange(index: number, valid: boolean): void {
     this.isRoundValid[index] = valid;
   }
 
-  onCanvasCreated(canvas: fabric.Canvas){
+  onCanvasCreated(canvas: fabric.Canvas): void{
     this.canvases.push(canvas);
   }
 
-  createExperiment(){
-    console.log(this.rounds);
+  createExperiment(): void{
     for (let i = 0; i < this.rounds.length; i++){
       this.syncRoundAndCanvas(i);
     }
     if(this.experiment){
-      console.log("mar az ifben")
       this.experimentService.updateExperiment({experimentId: this.experiment._id ,updatedExperiment: {rounds: this.rounds}}).subscribe({
-        next: (experiment) => {
+        next: () => {
           this.router.navigate(['/research/experiment/details/', this.experiment?._id]);
         },
         error: (error) => {
-          console.log(error); //TODO: display error message
+          this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
         }
       });
     }
@@ -103,8 +106,6 @@ export class ManualConfigurationComponent implements OnInit{
       fill: shape.fill as string ?? '#000000',
       strokeWidth: 0
     };
-    console.log('convert to new shape')
-    console.log(newShape);
     return newShape;
   }
 }

@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {MatTableModule} from '@angular/material/table';
 
 import { RoundsTableComponent } from './rounds-table.component';
 
@@ -8,7 +9,8 @@ describe('RoundsTableComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RoundsTableComponent ]
+      declarations: [ RoundsTableComponent ],
+      imports: [MatTableModule]
     })
     .compileComponents();
 

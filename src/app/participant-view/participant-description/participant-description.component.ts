@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 
 @Component({
@@ -19,7 +20,7 @@ export class ParticipantDescriptionComponent implements OnInit{
   });
 
 
-  constructor(private experimentService: ExperimentService) { }
+  constructor(private experimentService: ExperimentService, private toastr: ToastrService) { }
 
   ngOnInit(): void {
     this.experimentService.getDescription(this.experimentId, this.demoMode).subscribe({
@@ -27,13 +28,12 @@ export class ParticipantDescriptionComponent implements OnInit{
         this.description = description;
       },
       error: (error) => {
-        console.log("in participant-description.component.ts");
-        console.log(error); //TODO: display error message
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
   }
 
-  onSubmit(){
+  onSubmit(): void{
     this.nextStep.emit();
   }
 }

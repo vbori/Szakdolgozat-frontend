@@ -5,6 +5,7 @@ import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { ExperimentCreationConstants } from '../experiment-creation.constants';
 import { fabric } from 'fabric';
 import { Round } from 'src/app/common/models/round.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-experiment-basics',
@@ -35,7 +36,8 @@ export class ExperimentBasicsComponent implements AfterViewInit{
 
   constructor(private experimentService: ExperimentService,
               public constants: ExperimentCreationConstants,
-              private changeDetector: ChangeDetectorRef) { }
+              private changeDetector: ChangeDetectorRef,
+              private toastr: ToastrService) { }
 
   ngAfterViewInit(): void {
     this.createCanvases();
@@ -106,12 +108,10 @@ export class ExperimentBasicsComponent implements AfterViewInit{
       this.experimentService.createExperiment(name, researcherDescription,
         maxParticipantNum, controlGroupChance, cursorImageMode, positionTrackingFrequency).subscribe({
         next: (experiment) => {
-          console.log("created experiment")
-          console.log(experiment)
           this.handleExperimentChange(experiment);
         },
         error: (error) => {
-          console.log(error); //TODO: display error message
+          this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
         }
       });
   }
@@ -120,18 +120,17 @@ export class ExperimentBasicsComponent implements AfterViewInit{
     console.log(this.experimentBasicsForm.value)
     this.experimentService.updateExperiment({experimentId: this.experiment?._id, updatedExperiment: this.experimentBasicsForm.value}).subscribe({
       next: (experiment) => {
-        console.log("updated experiment")
-        console.log(experiment)
         this.handleExperimentChange(experiment);
       },
       error: (error) => {
-        console.log(error); //TODO: display error message
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
   }
 
   handleExperimentChange(experiment: Experiment): void {
     this.experiment = experiment;
+    this.toastr.success('Settings saved', 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
     this.experimentBasicsForm.markAsPristine();
     this.experimentChange.emit(this.experiment);
     this.nextStep.emit();

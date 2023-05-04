@@ -8,6 +8,7 @@ import { ParticipantViewModule } from './participant-view/participant-view.modul
 import { NavbarComponent } from './navbar/navbar.component';
 import { Error404Component } from './error404/error404.component';
 import { MatIconModule } from '@angular/material/icon';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -21,9 +22,11 @@ import { MatIconModule } from '@angular/material/icon';
     BrowserAnimationsModule,
     ResearcherViewModule,
     ParticipantViewModule,
-    MatIconModule
+    MatIconModule,
+    ToastrModule.forRoot()
   ],
-  providers: [],
+  providers: [
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

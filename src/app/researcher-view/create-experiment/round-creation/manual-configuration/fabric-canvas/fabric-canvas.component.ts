@@ -56,7 +56,6 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
 
     this.initializeCanvas();
     this.initializeForm();
-    console.log(this.round);
     if(this.round.objects.length > 0){
       let distractingShape = this.round.objects.filter((obj) => obj.distraction).at(0);
       if(!distractingShape){
@@ -178,7 +177,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     }
   }
 
-  setShapeDistraction(event: MatCheckboxChange): void{ 
+  setShapeDistraction(event: MatCheckboxChange): void{
     if(event.checked){
       this.distractionForm.controls.shapeDistractionDuration.enable();
       this.round.shapeDistractionDuration = this.distractionForm.controls.shapeDistractionDuration.value;
@@ -191,7 +190,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     }else{
       this.distractionForm.controls.shapeDistractionDuration.disable();
       this.round.shapeDistractionDuration = undefined;
-      this.canvas.discardActiveObject(); 
+      this.canvas.discardActiveObject();
       this.distractingShape?.set('visible', false);
     }
     this.checkIntersection();
@@ -206,7 +205,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
         if (obj === comparisonShape || !obj.visible) return;
         if(comparisonShape?.intersectsWithObject(obj)){
           this.shapesIntersect = true;
-          this.validityChange.emit(false); 
+          this.validityChange.emit(false);
         }
       });
     }
@@ -222,33 +221,28 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     if(this.round.backgroundDistraction){
       this.round.backgroundDistraction.duration = this.distractionForm.controls.backgroundDistraction.controls.duration.value;
     }
-    console.log(this.round);
   }
 
   changeBackgroundDistractionColor(): void{
     if(this.round.backgroundDistraction){
       this.round.backgroundDistraction.color = this.distractionForm.controls.backgroundDistraction.controls.color.value;
     }
-    console.log(this.round);
   }
 
   changeBackgroundDistractionFlashingColor(): void{
     if(this.round.backgroundDistraction?.flashing){
       this.round.backgroundDistraction.flashing.color = this.distractionForm.controls.backgroundDistraction.controls.flashing?.controls.color.value;
     }
-    console.log(this.round);
   }
 
   changeBackgroundDistractionFlashingFrequency(): void{
     if(this.round.backgroundDistraction?.flashing){
       this.round.backgroundDistraction.flashing.frequency = this.distractionForm.controls.backgroundDistraction.controls.flashing?.controls.frequency.value;
     }
-    console.log(this.round);
   }
 
   changeShapeDistractionDuration(): void{
     this.round.shapeDistractionDuration = this.distractionForm.controls.shapeDistractionDuration.value;
-    console.log(this.round);
   }
 
   changeSelectedObject(event: MatTabChangeEvent){

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -11,8 +12,7 @@ export class RegisterComponent {
 
   hide = true;
 
-  constructor(private readonly authService: AuthService) {}
-
+  constructor(private readonly authService: AuthService, private toastr: ToastrService) {}
 
   checkPasswords: ValidatorFn = (group: AbstractControl):  ValidationErrors | null => {
     let pass = group.get('password')?.value;
@@ -30,11 +30,12 @@ export class RegisterComponent {
     const {username, password} = this.registerForm.value;
     if(username && password)
     this.authService.register({username, password}).subscribe({
-      next: (response) => {
-        console.log(response.body?.message); //TODO: add messages to the user
+      next: () => {
+        this.toastr.success('Registered successfully', 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
       },
       error: (error) => {
-        console.log(error);
+        console.log(error)
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
   }

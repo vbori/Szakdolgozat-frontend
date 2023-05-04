@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 
@@ -17,7 +18,7 @@ export class ParticipantDescriptionEditorComponent implements AfterViewInit{
     participantDescription: new FormControl<string>('Welcome to the experiment!', [Validators.required, Validators.minLength(10)])
   });
 
-  constructor(private experimentService: ExperimentService) { }
+  constructor(private experimentService: ExperimentService, private toastr: ToastrService) { }
 
   ngAfterViewInit(): void {
     if(this.experiment){
@@ -32,14 +33,13 @@ export class ParticipantDescriptionEditorComponent implements AfterViewInit{
       this.experimentService.updateExperiment({experimentId: this.experiment?._id, updatedExperiment: this.participantDescriptionForm.value}).subscribe({
         next: (experiment) => {
           this.experiment = experiment;
-          console.log("experiment updated in part desc")
-          console.log(this.experiment);
+          this.toastr.success('Description saved', 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
           this.participantDescriptionForm.markAsPristine();
           this.experimentChange.emit(this.experiment);
           this.nextStep.emit();
         },
         error: (error) => {
-          console.log(error); //TODO: display error message
+          this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
         }
       });
     }else{

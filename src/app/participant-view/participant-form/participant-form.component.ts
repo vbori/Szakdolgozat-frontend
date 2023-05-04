@@ -4,6 +4,7 @@ import { Question } from 'src/app/common/models/form.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { ParticipantService } from '../services/participant.service';
 import { Response } from '../models/participant.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-participant-form',
@@ -21,13 +22,13 @@ export class ParticipantFormComponent implements OnInit{
   constructor(private readonly experimentService: ExperimentService,
               private readonly participantService: ParticipantService,
               private readonly formBuilder: FormBuilder,
-              private readonly changeDetector: ChangeDetectorRef) { }
+              private readonly changeDetector: ChangeDetectorRef,
+              private toastr: ToastrService) { }
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({});
     this.experimentService.getForm(this.experimentId).subscribe({
       next: (form) => {
-        console.log(form)
         this.questions = form.questions;
         this.questions.forEach(question => {
           if (question.validation) {
@@ -39,12 +40,12 @@ export class ParticipantFormComponent implements OnInit{
         this.changeDetector.detectChanges();
       },
       error: (error) => {
-        console.log(error); //TODO: display error message
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
   }
 
-  onSubmit(){
+  onSubmit(): void{
     if(!this.demoMode){
       console.log(this.form.value);
       let responses: Response[] = [];
@@ -59,7 +60,7 @@ export class ParticipantFormComponent implements OnInit{
           this.nextStep.emit();
         },
         error: (error) => {
-          console.log(error); //TODO: handle error
+          this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
         }
       });
     }else{

@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 import { ExperimentListComponent } from './experiment-list.component';
 
@@ -8,12 +10,15 @@ describe('ExperimentListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ExperimentListComponent ]
+      declarations: [ ExperimentListComponent ],
+      imports: [HttpClientTestingModule, ToastrModule.forRoot()],
+      providers: [ToastrService]
     })
     .compileComponents();
 
     fixture = TestBed.createComponent(ExperimentListComponent);
     component = fixture.componentInstance;
+    component.experimentStatus = 'Active'
     fixture.detectChanges();
   });
 

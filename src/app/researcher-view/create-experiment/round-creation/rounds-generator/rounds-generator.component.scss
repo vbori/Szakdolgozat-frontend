@@ -31,3 +31,9 @@ input[type="color"]::-webkit-color-swatch-wrapper {
   padding: 10px;
   margin: 10px 0;
 }
+
+.verticalContainer{
+  display: flex;
+  flex-direction: column;
+  margin: 10px 0;
+}
