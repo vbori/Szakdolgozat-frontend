@@ -1,9 +1,11 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { fabric } from 'fabric';
-import {Round, FabricShape} from '../../common/models/round.model';
+import {IRound } from '../../common/models/round.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
-import { Click, Position, Result } from 'src/app/common/models/result.model';
+import { Click, Position, Result } from 'src/app/participant-view/models/result.model';
 import { ToastrService } from 'ngx-toastr';
+import { ResultService } from '../services/result.service';
+import { FabricShape } from 'src/app/common/models/shape.model';
 
 @Component({
   selector: 'app-experiment',
@@ -12,41 +14,51 @@ import { ToastrService } from 'ngx-toastr';
 })
 
 export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
-  @Input() experimentId: string;
-  @Input() demoMode: boolean;
-  @Input() participantId: string;
-  @Input() controlMode: boolean;
+  @Input() experimentId: string = 'expId';
+  @Input() demoMode: boolean = false;
+  @Input() participantId: string = 'partId';
+  @Input() controlMode: boolean = false;
   @Output() finishedExperiment = new EventEmitter();
 
+  //Received from backend
   cursorImageMode: string | undefined = undefined;
   positionTrackingFrequency: number | undefined = undefined;
-
-  mainCanvas: fabric.Canvas;
-  hiddenCanvas: any; //TODO: type this
-  distractingShape:  FabricShape | undefined = undefined;
-  flashTimers:  ReturnType<typeof setInterval>[] = [];
-
-  backgroundDistractionOn: boolean | undefined = undefined;
-  shapeDistractionOn: boolean | undefined = undefined;
   background: string | undefined = 'white';
   backgroundFlashColor: string | undefined = 'black';
   distractingBackground: string | undefined ='blue';
-  maxCount: number;
+  maxCount: number = 0;
+
+  //Fabric.js related
+  mainCanvas: fabric.Canvas;
+  hiddenCanvas: any;
+  distractingShape:  FabricShape | undefined = undefined;
+
+  //Helper variables
+  backgroundDistractionOn: boolean | undefined = undefined;
+  shapeDistractionOn: boolean | undefined = undefined;
+  startedDrawing: boolean = false;
   counter: number = 0;
   targetClicked: boolean = false;
+  baseClicked: boolean = false;
   startTime: number | undefined = undefined;
   trackable: boolean = false;
   positionTracker: ReturnType<typeof setInterval> | undefined = undefined;
+  flashTimers:  ReturnType<typeof setInterval>[] = [];
+  timeOuts: ReturnType<typeof setTimeout>[] = [];
+  lastBaseShapeClick: Position | undefined = undefined;
   previousCursorPosition: Position | undefined = undefined;
 
+  //Result variables
   clicks: Click[] = [];
   misclickCount: number = 0;
-  timeNeeded: number;
+  timeNeeded: number = 0;
   cursorPositions: Position[] = [];
   cursorPathLength: number = 0;
-  rounds: Round[];
+  rounds: IRound[] = [];
 
-  constructor(private readonly experimentService: ExperimentService, private toastr:ToastrService ) { }
+  constructor(private readonly experimentService: ExperimentService,
+              private readonly resultService: ResultService,
+              private toastr:ToastrService ) { }
 
   ngOnInit(): void {
     this.experimentService.getRoundsAndTrackingInfo(this.experimentId).subscribe({
@@ -62,39 +74,51 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
         this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
+
+    console.log("controlMode: " + this.controlMode);
   }
 
   ngAfterViewInit(): void {
+    //Create canvases and set options and event listeners
     this.mainCanvas = new fabric.Canvas('mainCanvas');
     this.mainCanvas.selection = false;
     this.mainCanvas.hoverCursor = 'pointer';
 
-    this.hiddenCanvas = new fabric.Canvas('hiddenCanvas', {containerClass: 'hiddenCanvas'});
-    this.hiddenCanvas.selection = false;
+    if(!this.demoMode){
+      console.log("creating hidden canvas")
+      this.hiddenCanvas = new fabric.Canvas('hiddenCanvas', {containerClass: 'hiddenCanvas'});
+      this.hiddenCanvas.selection = false;
 
-    this.mainCanvas.on('mouse:move', ({e}) => this.handleMouseMove(e));
-    this.mainCanvas.on('mouse:down', ({e}) => this.handleMouseDown(e));
+      this.mainCanvas.on('mouse:move', ({e}) => this.handleMouseMove(e));
+      this.mainCanvas.on('mouse:down', ({e}) => this.handleMouseDown(e));
+    }
   }
 
-  ngOnDestroy(){
+  ngOnDestroy(): void{
     for(let timer of this.flashTimers){
       clearInterval(timer);
     }
+
+    for(let timer of this.timeOuts){
+      clearTimeout(timer);
+    }
+
     if(this.positionTracker)
     clearInterval(this.positionTracker);
   }
 
-  playRound(round: Round): void {
+  playRound(round: IRound): void {
     this.initializeRound();
     this.setBackground(round);
     this.loadMainCanvas(round);
-    if(this.cursorImageMode){
+    if(this.cursorImageMode && !this.demoMode){
       this.loadHiddenCanvas(round);
     }
   }
 
   initializeRound(): void{
-    if(this.positionTrackingFrequency){
+    if(this.positionTrackingFrequency && !this.demoMode){
+      console.log("starting position tracker")
       this.positionTracker = setInterval(() => {
         this.trackable = true;
       }, this.positionTrackingFrequency);
@@ -103,6 +127,8 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     this.cursorPathLength = 0;
     this.clicks = [];
     this.targetClicked = false;
+    this.baseClicked = this.counter > 0 ? true : false;
+    this.startedDrawing = false;
     this.misclickCount = 0;
     this.cursorPositions = [];
     this.backgroundDistractionOn = undefined;
@@ -110,7 +136,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     this.startTime = new Date().getTime();
   }
 
-  setBackground(round: Round): void{
+  setBackground(round: IRound): void{
     this.background = round.background;
     this.distractingBackground = round.backgroundDistraction?.color;
     if(round.backgroundDistraction?.flashing?.color){
@@ -118,7 +144,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     }
   }
 
-  loadMainCanvas(round: Round): void{
+  loadMainCanvas(round: IRound): void{
     this.mainCanvas.clear();
     this.mainCanvas.setHeight(round.canvasHeight);
     this.mainCanvas.setWidth(round.canvasWidth);
@@ -135,7 +161,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
         if(shape.target){
           shape.on('mousedown', this.handleTargetShapeClick.bind(this));
         }else{
-          shape.on('mousedown', this.handleBaseShapeClick.bind(this));
+          shape.on('mousedown', ({e}) => this.handleBaseShapeClick(e));
           shape.on('mouseover', this.handleBaseShapeHover.bind(this));
           shape.on('mouseout', this.handleBaseShapeLeave.bind(this));
         }
@@ -153,10 +179,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
 
   }
 
-  loadHiddenCanvas(round: Round): void{
-    this.hiddenCanvas.isDrawingMode = false;
-    this.hiddenCanvas.clear();
-
+  loadHiddenCanvas(round: IRound): void{
     this.hiddenCanvas.setHeight(this.mainCanvas.getHeight());
     this.hiddenCanvas.setWidth(this.mainCanvas.getWidth());
 
@@ -166,6 +189,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
         if(this.cursorImageMode == 'Outlines only'){
           object.set('fill', 'white');
           object.set('stroke', 'black');
+          object.set('strokeWidth', 1);
         }
       }else{
         object.set('visible', false);
@@ -177,14 +201,26 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     }
   }
 
-  handleBaseShapeClick(): void {
-    if (this.targetClicked) {
+  handleBaseShapeClick(event: MouseEvent): void {
+    if (this.targetClicked) { //If round is finished, save results and start next round
       if(!this.demoMode){
         this.saveResults(this.counter);
       }
 
+      this.lastBaseShapeClick = this.mainCanvas.getPointer(event);
+
+      if(this.cursorImageMode && !this.demoMode){
+        this.hiddenCanvas.clear();
+        this.hiddenCanvas.isDrawingMode = true;
+        this.hiddenCanvas.freeDrawingBrush = new fabric.PencilBrush(this.hiddenCanvas);
+      }
+
       for(let timer of this.flashTimers){
         clearInterval(timer);
+      }
+
+      for(let timeOut of this.timeOuts){
+        clearTimeout(timeOut);
       }
 
       this.counter++;
@@ -196,35 +232,39 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
         this.finishedExperiment.emit();
         return
       }
+    }else{
+      this.baseClicked = true;
     }
   }
 
-  handleTargetShapeClick(): void {
-    this.targetClicked = true;
-    if(this.startTime != undefined){
-      this.timeNeeded = new Date().getTime() - this.startTime;
-    }
+  handleTargetShapeClick(): void { //If target shape is clicked, save measurements
+    if(this.baseClicked && !this.targetClicked){
+      this.targetClicked = true;
+      if(this.startTime != undefined){
+        this.timeNeeded = new Date().getTime() - this.startTime;
+      }
 
-    if(this.positionTracker){
-      clearInterval(this.positionTracker);
-    }
+      if(this.positionTracker){
+        clearInterval(this.positionTracker);
+      }
 
-    if(this.cursorImageMode && this.hiddenCanvas.isDrawingMode){
-      this.hiddenCanvas.freeDrawingBrush._finalizeAndAddPath();
-      this.hiddenCanvas.isDrawingMode = false;
+      if(this.cursorImageMode && !this.demoMode &&this.hiddenCanvas.isDrawingMode){
+        this.hiddenCanvas.freeDrawingBrush._finalizeAndAddPath();
+        this.hiddenCanvas.isDrawingMode = false;
+      }
     }
   }
 
-  handleBaseShapeHover(): void {
+  handleBaseShapeHover(): void { //When cursor hovers over base shape, start drawing on hidden canvas
     if(!this.targetClicked){
-      if(this.cursorImageMode && !this.hiddenCanvas.isDrawingMode){
+      if(this.cursorImageMode && !this.demoMode && !this.hiddenCanvas.isDrawingMode){
         this.hiddenCanvas.isDrawingMode = true;
         this.hiddenCanvas.freeDrawingBrush = new fabric.PencilBrush(this.hiddenCanvas);
       }
     }
   }
 
-  handleBaseShapeLeave(): void {
+  handleBaseShapeLeave(): void { //When cursor leaves base shape, start background and shape distractions
     if(!this.targetClicked && !this.controlMode){
       if(this.rounds[this.counter].backgroundDistraction && this.backgroundDistractionOn == undefined){
         this.startBackgroundDistraction();
@@ -236,8 +276,12 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     }
   }
 
-  handleMouseMove(event: MouseEvent): void {
-    if (this.hiddenCanvas.isDrawingMode) {
+  handleMouseMove(event: MouseEvent): void { //When cursor moves, draw on hidden canvas and track cursor position and path length
+    if(this.hiddenCanvas.isDrawingMode) {
+      if(!this.startedDrawing && this.counter > 0){
+        this.hiddenCanvas.freeDrawingBrush.onMouseMove(this.lastBaseShapeClick,{e: true});
+        this.startedDrawing = true;
+      }
       const pointer = this.mainCanvas.getPointer(event);
       this.hiddenCanvas.freeDrawingBrush.color = this.background == 'red' ? 'blue' : 'red';
       this.hiddenCanvas.freeDrawingBrush.onMouseMove(pointer,{e: true});
@@ -258,11 +302,11 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
   }
 
   handleMouseDown(event: MouseEvent): void {
-    if(this.startTime != undefined && !this.targetClicked){
+    if(this.startTime != undefined && !this.targetClicked){ //Clicks are only tracked until the target shape is clicked
       const timestamp = new Date().getTime() - this.startTime;;
       const position = this.mainCanvas.getPointer(event);
       const shape = this.mainCanvas.findTarget(event, false) as FabricShape;
-      const misclick = !(!!shape) || (shape && !shape.target && !this.targetClicked);
+      const misclick = !(!!shape) || (shape && !shape.target);
       if(misclick){
         this.misclickCount++;
       }
@@ -283,16 +327,18 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
         this.mainCanvas.backgroundColor = this.mainCanvas.backgroundColor == this.distractingBackground ? this.backgroundFlashColor : this.distractingBackground;
         this.mainCanvas.renderAll();
       }, this.rounds[this.counter].backgroundDistraction?.flashing?.frequency);
+      this.flashTimers.push(interval);
     }
 
-    setTimeout(() => {
-      this.mainCanvas.backgroundColor = this.background;
+    let timeout = setTimeout(() => {
       if(interval != null){
         clearInterval(interval);
         this.backgroundDistractionOn = false;
       }
+      this.mainCanvas.backgroundColor = this.background;
       this.mainCanvas.renderAll();
     }, this.rounds[this.counter].backgroundDistraction?.duration);
+    this.timeOuts.push(timeout);
   }
 
   startShapeDistraction(): void {
@@ -301,13 +347,14 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
       this.distractingShape.set('visible', true);
       this.mainCanvas.renderAll();
 
-      setTimeout(() => {
+      let timeout = setTimeout(() => {
         if(this.distractingShape){
           this.distractingShape.set('visible', false);
           this.shapeDistractionOn = false;
           this.mainCanvas.renderAll();
         }
       }, this.rounds[this.counter].shapeDistractionDuration);
+      this.timeOuts.push(timeout);
     }
   }
 
@@ -316,7 +363,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
       this.saveImage(counter);
     }
 
-    const result = {
+    const result: Result = {
         experimentId: this.experimentId,
         participantId: this.participantId,
         roundId: this.rounds[counter]._id,
@@ -328,7 +375,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
         misclickCount: this.misclickCount
       };
 
-    this.experimentService.saveResult(result).subscribe({
+    this.resultService.saveResult(result).subscribe({
       next: () => {
         console.log('Result uploaded to server');
       },
@@ -340,16 +387,15 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
 
   saveImage(counter: number): void {
     const imageData = this.hiddenCanvas.toDataURL("image/jpeg", 0.75);
-    this.experimentService.saveImage(imageData, this.experimentId, this.participantId, counter).subscribe({
+    console.log('image converted to data url', counter);
+    this.resultService.saveImage(imageData, this.experimentId, this.participantId, counter+1).subscribe({
       next: () => {
-        console.log('Image uploaded to server');
+        console.log('Image uploaded to server',counter );
       },
       error:(error)  => {
         this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
-
-    this.hiddenCanvas.clear();
   }
 
   getDistanceBetweenPositions(position1: Position, position2: Position): number {

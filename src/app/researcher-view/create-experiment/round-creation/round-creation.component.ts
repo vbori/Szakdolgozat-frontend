@@ -11,7 +11,7 @@ export class RoundCreationComponent {
   @Output() experimentChange = new EventEmitter<Experiment>();
   selectedTabIndex = 0;
 
-  onExperimentChange(experiment: Experiment){
+  onExperimentChange(experiment: Experiment): void{
     this.experiment = experiment;
     this.experimentChange.emit(this.experiment);
   }

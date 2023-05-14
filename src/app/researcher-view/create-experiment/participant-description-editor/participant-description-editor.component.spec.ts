@@ -37,4 +37,10 @@ describe('ParticipantDescriptionEditorComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('form should be invalid when description is missing', () => {
+    component.participantDescriptionForm.controls['participantDescription'].setValue('');
+    expect(component.participantDescriptionForm.controls['participantDescription'].valid).toBeFalsy();
+    expect(component.participantDescriptionForm.valid).toBeFalsy();
+  });
 });

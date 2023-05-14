@@ -39,4 +39,9 @@ describe('AuthComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should render tab group', () => {
+    const compiled = fixture.nativeElement;
+    expect(compiled.querySelector('mat-tab-group')).toBeTruthy();
+  });
 });

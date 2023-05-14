@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { ResearcherService } from '../services/researcher.service';
 
 @Component({
   selector: 'app-researcher-overview',

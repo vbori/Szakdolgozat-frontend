@@ -22,4 +22,8 @@ describe('RoundsTableComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should create table', () => {
+    expect(fixture.nativeElement.querySelector('table')).toBeTruthy();
+  });
 });

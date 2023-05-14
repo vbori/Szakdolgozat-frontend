@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Question } from 'src/app/common/models/form.model';
+import { IQuestion } from 'src/app/common/models/form.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { ParticipantService } from '../services/participant.service';
 import { Response } from '../models/participant.model';
@@ -13,10 +13,10 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class ParticipantFormComponent implements OnInit{
   form: FormGroup   = new FormGroup({});
-  questions : Question[];
-  @Input() experimentId: string
-  @Input() participantId: string;
-  @Input() demoMode: boolean;
+  questions : IQuestion[] = [];
+  @Input() experimentId: string = 'id1';
+  @Input() participantId: string ='id2';
+  @Input() demoMode: boolean = false;
   @Output() nextStep = new EventEmitter();
 
   constructor(private readonly experimentService: ExperimentService,
@@ -33,7 +33,9 @@ export class ParticipantFormComponent implements OnInit{
         this.questions.forEach(question => {
           if (question.validation) {
             this.form.addControl(question.questionId, this.formBuilder.control('', [Validators.min(question.validation?.min),Validators.max(question.validation?.max)]));
-          } else {
+          } else if(question.type === 'checkbox'){
+            this.form.addControl(question.questionId, this.formBuilder.control(false));
+          }else{
             this.form.addControl(question.questionId, this.formBuilder.control(''));
           }
         });

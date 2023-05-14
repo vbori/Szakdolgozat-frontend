@@ -24,7 +24,10 @@ export class ExperimentDetailsComponent implements OnInit {
         this.experiment = experiment;
         this.formatDates();
       },
-      error: () => this.router.navigate(['/404'])
+      error: (error) =>  {
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+        this.router.navigate(['/research']);
+      }
     });
   }
 

@@ -1,13 +1,13 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormGroup, FormControl, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
-import { FabricShape, ShapeType } from 'src/app/common/models/round.model';
 import { fabric } from 'fabric';
 import { MatSelectChange } from '@angular/material/select';
 import { ShapeService } from 'src/app/researcher-view/services/shape.service';
 import { ExperimentCreationConstants } from 'src/app/researcher-view/create-experiment/experiment-creation.constants';
 import { MatCheckboxChange } from '@angular/material/checkbox';
-import { Flashing } from 'src/app/common/models/round.model';
 import { markControlsTouched } from 'src/app/researcher-view/utils/formUtils';
+import { ShapeType, FabricShape, Flashing } from 'src/app/common/models/shape.model';
+import { Subscription } from 'rxjs';
 
 interface ShapeOption {
   value: ShapeType;
@@ -20,11 +20,11 @@ interface ShapeOption {
   styleUrls: ['./shape-form.component.scss']
 })
 
-export class ShapeFormComponent implements OnInit, AfterViewInit{
+export class ShapeFormComponent implements OnInit, AfterViewInit, OnDestroy{
   @Input() shape: FabricShape;
   @Input() canvas: fabric.Canvas;
-  @Input() index: number;
-  @Input() shapesIntersect: boolean;
+  @Input() index: number = 0;
+  @Input() shapesIntersect: boolean = false;
   @Output() validityChange = new EventEmitter<boolean>();
   @Output() shapesIntersectChange = new EventEmitter<boolean>();
   @Output() shapeSelected = new EventEmitter<number>();
@@ -35,9 +35,11 @@ export class ShapeFormComponent implements OnInit, AfterViewInit{
     {value: 'circle', viewValue: 'Circle'}
   ];
 
+  subscriptions: Subscription[] = [];
+
   shapeConfigForm = new FormGroup({
     type: new FormControl<string>('circle', {validators: [Validators.required]}),
-    radius: new FormControl<number>(25, {validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE / 2), Validators.max(this.constants.MAX_SHAPE_SIZE / 2), Validators.pattern("^[0-9]*$")]}),
+    radius: new FormControl<number>(25, {validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE / 2), Validators.max(this.constants.MAX_SHAPE_SIZE / 2), Validators.pattern("^[0-9]*(.[5|0])?$")]}),
     left: new FormControl<number>(100, {validators: [Validators.required, Validators.min(0), Validators.pattern("^[0-9]*$")]}),
     top: new FormControl<number>(100, {validators: [Validators.required, Validators.min(0), Validators.pattern("^[0-9]*$")]}),
     width: new FormControl<number>(50, {validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE), Validators.pattern("^[0-9]*$")]}),
@@ -58,9 +60,17 @@ export class ShapeFormComponent implements OnInit, AfterViewInit{
   }
 
   ngAfterViewInit(): void {
-    this.shapeConfigForm.statusChanges?.subscribe((status) => {
+    let subscription = this.shapeConfigForm.statusChanges?.subscribe((status) => {
       this.validityChange.emit(status === 'VALID');
     });
+
+    if(subscription){
+      this.subscriptions.push(subscription);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
   initializeForm(): void{
@@ -71,14 +81,14 @@ export class ShapeFormComponent implements OnInit, AfterViewInit{
     this.shapeConfigForm.controls.left.setValue(this.shape.left ? Math.floor(this.shape.left) : 100);
     this.shapeConfigForm.controls.top.setValue(this.shape.top ? Math.floor(this.shape.top) : 100);
     this.shapeConfigForm.controls.fill.setValue(this.shape.fill ? this.shape.fill as string : 'blue');
-    this.shapeConfigForm.controls.radius.setValue(this.shape.radius ? Math.round(this.shape.getScaledWidth()/2) : 25);
+    //this.shapeConfigForm.controls.radius.setValue(this.shape.radius ? Math.round(this.shape.getScaledWidth()/2) : 25);
+    this.shapeConfigForm.controls.radius.setValue(this.shape.radius ? Math.round(this.shape.getScaledWidth())/2 : 25);
     this.shapeConfigForm.controls.type.setValue(this.shape.type ? this.shape.type : 'circle');
     this.shapeConfigForm.controls.useFlashing.setValue(this.shape.flashing ? true : false);
     this.shapeConfigForm.controls.flashing.controls.color.setValue(this.shape.flashing ? this.shape.flashing.color : '#000000');
     this.shapeConfigForm.controls.flashing.controls.frequency.setValue(this.shape.flashing ? this.shape.flashing.frequency : 500);
     markControlsTouched(this.shapeConfigForm);
   }
-
 
   addEventHandlers(shape: FabricShape): void{
     shape.on('scaling', this.handleObjectScaling.bind(this));
@@ -131,7 +141,8 @@ export class ShapeFormComponent implements OnInit, AfterViewInit{
 
     this.shapeConfigForm.controls.width.setValue(Math.round(this.shape.getScaledWidth()));
     this.shapeConfigForm.controls.height.setValue(Math.round(this.shape.getScaledHeight()));
-    this.shapeConfigForm.controls.radius.setValue(Math.round((this.shape.getScaledWidth() / 2.0)));
+    //this.shapeConfigForm.controls.radius.setValue(Math.round((this.shape.getScaledWidth() / 2.0)));
+    this.shapeConfigForm.controls.radius.setValue(Math.round(this.shape.getScaledWidth()) / 2.0);
     this.shapeConfigForm.controls.width.markAsDirty();
     this.shapeConfigForm.controls.height.markAsDirty();
     this.shapeConfigForm.controls.radius.markAsDirty();

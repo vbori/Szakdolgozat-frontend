@@ -4,7 +4,7 @@
       <ng-template matStepLabel>Experiment description</ng-template>
       <ng-template matStepContent>
         <ng-container *ngIf="participant">
-          <app-participant-description [experimentId]="participant.experimentId" [demoMode]="demoMode" (nextStep) = "onNextStep()"></app-participant-description>
+          <app-participant-description [experimentId]="participant.experimentId" (nextStep) = "onNextStep()"></app-participant-description>
         </ng-container>
       </ng-template>
     </mat-step>

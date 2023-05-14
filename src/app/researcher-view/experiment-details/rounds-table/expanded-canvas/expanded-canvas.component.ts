@@ -1,6 +1,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { FabricShape, Round, Shape } from 'src/app/common/models/round.model';
+import { IRound } from 'src/app/common/models/round.model';
 import { fabric } from 'fabric';
+import { IShape, FabricShape } from 'src/app/common/models/shape.model';
 
 @Component({
   selector: 'app-expanded-canvas',
@@ -8,13 +9,10 @@ import { fabric } from 'fabric';
   styleUrls: ['./expanded-canvas.component.scss']
 })
 export class ExpandedCanvasComponent implements AfterViewInit, OnInit{
-  @Input() round: Round | null;
+  @Input() round: IRound | undefined = undefined;
   canvas: fabric.Canvas | undefined = undefined;
   canvasLoaded = false;
-  shapes: Shape[] = [];
-  baseShape: Shape;
-  targetShape: Shape;
-  distractingShape: Shape;
+  shapes: IShape[] = [];
   displayedColumns: string[] = ['Base shape', 'Target shape', 'Distraction shape'];
 
   constructor(private changeDetector: ChangeDetectorRef) { }
@@ -37,7 +35,7 @@ export class ExpandedCanvasComponent implements AfterViewInit, OnInit{
     this.changeDetector.detectChanges();
   }
 
-  getLabel(shape: Shape): string {
+  getLabel(shape: IShape): string {
     if(shape.distraction) {
       return 'Distraction Shape';
     }else if(shape.target) {
@@ -47,7 +45,7 @@ export class ExpandedCanvasComponent implements AfterViewInit, OnInit{
     }
   }
 
-  getType(shape: Shape): string {
+  getType(shape: IShape): string {
     if(shape.type === 'circle') {
       return 'Circle';
     }else if(shape.type === 'rect') {

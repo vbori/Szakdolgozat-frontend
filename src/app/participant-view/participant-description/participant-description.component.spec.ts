@@ -32,4 +32,26 @@ describe('ParticipantDescriptionComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('"Next" button should be disabled when the conditions are not accepted', () => {
+    component.participantDescriptionForm.controls['conditionsCheckbox'].setValue(false);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#next-btn').disabled).toBeTruthy();
+    expect(component.participantDescriptionForm.valid).toBeFalsy();
+  });
+
+  it('"Next" button should be disabled when the flash warning is not accepted', () => {
+    component.participantDescriptionForm.controls['flashWarningCheckbox'].setValue(false);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#next-btn').disabled).toBeTruthy();
+    expect(component.participantDescriptionForm.valid).toBeFalsy();
+  });
+
+  it('"Next" button should be enabled when the conditions and flash warning are accepted', () => {
+    component.participantDescriptionForm.controls['conditionsCheckbox'].setValue(true);
+    component.participantDescriptionForm.controls['flashWarningCheckbox'].setValue(true);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#next-btn').disabled).toBeFalsy();
+    expect(component.participantDescriptionForm.valid).toBeTruthy();
+  });
 });

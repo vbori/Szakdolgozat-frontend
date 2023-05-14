@@ -1,10 +1,12 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { fabric } from 'fabric';
-import { FabricShape, Round } from 'src/app/common/models/round.model';
+import { IRound } from 'src/app/common/models/round.model';
 import { ExperimentCreationConstants } from '../../../experiment-creation.constants';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatTabChangeEvent } from '@angular/material/tabs';
+import { FabricShape } from 'src/app/common/models/shape.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-fabric-canvas',
@@ -12,11 +14,11 @@ import { MatTabChangeEvent } from '@angular/material/tabs';
   styleUrls: ['./fabric-canvas.component.scss']
 })
 
-export class FabricCanvasComponent implements AfterViewInit, OnChanges{
-  @Input() canvasWidth: number;
-  @Input() canvasHeight: number;
-  @Input() roundIdx: number;
-  @Input() round: Round;
+export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestroy{
+  @Input() canvasWidth: number = 600;
+  @Input() canvasHeight: number = 600;
+  @Input() roundIdx: number = 0;
+  @Input() round: IRound;
 
   @Output() validityChange = new EventEmitter<boolean>();
   @Output() canvasCreated = new EventEmitter<fabric.Canvas>();
@@ -30,13 +32,15 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
   tabLabels = ['Base Shape', 'Target Shape', 'Distracting Shape'];
   selectedTabIndex = 0;
 
+  subscriptions: Subscription[] = [];
+
   distractionForm = new FormGroup({
-    backgroundColor: new FormControl<string>('#FFFFFF', {nonNullable: true, validators: [Validators.required]}),
+    backgroundColor: new FormControl<string>('#ffffff', {nonNullable: true, validators: [Validators.required]}),
     useBackgroundDistraction: new FormControl<boolean>(false, {nonNullable: true}),
     useShapeDistraction: new FormControl<boolean>(false, {nonNullable: true}),
     shapeDistractionDuration: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME),Validators.pattern("^[0-9]*$")]}),
     backgroundDistraction : new FormGroup({
-      color: new FormControl<string>('#FF0000',{nonNullable: true, validators: [Validators.required]}),
+      color: new FormControl<string>('#ff0000',{nonNullable: true, validators: [Validators.required]}),
       duration: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME), Validators.pattern("^[0-9]*$")]}),
       useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
       flashing: new FormGroup({
@@ -49,11 +53,6 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
   constructor(private changeDetector: ChangeDetectorRef, public constants: ExperimentCreationConstants) { }
 
   ngAfterViewInit(): void {
-    this.distractionForm.statusChanges?.subscribe((status) => {
-      let allValid = status === 'VALID' && this.validities.baseShape && this.validities.targetShape && (this.distractionForm.value.useShapeDistraction ? this.validities.distractingShape : true);
-      this.validityChange.emit(allValid);
-    });
-
     this.initializeCanvas();
     this.initializeForm();
     if(this.round.objects.length > 0){
@@ -84,6 +83,10 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     }
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+  }
+
   initializeCanvas(): void{
     this.canvas = new fabric.Canvas(`canvas${this.roundIdx}`);
     this.canvas.setHeight(this.canvasHeight);
@@ -94,12 +97,36 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
   }
 
   initializeForm(): void{
+    console.log(this.round);
     this.distractionForm.patchValue(this.round);
+    this.distractionForm.controls.backgroundColor.setValue(this.round.background);
     this.distractionForm.controls.useBackgroundDistraction.setValue(!!this.round.backgroundDistraction);
     this.distractionForm.controls.useShapeDistraction.setValue(!!this.round.shapeDistractionDuration);
+    this.distractionForm.controls.shapeDistractionDuration.setValue(this.round.shapeDistractionDuration ?? 500);
+
+    if(!this.round.backgroundDistraction){
+      this.distractionForm.controls.backgroundDistraction.disable();
+    }
+
+    if(!this.round.shapeDistractionDuration){
+      this.distractionForm.controls.shapeDistractionDuration.disable();
+    }
+
+    console.log('useBackgroundDistraction', this.distractionForm.controls.useBackgroundDistraction.value);
+
+    let subscription = this.distractionForm.statusChanges?.subscribe((status) => {
+      console.log('status', status)
+      let allValid = status === 'VALID' && this.validities.baseShape && this.validities.targetShape && (this.distractionForm.value.useShapeDistraction ? this.validities.distractingShape : true);
+      console.log('allValid', allValid);
+      this.validityChange.emit(allValid);
+    });
+
+    if(subscription){
+      this.subscriptions.push(subscription);
+    }
   }
 
-  loadCanvasData(round: Round): void{
+  loadCanvasData(round: IRound): void{
     if(this.canvas)
     this.canvas.loadFromJSON(round, this.canvas.renderAll.bind(this.canvas), (o: any, shape: FabricShape) => {
       shape.setControlsVisibility({ mtr: false });
@@ -120,15 +147,18 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
   }
 
   handleCanvasWidthChange(): void{
-    if(this.canvasWidth <= this.constants.MAX_CANVAS_HEIGHT && this.canvasWidth >= this.constants.MIN_CANVAS_WIDTH){
+    if(this.canvasWidth <= this.constants.MAX_CANVAS_WIDTH && this.canvasWidth >= this.constants.MIN_CANVAS_WIDTH){
       this.canvas.setWidth(this.canvasWidth);
 
-      this.canvas.forEachObject((shape) => {
-        if(shape.left && shape.width && shape.left + shape.width > this.canvasWidth){
-          shape.set('left', this.canvasWidth - shape.width);
+      this.canvas.forEachObject((shape: FabricShape) => {
+        if(shape.left && shape.left + Math.ceil(shape.getScaledWidth()) > this.canvasWidth){
+          shape.set('left', this.canvasWidth - Math.ceil(shape.getScaledWidth()));
+          shape.fire('moving');
           this.canvas.renderAll();
         }
       })
+
+      this.checkIntersection();
     }
   }
 
@@ -137,11 +167,13 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
       this.canvas.setHeight(this.canvasHeight);
 
       this.canvas.forEachObject((shape) => {
-        if(shape.top && shape.height && shape.top + shape.height > this.canvasHeight){
-          shape.set('top', this.canvasHeight - shape.height);
+        if(shape.top && shape.top + Math.ceil(shape.getScaledHeight()) > this.canvasHeight){
+          shape.set('top', this.canvasHeight - Math.ceil(shape.getScaledHeight()));
           this.canvas.renderAll();
         }
       })
+
+      this.checkIntersection();
     }
   }
 
@@ -269,7 +301,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges{
     this.validityChange.emit(allValid);
   }
 
-  readonly CANVASDATA: Round = {
+  readonly CANVASDATA: IRound = {
     "objects": [
       {
         "type": "circle",

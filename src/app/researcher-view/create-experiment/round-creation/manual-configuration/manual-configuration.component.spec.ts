@@ -40,4 +40,28 @@ describe('ManualConfigurationComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('form should be invalid when canvas width is larger than maximum', () => {
+    component.canvasForm.controls['canvasWidth'].setValue(component.constants.MAX_CANVAS_WIDTH + 1);
+    expect(component.canvasForm.controls['canvasWidth'].valid).toBeFalsy();
+    expect(component.canvasForm.valid).toBeFalsy();
+  });
+
+  it('form should be invalid when canvas width is smaller than minimum', () => {
+    component.canvasForm.controls['canvasWidth'].setValue(component.constants.MIN_CANVAS_WIDTH - 1);
+    expect(component.canvasForm.controls['canvasWidth'].valid).toBeFalsy();
+    expect(component.canvasForm.valid).toBeFalsy();
+  });
+
+  it('form should be invalid when canvas height is larger than maximum', () => {
+    component.canvasForm.controls['canvasHeight'].setValue(component.constants.MAX_CANVAS_HEIGHT + 1);
+    expect(component.canvasForm.controls['canvasHeight'].valid).toBeFalsy();
+    expect(component.canvasForm.valid).toBeFalsy();
+  });
+
+  it('form should be invalid when canvas height is smaller than minimum', () => {
+    component.canvasForm.controls['canvasHeight'].setValue(component.constants.MIN_CANVAS_HEIGHT - 1);
+    expect(component.canvasForm.controls['canvasHeight'].valid).toBeFalsy();
+    expect(component.canvasForm.valid).toBeFalsy();
+  });
 });

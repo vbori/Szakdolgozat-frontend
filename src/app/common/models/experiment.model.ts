@@ -1,5 +1,5 @@
-import { ExperimentConfiguration } from "./config.model";
-import { Round } from "./round.model";
+import { ExperimentConfiguration } from "../../researcher-view/models/config.model";
+import { IRound } from "./round.model";
 
 export interface ExperimentExtract{
   _id: string;
@@ -18,7 +18,7 @@ export interface Experiment extends ExperimentExtract {
   cursorImageMode?: string;
   positionTrackingFrequency?: number;
   participantDescription: string;
-  rounds: Round[];
+  rounds: IRound[];
   experimentConfiguration?: ExperimentConfiguration;
 }
 

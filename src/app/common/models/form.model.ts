@@ -1,5 +1,5 @@
 export interface Form {
-  questions: Question[];
+  questions: IQuestion[];
 }
 
 interface Validation {
@@ -11,7 +11,7 @@ export interface Option {
   optionLabel: string;
 }
 
-export interface Question {
+export interface IQuestion {
   questionId: string;
   label: string;
   type: QuestionType;
@@ -20,7 +20,7 @@ export interface Question {
   required: boolean;
 }
 
-export class QuestionClass implements Question {
+export class Question implements IQuestion {
   questionId: string;
   label: string;
   type: QuestionType;
@@ -38,4 +38,4 @@ export class QuestionClass implements Question {
   }
 }
 
-type QuestionType = 'text' | 'number' | 'radio' | 'checkbox' | 'select';
+export type QuestionType = 'text' | 'number' | 'radio' | 'checkbox' | 'select';

@@ -38,14 +38,31 @@ export class ParticipantViewComponent implements OnInit{
 
     this.experimentId = this.route.snapshot.params['experimentId'];
 
-    this.experimentService.hasForm(this.experimentId).subscribe({
-      next: (hasForm) => {
-        this.hasForm = hasForm;
-      },
-      error: (error) => {
-        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
-      }
-    });
+    if(this.demoMode){
+      this.experimentService.getExperimentById(this.experimentId).subscribe({
+        next: (experiment) => {
+          if(experiment.rounds.length == 0){
+            this.toastr.error('Experiment does not have rounds', 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+            this.router.navigate(['/research']);
+            return;
+          }else{
+            this.hasForm = !!experiment.formId;
+          }
+        },
+        error: (error) => {
+          this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+        }
+      });
+    }else{
+      this.experimentService.hasForm(this.experimentId).subscribe({
+        next: (hasForm) => {
+          this.hasForm = hasForm;
+        },
+        error: (error) => {
+          this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+        }
+      });
+    }
 
     if(!this.demoMode){
       this.participantService.getParticipant(this.experimentId).subscribe({

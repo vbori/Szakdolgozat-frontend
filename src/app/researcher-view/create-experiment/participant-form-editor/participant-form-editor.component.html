@@ -3,15 +3,19 @@
   <ng-container *ngFor="let question of questions; let i=index;">
     <div class="flexContainer">
       <h3><b>Question {{i+1}}</b></h3>
-      <button mat-raised-button color="warn" (click)="removeQuestion(i)" [disabled]="questions.length == 1">Remove Question</button>
+      <button mat-raised-button color="warn" (click)="removeQuestion(i)" [disabled]="questions.length == 1">Remove question</button>
     </div>
-    <app-question-creation [question]="question" (questionChange)="onQuestionChange()"  (validityChange)="onValidityChange(i, $event)"></app-question-creation>
+    <app-question-creation
+      [question]="question"
+      (questionChange)="onQuestionChange()"
+      (validityChange)="onValidityChange(i, $event)">
+    </app-question-creation>
     <mat-divider></mat-divider>
   </ng-container>
 
   <div class="buttonsContainer">
-    <button mat-raised-button color="primary" (click)="addQuestion()">Add Question</button>
-    <button mat-raised-button color="primary" (click)="saveForm()" [disabled]="isSubmitDisabled()">Create and Save Form</button>
+    <button mat-raised-button color="primary" (click)="addQuestion()" [disabled]="questions.length >= constants.MAX_QUESTION_NUM">Add question</button>
+    <button mat-raised-button color="primary" (click)="saveForm()" [disabled]="isQuestionValid.includes(false)">Create and save form</button>
     <button mat-raised-button color="warn" (click)="formNotNeeded()">Remove form</button>
   </div>
 </div>

@@ -1,4 +1,4 @@
-import { Flashing } from "./round.model";
+import { Flashing } from "src/app/common/models/shape.model";
 
 interface BackgroundDistractionConfig {
   color: string;
@@ -28,7 +28,7 @@ export interface ExperimentConfiguration {
   distractedRoundNum: number;
   changePosition: boolean;
   changeShapeSize: boolean;
-  twoDimensional: boolean;
+  oneDimensional: boolean;
   canvasHeight: number;
   canvasWidth: number;
   baseShapeTypes: ConfigShapeType[];

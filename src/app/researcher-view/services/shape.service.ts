@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { fabric } from 'fabric';
-import { FabricShape } from 'src/app/common/models/round.model';
+import { FabricShape } from 'src/app/common/models/shape.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class ShapeService {
     let shape: FabricShape;
     let width = Math.round(currentShape.getScaledWidth());
     let height = Math.round(currentShape.getScaledHeight());
-    let { left, top, fill, target, distraction, originX, originY } = currentShape;
+    let { left, top, fill, target, distraction, originX, originY, flashing } = currentShape;
     switch (newType) {
       case 'circle':
         let newSize: number;
@@ -33,7 +33,8 @@ export class ShapeService {
           height: newSize,
           width: newSize,
           fill: fill,
-          radius: Math.round((newSize / 2.0)),
+          //radius: Math.round((newSize / 2.0)),
+          radius: newSize / 2.0,
           originX: originX,
           originY: originY
         }) as FabricShape;
@@ -59,6 +60,7 @@ export class ShapeService {
     shape.set("strokeWidth", 0);
     shape.target = target;
     shape.distraction = distraction;
+    shape.flashing = flashing;
     console.log(shape)
     return shape;
   }

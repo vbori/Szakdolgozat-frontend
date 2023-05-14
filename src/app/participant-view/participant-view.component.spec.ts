@@ -40,4 +40,8 @@ describe('ParticipantViewComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should have @ViewChild stepper', () => {
+    expect(component.stepper).toBeTruthy();
+  });
 });

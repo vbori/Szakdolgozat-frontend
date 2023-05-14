@@ -2,7 +2,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ResearcherCredentials, ResearcherToken } from '../models/researcher-credentials.model';
+import { ResearcherCredentials } from '../models/researcher-credentials.model';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -16,8 +16,8 @@ export class AuthService {
   constructor(private readonly http: HttpClient, private readonly router: Router) {
     const token = localStorage.getItem('accessToken');
     this._isLoggedIn$.next(!!token);
-    if(localStorage.getItem('accessToken')){
-      const jwtBase64 = localStorage.getItem('accessToken')?.split('.')[1];
+    if(!!token){
+      const jwtBase64 = token.split('.')[1];
       const jwtToken = jwtBase64 ? JSON.parse(window.atob(jwtBase64)) : undefined;
       if(jwtToken.exp * 1000 <= Date.now()){
         this.refreshToken().subscribe();
@@ -27,10 +27,10 @@ export class AuthService {
     }
   }
 
-  public login(credentials: ResearcherCredentials): Observable<ResearcherToken> {
+  public login(credentials: ResearcherCredentials): Observable<string> {
     return this.http.post(`${environment.baseUrl}/auth/login`, credentials, {withCredentials: true}).pipe(
       tap((token: any) => {
-        localStorage.setItem('accessToken', token.accessToken);
+        localStorage.setItem('accessToken', token);
         this.startRefreshTokenTimer();
         this._isLoggedIn$.next(true);
       })
@@ -42,21 +42,18 @@ export class AuthService {
   }
 
   public logout(): Observable<HttpResponse<{ message: string }>> {
-    return this.http.delete<{ message: string }>(`${environment.baseUrl}/auth/logout`, { observe: 'response', withCredentials: true}).pipe(
-      tap(() => {
-        localStorage.removeItem('accessToken');
-        this.stopRefreshTokenTimer();
-        this._isLoggedIn$.next(false);
-      })
-    );
+    localStorage.removeItem('accessToken');
+    this.stopRefreshTokenTimer();
+    this._isLoggedIn$.next(false);
+    return this.http.delete<{ message: string }>(`${environment.baseUrl}/auth/logout`, { observe: 'response', withCredentials: true});
   }
 
   private refreshTokenTimeout?:  ReturnType<typeof setTimeout>;
 
   refreshToken() {
-    return this.http.post<ResearcherToken>(`${environment.baseUrl}/auth/token`, {}, { withCredentials: true })
+    return this.http.post<string>(`${environment.baseUrl}/auth/token`, {}, { withCredentials: true })
       .pipe(map((token) => {
-        localStorage.setItem('accessToken', token.accessToken);
+        localStorage.setItem('accessToken', token);
         this.startRefreshTokenTimer();
       }),
       catchError(() => {

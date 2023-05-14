@@ -4,8 +4,7 @@ import { Observable, map } from 'rxjs';
 import { Experiment, ExperimentExtract } from '../models/experiment.model';
 import { environment } from 'src/environments/environment';
 import { Form } from '../models/form.model';
-import { Result } from '../models/result.model';
-import { Round } from '../models/round.model';
+import { IRound } from '../models/round.model';
 
 @Injectable({
   providedIn: 'root'
@@ -86,12 +85,12 @@ export class ExperimentService {
     );
   }
 
-  public getDescription(experimentId: string, demoMode: boolean = false ): Observable<string> {
-    return this.http.get<string>(`${environment.baseUrl}/participant/getDescription/${experimentId}/${demoMode}`);
+  public getDescription(experimentId: string): Observable<string> {
+    return this.http.get<string>(`${environment.baseUrl}/participant/getDescription/${experimentId}`);
   }
 
-  public getRoundsAndTrackingInfo(experimentId: string): Observable<{rounds: Round[], cursorImageMode: string | undefined, positionTrackingFrequency: number | undefined}> {
-    return this.http.get<{rounds: Round[], cursorImageMode: string | undefined, positionTrackingFrequency: number | undefined}>(`${environment.baseUrl}/participant/getRoundsAndTrackingInfo/${experimentId}`);
+  public getRoundsAndTrackingInfo(experimentId: string): Observable<{rounds: IRound[], cursorImageMode: string | undefined, positionTrackingFrequency: number | undefined}> {
+    return this.http.get<{rounds: IRound[], cursorImageMode: string | undefined, positionTrackingFrequency: number | undefined}>(`${environment.baseUrl}/participant/getRoundsAndTrackingInfo/${experimentId}`);
   }
 
   public getForm(experimentId: string): Observable<Form> {
@@ -100,14 +99,5 @@ export class ExperimentService {
 
   public hasForm(experimentId: string): Observable<boolean> {
     return this.http.get<boolean>(`${environment.baseUrl}/participant/hasForm/${experimentId}`);
-  }
-
-  public saveImage(imageData: string, experimentId: string, participantId: string, roundIdx: number): Observable<any>   {
-    let body = { imageData, experimentId, participantId, roundIdx}
-    return this.http.post<any>(`${environment.baseUrl}/participant/saveImage`, body);
-  }
-
-  public saveResult(result: Result): Observable<string> {
-    return this.http.post<string>(`${environment.baseUrl}/participant/addResult`, {result});
   }
 }

@@ -49,4 +49,35 @@ describe('RegisterComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('form should be invalid when username is missing', () => {
+    component.registerForm.controls['username'].setValue('');
+    expect(component.registerForm.controls['username'].valid).toBeFalsy();
+    expect(component.registerForm.valid).toBeFalsy();
+  });
+
+  it('form should be invalid when username is less than 3 characters long', () => {
+    component.registerForm.controls['username'].setValue('ab');
+    expect(component.registerForm.controls['username'].valid).toBeFalsy();
+    expect(component.registerForm.valid).toBeFalsy();
+  });
+
+  it('form should be invalid when password is less than 6 characters long', () => {
+    component.registerForm.controls['password'].setValue('ab');
+    expect(component.registerForm.controls['password'].valid).toBeFalsy();
+    expect(component.registerForm.valid).toBeFalsy();
+  });
+
+  it('form should be invalid when password is missing', () => {
+    component.registerForm.controls['password'].setValue('');
+    expect(component.registerForm.controls['password'].valid).toBeFalsy();
+    expect(component.registerForm.valid).toBeFalsy();
+  });
+
+  it('should enable register button when form is valid', () => {
+    component.registerForm.controls['username'].setValue('username');
+    component.registerForm.controls['password'].setValue('password');
+    component.registerForm.controls['passwordConfirmation'].setValue('password');
+    expect(component.registerForm.valid).toBeTruthy();
+  });
 });

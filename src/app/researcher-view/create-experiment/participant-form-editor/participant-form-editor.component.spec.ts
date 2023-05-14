@@ -20,10 +20,27 @@ describe('ParticipantFormEditorComponent', () => {
 
     fixture = TestBed.createComponent(ParticipantFormEditorComponent);
     component = fixture.componentInstance;
+    component.experiment = undefined;
+    component.isDirty = false;
+    component.isQuestionValid = [true];
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('onQuestionChange', () => {
+    it('should set the isDirty flag to true', () => {
+      component.onQuestionChange();
+      expect(component.isDirty).toBeTrue();
+    });
+  });
+
+  describe('onValidityChange', () => {
+    it('should set the proper element in the isQuestionValid array', () => {
+      component.onValidityChange(0, true);
+      expect(component.isQuestionValid[0]).toBeTrue();
+    });
   });
 });

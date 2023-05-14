@@ -9,9 +9,8 @@ import { ExperimentService } from 'src/app/common/services/experiment.service';
   styleUrls: ['./participant-description.component.scss']
 })
 export class ParticipantDescriptionComponent implements OnInit{
-  @Input() experimentId: string;
+  @Input() experimentId: string = "id1";
   @Output() nextStep = new EventEmitter();
-  @Input() demoMode: boolean;
   description: string;
 
   participantDescriptionForm = new FormGroup({
@@ -23,7 +22,7 @@ export class ParticipantDescriptionComponent implements OnInit{
   constructor(private experimentService: ExperimentService, private toastr: ToastrService) { }
 
   ngOnInit(): void {
-    this.experimentService.getDescription(this.experimentId, this.demoMode).subscribe({
+    this.experimentService.getDescription(this.experimentId).subscribe({
       next: (description) => {
         this.description = description;
       },

@@ -25,4 +25,8 @@ describe('ResearcherOverviewComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should create tabs', () => {
+    expect(fixture.nativeElement.querySelector('mat-tab-group')).toBeTruthy();
+  });
 });

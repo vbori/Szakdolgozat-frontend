@@ -1,33 +1,33 @@
-import { ConfigShapeType, ExperimentConfiguration } from "src/app/common/models/config.model";
-import { BackgroundDistraction, Round, Shape, ShapeType } from "src/app/common/models/round.model";
+import { ConfigShapeType, ExperimentConfiguration } from "src/app/researcher-view/models/config.model";
+import { BackgroundDistraction, IRound } from "src/app/common/models/round.model";
+import { IShape, ShapeType } from "src/app/common/models/shape.model";
 
-export function createInitialShape(canvasHeight: number, types: ConfigShapeType[], minWidth: number, maxWidth: number, minHeight: number, maxHeight: number, color: string, target: boolean, distraction: boolean): Shape{
+export function createInitialShape(canvasHeight: number, types: ConfigShapeType[], minWidth: number, maxWidth: number, minHeight: number, maxHeight: number, color: string, target: boolean, distraction: boolean): IShape{
   let chosenType: ConfigShapeType = types[Math.floor(Math.random() * types.length)];
-  let width, height: number = 0;
+  let width = minWidth + Math.floor(Math.random() * (maxWidth - minWidth + 1)); //choose a random width between the min and max
+  let height: number = 0;
   let radius: number | undefined = undefined;
-  let type: ShapeType
-  let sameSize: boolean;
+  let type: ShapeType //unlike chosenType, this can't be a square
+  let sameSize: boolean; //whether the width and height are the same
+
   switch(chosenType){
     case 'circle':
-      width = minWidth + Math.floor(Math.random() * (maxWidth - minWidth + 1));
       radius = width / 2.0;
       type = 'circle';
       sameSize = true;
       break;
     case 'square':
-      width = minWidth + Math.floor(Math.random() * (maxWidth - minWidth + 1));
       type = 'rect';
       sameSize = true;
       break;
     case 'rect':
-      width = minWidth + Math.floor(Math.random() * (maxWidth - minWidth + 1));
       height = minHeight + Math.floor(Math.random() * (maxHeight - minHeight + 1));
       type = 'rect';
       sameSize = false;
       break;
   }
-  let top = sameSize ? Math.floor(Math.random() * (canvasHeight - width)) : Math.floor(Math.random() * (canvasHeight - height));
-  let shape: Shape = {
+  let top = Math.floor(Math.random() * (canvasHeight - (sameSize ? width : height))); //choose a random top position between 0 and the last possible position
+  let shape: IShape = {
     width: width,
     height: sameSize ? width : height,
     radius: radius,
@@ -61,11 +61,11 @@ export function chooseDistractedRoundIndexes(numRounds: number, distractedRounds
   return distractedRoundIndexes;
 }
 
-export function calculateMaxSpace(canvasSize: number, normalMinSize: number, normalMaxSize: number, distractionMinSize: number | undefined, distractionMaxSize: number | undefined): { normalMaxSpace: number, distractionMaxSpace: number | undefined } {
+export function calculateMaxSpace(canvasSize: number, normalMinSize: number, distractionMinSize: number | undefined): { normalMaxSpace: number, distractionMaxSpace: number | undefined } {
   let normalMaxSpace  = canvasSize / 2;
   let distractionMaxSpace: number  | undefined = undefined;
-  if(distractionMinSize && distractionMaxSize){
-    if(canvasSize - distractionMinSize - 2* normalMinSize > 0){
+  if(distractionMinSize){
+    if(canvasSize - distractionMinSize - 2* normalMinSize > 0){ //If there is extra space, divide it evenly between the shapes
       let dividedFreeSpace = Math.floor((canvasSize - distractionMinSize - 2* normalMinSize) / 3);
       normalMaxSpace = normalMinSize + dividedFreeSpace;
       distractionMaxSpace = distractionMinSize + dividedFreeSpace;
@@ -78,8 +78,8 @@ export function calculateMaxSpace(canvasSize: number, normalMinSize: number, nor
   return { normalMaxSpace, distractionMaxSpace };
 }
 
-export function createRound(roundIdx: number, config: ExperimentConfiguration, baseShape: Shape, targetShape: Shape, distractionMode: number, distractionMaxSpace: number | undefined, maxHeight: number, normalMaxLimit: number): Round{
-  let distractingShape: Shape | undefined = undefined;
+export function createRound(roundIdx: number, config: ExperimentConfiguration, baseShape: IShape, targetShape: IShape, distractionMode: number, distractionMaxSpace: number | undefined, maxHeight: number, normalMaxLimit: number): IRound{
+  let distractingShape: IShape | undefined = undefined;
   let shapeDistractionDuration: number | undefined = undefined;
   let backgroundDistraction : BackgroundDistraction | undefined = undefined;
 
@@ -104,7 +104,7 @@ export function createRound(roundIdx: number, config: ExperimentConfiguration, b
     }
   }
 
-  let round: Round = {
+  let round: IRound = {
     roundIdx: roundIdx,
     objects: distractingShape ? [baseShape, distractingShape, targetShape] : [baseShape, targetShape],
     background: config.backgroundColor,
@@ -113,5 +113,6 @@ export function createRound(roundIdx: number, config: ExperimentConfiguration, b
     shapeDistractionDuration: shapeDistractionDuration,
     backgroundDistraction: backgroundDistraction
   }
+  console.log(round)
   return round;
 }

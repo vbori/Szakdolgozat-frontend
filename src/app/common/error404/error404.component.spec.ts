@@ -20,4 +20,8 @@ describe('Error404Component', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should have a h1 tag with the text "Error 404: Experiment not found"', () => {
+    expect(fixture.nativeElement.querySelector('h1').textContent).toEqual('Error 404: Experiment not found');
+  });
 });

@@ -44,6 +44,9 @@
       </div>
       <div *ngSwitchCase="'checkbox'">
         <mat-checkbox [formControlName]="question.questionId" [required]="question.required">{{question.label}}</mat-checkbox>
+        <mat-error *ngIf="form.controls[question.questionId].hasError('required')">
+          This checkbox is required!
+        </mat-error>
       </div>
     </div>
   </ng-container>

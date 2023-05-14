@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Form, Question } from 'src/app/common/models/form.model';
+import { Form, IQuestion } from 'src/app/common/models/form.model';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -18,7 +18,7 @@ export class FormService {
     return this.http.get<Form>(`${environment.baseUrl}/research/getForm?experimentId=${experimentId}`, { headers});
   }
 
-  public addForm(experimentId: string, questions: Question[]): Observable<HttpResponse<{ message: string }>> {
+  public addForm(experimentId: string, questions: IQuestion[]): Observable<HttpResponse<{ message: string }>> {
     let options = {
       headers : new HttpHeaders({
         "Content-Type": "application/json",
@@ -31,7 +31,7 @@ export class FormService {
     return this.http.post<{ message: string }>(`${environment.baseUrl}/research/addForm`, body, options);
   }
 
-  public updateForm(experimentId: string, questions: Question[]): Observable<HttpResponse<{ message: string }>> {
+  public updateForm(experimentId: string, questions: IQuestion[]): Observable<HttpResponse<{ message: string }>> {
     let options = {
       headers : new HttpHeaders({
         "Content-Type": "application/json",

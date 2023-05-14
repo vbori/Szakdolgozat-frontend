@@ -1,11 +1,13 @@
-import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { ExperimentCreationConstants } from '../experiment-creation.constants';
 import { fabric } from 'fabric';
-import { FabricShape, Round } from 'src/app/common/models/round.model';
+import { IRound } from 'src/app/common/models/round.model';
 import { ToastrService } from 'ngx-toastr';
+import { FabricShape } from 'src/app/common/models/shape.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-experiment-basics',
@@ -13,15 +15,17 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./experiment-basics.component.scss', '../create-experiment.component.scss']
 })
 
-export class ExperimentBasicsComponent implements AfterViewInit{
-  @Input() experiment: Experiment | undefined
+export class ExperimentBasicsComponent implements AfterViewInit, OnDestroy{
+  @Input() experiment: Experiment | undefined = undefined;
   @Output() experimentChange = new EventEmitter<Experiment>();
   @Output() nextStep = new EventEmitter<void>();
 
+  subscriptions: Subscription[] = [];
+
   outlineCanvas: fabric.Canvas;
-  outlineCanvasData: Round = {"objects":[{"type":"rect", "originX":"left","originY":"top","left":10,"top":10,"width":50,"height":50, "target": false, "distraction": false, "fill": "#fff", "strokeWidth": 1},{"type":"circle", "originX":"left","originY":"top","left":100,"top":100,"radius":25, "target": false, "distraction": false, "fill": "#fff", "strokeWidth": 1, "width":50,"height":50}], canvasHeight:200, canvasWidth:200, "background"  :"#fff"};
+  outlineCanvasData: IRound = {"objects":[{"type":"rect", "originX":"left","originY":"top","left":10,"top":10,"width":50,"height":50, "target": false, "distraction": false, "fill": "#fff", "strokeWidth": 1},{"type":"circle", "originX":"left","originY":"top","left":100,"top":100,"radius":25, "target": false, "distraction": false, "fill": "#fff", "strokeWidth": 1, "width":50,"height":50}], canvasHeight:200, canvasWidth:200, "background"  :"#fff"};
   coloredCanvas: fabric.Canvas;
-  coloredCanvasData: Round = {"objects":[{"type":"rect", "originX":"left","originY":"top","left":10,"top":10,"width":50,"height":50,"fill":"blue", "target": false, "distraction": false, "strokeWidth": 1},{"type":"circle", "originX":"left","originY":"top","left":100,"top":100,"fill":"blue","radius":25, "target": false, "distraction": false, "strokeWidth": 1, "width":50,"height":50}], canvasHeight:200, canvasWidth:200, "background"  :"red"};
+  coloredCanvasData: IRound = {"objects":[{"type":"rect", "originX":"left","originY":"top","left":10,"top":10,"width":50,"height":50,"fill":"blue", "target": false, "distraction": false, "strokeWidth": 1},{"type":"circle", "originX":"left","originY":"top","left":100,"top":100,"fill":"blue","radius":25, "target": false, "distraction": false, "strokeWidth": 1, "width":50,"height":50}], canvasHeight:200, canvasWidth:200, "background"  :"red"};
 
   experimentBasicsForm = new FormGroup({
     name: new FormControl<string>('', [Validators.required, Validators.minLength(3)]),
@@ -44,8 +48,27 @@ export class ExperimentBasicsComponent implements AfterViewInit{
 
     if(this.experiment){
       this.initializeForm();
-      this.changeDetector.detectChanges();
     }
+
+    let subscription = this.experimentBasicsForm.get('positionArrayNeeded')?.valueChanges.subscribe(value => {
+      if(value){
+        this.experimentBasicsForm.get('positionTrackingFrequency')?.enable();
+      }else{
+        this.experimentBasicsForm.get('positionTrackingFrequency')?.disable();
+      }
+
+      this.changeDetector.detectChanges();
+    });
+
+    if(subscription){
+      this.subscriptions.push(subscription);
+    }
+
+    this.changeDetector.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
   initializeForm(): void{

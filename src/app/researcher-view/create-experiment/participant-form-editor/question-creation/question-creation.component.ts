@@ -1,28 +1,44 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { QuestionClass } from 'src/app/common/models/form.model';
+import { Question } from 'src/app/common/models/form.model';
+import { ExperimentCreationConstants } from '../../experiment-creation.constants';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-question-creation',
   templateUrl: './question-creation.component.html',
   styleUrls: ['./question-creation.component.scss']
 })
-export class QuestionCreationComponent implements AfterViewInit {
-  @Input() question: QuestionClass;
+export class QuestionCreationComponent implements AfterViewInit, OnDestroy {
+  @Input() question: Question;
   @Output() validityChange = new EventEmitter<boolean>();
   @Output() questionChange = new EventEmitter<void>();
   @ViewChild('form', { read: NgForm, static: false }) form!: NgForm;
   answerTypes = ['text', 'number', 'radio', 'checkbox', 'select'];
   useValidation = false;
+  subsciptions: Subscription[] = [];
+
+  constructor(public readonly constants : ExperimentCreationConstants) {}
 
   ngAfterViewInit(){
-    this.form.statusChanges?.subscribe((status) => {
+    let subscription = this.form.statusChanges?.subscribe((status) => {
       this.validityChange.emit(status === 'VALID');
     });
 
-    this.form.valueChanges?.subscribe(() => {
+    let subsciption2 = this.form.valueChanges?.subscribe(() => {
       this.questionChange.emit();
     });
+
+    if(subscription)
+      this.subsciptions.push(subscription);
+
+
+    if(subsciption2)
+      this.subsciptions.push(subsciption2);
+  }
+
+  ngOnDestroy(){
+    this.subsciptions.forEach((subscription) => subscription.unsubscribe());
   }
 
   addOption() {

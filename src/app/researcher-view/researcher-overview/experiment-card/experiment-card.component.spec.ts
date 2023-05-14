@@ -33,4 +33,8 @@ describe('ExperimentCardComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should create card', () => {
+    expect(fixture.nativeElement.querySelector('mat-card')).toBeTruthy();
+  });
 });

@@ -1,9 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-// Font Awesome
-@import "@fortawesome/fontawesome-free/scss/fontawesome.scss";
-@import "@fortawesome/fontawesome-free/scss/solid.scss";
-@import "@fortawesome/fontawesome-free/scss/regular.scss";
-@import "@fortawesome/fontawesome-free/scss/brands.scss";
+
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
 // MDB SCSS
@@ -38,7 +34,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; margin-top:
   }
 }
 
-@media (max-width: 1000px), (max-height: 650px) {
+@media (max-width: 1079px), (max-height: 649px) {
   app-root {
     display: none;
   }

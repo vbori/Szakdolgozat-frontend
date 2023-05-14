@@ -7,7 +7,7 @@
 </div>
 <div class="container">
   <canvas class="canvas" [id]="'canvas'+  round?.roundIdx"></canvas>
-  <ng-container *ngIf="shapes" class="table-container">
+  <ng-container *ngIf="shapes && shapes.length > 0" class="table-container">
     <table class="table">
       <thead>
         <tr>

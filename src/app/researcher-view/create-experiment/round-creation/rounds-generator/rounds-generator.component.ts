@@ -1,14 +1,15 @@
-import { Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 import { ExperimentCreationConstants } from '../../experiment-creation.constants';
-import { ExperimentRoundsValidator } from 'src/app/common/validators/experiment-rounds.validator';
+import { ExperimentRoundsValidator } from 'src/app/researcher-view/services/validators/experiment-rounds.validator';
 import { Experiment } from 'src/app/common/models/experiment.model';
-import { Round, Shape } from 'src/app/common/models/round.model';
-import { ConfigShapeType, ExperimentConfiguration } from 'src/app/common/models/config.model';
+import { IRound } from 'src/app/common/models/round.model';
+import { ConfigShapeType, ExperimentConfiguration } from 'src/app/researcher-view/models/config.model';
 import { createInitialShape, chooseDistractedRoundIndexes, calculateMaxSpace, createRound } from 'src/app/researcher-view/utils/generatorUtils';
-import { markControlsTouched } from 'src/app/researcher-view/utils/formUtils';
 import { ToastrService } from 'ngx-toastr';
+import { IShape } from 'src/app/common/models/shape.model';
+import { Subscription } from 'rxjs';
 
 interface ShapeOption {
   value: ConfigShapeType;
@@ -21,9 +22,9 @@ interface ShapeOption {
   styleUrls: ['./rounds-generator.component.scss']
 })
 
-export class RoundsGeneratorComponent implements OnInit{
+export class RoundsGeneratorComponent implements OnInit, OnDestroy{
 
-  @Input() experiment: Experiment | undefined
+  @Input() experiment: Experiment | undefined = undefined;
   @Output() experimentChange = new EventEmitter<Experiment>();
   @Output() nextStep = new EventEmitter<void>();
 
@@ -33,18 +34,20 @@ export class RoundsGeneratorComponent implements OnInit{
     {value: 'square', viewValue: 'Square'},
   ];
 
+  subscriptions: Subscription[] = [];
+
   roundGeneratorForm = new FormGroup({
     setNum: new FormControl<number>(1,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM),Validators.pattern("^[0-9]*$")]}),
     roundNum: new FormControl<number>(10,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM),Validators.pattern("^[0-9]*$") ]}),
-    backgroundColor: new FormControl<string>('#FFFFFF', {nonNullable: true, validators: [Validators.required]}),
-    targetShapeColor: new FormControl<string>('#00FF00',{nonNullable: true, validators: [Validators.required]}),
-    baseShapeColor: new FormControl<string>('#0000FF', {nonNullable: true, validators: [Validators.required]}),
+    backgroundColor: new FormControl<string>('#ffffff', {nonNullable: true, validators: [Validators.required]}),
+    targetShapeColor: new FormControl<string>('#ff0000',{nonNullable: true, validators: [Validators.required]}),
+    baseShapeColor: new FormControl<string>('#0000ff', {nonNullable: true, validators: [Validators.required]}),
     distractedRoundNum: new FormControl<number>(0, {nonNullable: true, validators: [Validators.required, Validators.min(0), Validators.pattern("^[0-9]*$")]}),
     useBackgroundDistraction: new FormControl<boolean>(false, {nonNullable: true}),
     useShapeDistraction: new FormControl<boolean>(false, {nonNullable: true}),
     changePosition: new FormControl<boolean>(true, {nonNullable: true}),
     changeShapeSize: new FormControl<boolean>(true, {nonNullable: true}),
-    twoDimensional: new FormControl<boolean>(false, {nonNullable: true}),
+    oneDimensional: new FormControl<boolean>(false, {nonNullable: true}),
     canvasHeight: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_CANVAS_HEIGHT), Validators.max(this.constants.MAX_CANVAS_HEIGHT),Validators.pattern("^[0-9]*$")]}),
     canvasWidth: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_CANVAS_WIDTH), Validators.max(this.constants.MAX_CANVAS_WIDTH),Validators.pattern("^[0-9]*$")]}),
     baseShapeTypes: new FormControl<string[]>(['rect'], {nonNullable: true, validators: [Validators.required]}),
@@ -54,7 +57,7 @@ export class RoundsGeneratorComponent implements OnInit{
     minHeight: new FormControl<number>(30, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE),Validators.pattern("^[0-9]*$")]}),
     maxHeight: new FormControl<number>(60, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_SHAPE_SIZE), Validators.max(this.constants.MAX_SHAPE_SIZE),Validators.pattern("^[0-9]*$")]}),
     backgroundDistractionConfig : new FormGroup({
-      color: new FormControl<string>('#FF0000',{nonNullable: true, validators: [Validators.required]}),
+      color: new FormControl<string>('#ff0000',{nonNullable: true, validators: [Validators.required]}),
       minDuration: new FormControl<number>(100, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME),Validators.pattern("^[0-9]*$")]}),
       maxDuration: new FormControl<number>(5000, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME),Validators.pattern("^[0-9]*$")]}),
       useFlashing: new FormControl<boolean>(false, {nonNullable: true}),
@@ -113,6 +116,10 @@ export class RoundsGeneratorComponent implements OnInit{
     }
   }
 
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+  }
+
   //TODO: add loading animation when generating rounds
 
   restoreForm(): void{
@@ -141,7 +148,7 @@ export class RoundsGeneratorComponent implements OnInit{
   }
 
   subscribeToDistractionChange(checkboxControlName: string, configFormName: string): void {
-    this.roundGeneratorForm.get(checkboxControlName)?.valueChanges.subscribe(value => {
+    let subscription = this.roundGeneratorForm.get(checkboxControlName)?.valueChanges.subscribe(value => {
       if(value){
         this.roundGeneratorForm.get(configFormName)?.enable();
       }else{
@@ -149,20 +156,28 @@ export class RoundsGeneratorComponent implements OnInit{
         this.roundGeneratorForm.get(configFormName)?.get('useFlashing')?.setValue(false);
       }
     });
+
+    if(subscription){
+      this.subscriptions.push(subscription);
+    }
   }
 
   subscribeToFlashingChange(configFormName: string): void {
-    this.roundGeneratorForm.get(configFormName)?.get('useFlashing')?.valueChanges.subscribe(value => {
+    let subscription = this.roundGeneratorForm.get(configFormName)?.get('useFlashing')?.valueChanges.subscribe(value => {
       if(value){
         this.roundGeneratorForm.get(configFormName)?.get('flashing')?.enable();
       }else{
         this.roundGeneratorForm.get(configFormName)?.get('flashing')?.disable();
       }
     });
+
+    if(subscription){
+      this.subscriptions.push(subscription);
+    }
   }
 
   onSubmit(): void{
-    if(!this.roundGeneratorForm.pristine){
+    if(!this.roundGeneratorForm.pristine || !this.experiment?.experimentConfiguration){
       this.setUnnecessaryControlsAvailability(false);
       const rounds = this.generateRounds(this.roundGeneratorForm.value as ExperimentConfiguration);
       const updatedExperiment = { experimentConfiguration: this.roundGeneratorForm.value, rounds: rounds};
@@ -198,57 +213,84 @@ export class RoundsGeneratorComponent implements OnInit{
     }
   }
 
-  generateRounds(config: ExperimentConfiguration): Round[]{
-    let rounds: Round[] = [];
+  generateRounds(config: ExperimentConfiguration): IRound[]{
 
-    let {normalMaxSpace, distractionMaxSpace } = calculateMaxSpace(config.canvasWidth, config.minWidth, config.maxWidth, config.distractingShapeConfig?.minWidth, config.distractingShapeConfig?.maxWidth);
-    let baseShape: Shape = createInitialShape(config.canvasHeight ,config.baseShapeTypes, config.minWidth, Math.min(normalMaxSpace, config.maxWidth), config.minHeight, config.maxHeight, config.baseShapeColor, false, false);
-    baseShape.left = Math.floor(Math.random() * (normalMaxSpace - baseShape.width));
+    let {normalMaxSpace, distractionMaxSpace } = calculateMaxSpace(config.canvasWidth, config.minWidth, config.distractingShapeConfig?.minWidth);
 
-    let restrictedHeight = config.twoDimensional ? config.maxHeight : Math.min(config.canvasHeight - baseShape.top, config.maxHeight);
+    const baseShape = this.createBaseShape(config, normalMaxSpace);
 
-    let initialTargetWidth:number|undefined = undefined;
-    let initialTargetHeight:number|undefined = undefined;
-    let initialTargetLeft:number|undefined = undefined;
-    let initialTargetTop:number|undefined = undefined;
+    let restrictedHeight = this.calculateRestrictedHeight(config, baseShape);
+    console.log(restrictedHeight)
+
+    let initialTargetWidth, initialTargetHeight, initialTargetLeft, initialTargetTop :number|undefined = undefined;
+    let rounds: IRound[] = [];
 
     for(let i = 0; i < config.setNum; i++){
-      let targetShape: Shape = createInitialShape(config.canvasHeight ,config.targetShapeTypes, initialTargetWidth ?? config.minWidth, initialTargetWidth ?? Math.min(normalMaxSpace, config.maxWidth), initialTargetHeight ?? config.minHeight, initialTargetHeight ?? restrictedHeight, config.targetShapeColor, true, false);
-      targetShape.left = initialTargetLeft ?? config.canvasWidth - (targetShape.width + Math.floor(Math.random() * (normalMaxSpace- targetShape.width)));
-      targetShape.top = initialTargetTop ?? targetShape.top;
-
-      if(config.twoDimensional){
-        targetShape.top = baseShape.top;
-      }
-
-      if(!config.changeShapeSize && initialTargetHeight === undefined){
-        initialTargetHeight = targetShape.height;
-        initialTargetWidth = targetShape.width;
-      }
-
-      if(!config.changePosition && initialTargetLeft === undefined){
-        initialTargetLeft = targetShape.left;
-        initialTargetTop = targetShape.top;
-      }
+      let {targetShape, initialTargetWidth: newInitialTargetWidth, initialTargetHeight: newInitialTargetHeight, initialTargetLeft: newInitialTargetLeft, initialTargetTop: newInitialTargetTop} = this.createTargetShape(config, initialTargetWidth, initialTargetHeight, initialTargetLeft, initialTargetTop, normalMaxSpace, baseShape.top, restrictedHeight);
+      initialTargetWidth = newInitialTargetWidth;
+      initialTargetHeight = newInitialTargetHeight;
+      initialTargetLeft = newInitialTargetLeft;
+      initialTargetTop = newInitialTargetTop;
 
       const distractedRoundIndexes = chooseDistractedRoundIndexes(config.roundNum, config.distractedRoundNum);
 
       for(let j = 0; j < config.roundNum; j++){
         let distractionMode = 0;
         if(distractedRoundIndexes.includes(j)){
-          if(config.backgroundDistractionConfig && config.distractingShapeConfig){
-            distractionMode = Math.floor(Math.random() * 3) + 1;
-          }else if(config.backgroundDistractionConfig){
-            distractionMode = 1;
-          }else if(config.distractingShapeConfig){
-            distractionMode = 2;
-          }
-        }  //0:no distraction 1: background distraction only, 2: shape distraction only, 3: shape distraction + background distraction
-        let round = createRound(j+1, config, baseShape, targetShape, distractionMode, distractionMaxSpace, restrictedHeight, normalMaxSpace);
+          distractionMode = this.getDistractionMode(config);
+        }
+        let round = createRound(i*config.roundNum + j+1, config, baseShape, targetShape, distractionMode, distractionMaxSpace, restrictedHeight, normalMaxSpace);
         rounds.push(round);
       }
     }
 
     return rounds;
   }
+
+  calculateRestrictedHeight(config: ExperimentConfiguration, baseShape: IShape): number{
+    return config.oneDimensional ? Math.min(config.canvasHeight - baseShape.top, config.maxHeight) : config.maxHeight;
+  }
+
+  getDistractionMode(config: ExperimentConfiguration): number{ //0:no distraction 1: background distraction only, 2: shape distraction only, 3: shape distraction + background distraction
+    if(config.backgroundDistractionConfig && config.distractingShapeConfig){
+      return Math.floor(Math.random() * 3) + 1;
+    }else if(config.backgroundDistractionConfig){
+      return 1;
+    }else if(config.distractingShapeConfig){
+      return 2;
+    }else{
+      return 0;
+    }
+  }
+
+  createBaseShape(config: ExperimentConfiguration, normalMaxSpace: number): IShape{
+    let baseShape: IShape = createInitialShape(config.canvasHeight ,config.baseShapeTypes, config.minWidth, Math.min(normalMaxSpace, config.maxWidth), config.minHeight, config.maxHeight, config.baseShapeColor, false, false);
+    baseShape.left = Math.floor(Math.random() * (normalMaxSpace - baseShape.width)); //Putting the shape somewhere between 0 and the last possible position
+
+    return baseShape;
+  }
+
+
+  createTargetShape(config: ExperimentConfiguration, initialTargetWidth: number|  undefined, initialTargetHeight: number | undefined, initialTargetLeft: number | undefined, initialTargetTop: number| undefined , normalMaxSpace: number, baseShapeTop: number, restrictedHeight: number): {targetShape: IShape, initialTargetWidth: number|undefined, initialTargetHeight: number| undefined, initialTargetLeft: number | undefined, initialTargetTop: number | undefined}{
+    let targetShape: IShape = createInitialShape(config.canvasHeight ,config.targetShapeTypes, initialTargetWidth ?? config.minWidth, initialTargetWidth ?? Math.min(normalMaxSpace, config.maxWidth), initialTargetHeight ?? config.minHeight, initialTargetHeight ?? restrictedHeight, config.targetShapeColor, true, false);
+    targetShape.left = initialTargetLeft ?? config.canvasWidth - (targetShape.width + Math.floor(Math.random() * (normalMaxSpace- targetShape.width)));
+    targetShape.top = initialTargetTop ?? targetShape.top;
+
+    if(config.oneDimensional){
+      targetShape.top = baseShapeTop + targetShape.height <= config.canvasHeight ?  baseShapeTop : config.canvasHeight - targetShape.height;
+    }
+
+    if(!config.changeShapeSize && initialTargetHeight === undefined){
+      initialTargetHeight = targetShape.height;
+      initialTargetWidth = targetShape.width;
+    }
+
+    if(!config.changePosition && initialTargetLeft === undefined){
+      initialTargetLeft = targetShape.left;
+      initialTargetTop = targetShape.top;
+    }
+
+    return {targetShape, initialTargetWidth, initialTargetHeight, initialTargetLeft, initialTargetTop};
+  }
+
 }

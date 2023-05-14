@@ -1,12 +1,17 @@
 :host {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
 
-  height: 100%;
+  height: auto;
   width: 100%;
 }
 
 mat-tab-group {
   width: 30%;
- }
+  min-width: 350px;
+}
+
+#authDrawing {
+  width: 50%;
+}

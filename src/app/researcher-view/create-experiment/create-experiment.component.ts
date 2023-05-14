@@ -1,7 +1,8 @@
 import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatStepper } from '@angular/material/stepper';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { Experiment } from 'src/app/common/models/experiment.model';
 import { ExperimentService } from 'src/app/common/services/experiment.service';
 
@@ -17,32 +18,42 @@ export class CreateExperimentComponent implements OnInit{
   experimentChecked: boolean;
   @ViewChild('stepper') stepper!: MatStepper;
 
-  constructor(private experimentService: ExperimentService, private readonly route: ActivatedRoute) {
+  constructor(private experimentService: ExperimentService,
+              private readonly route: ActivatedRoute,
+              private readonly router: Router,
+              private readonly toastr: ToastrService) {
   }
 
   ngOnInit(): void {
     if(this.route.snapshot.params['id'] != undefined){
       this.experimentService.getExperimentById(this.route.snapshot.params['id']).subscribe({
         next: (experiment) => {
-          this.experiment = experiment;
-          this.experimentChecked = true;
+          if(experiment.status != 'Draft'){
+            this.toastr.error('Experiment is not in draft mode', 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+            this.router.navigate(['/research']);
+            return;
+          }else{
+            this.experiment = experiment;
+            this.experimentChecked = true;
+            window.onbeforeunload = (event) => {
+              event.preventDefault();
+              event.returnValue = '';
+              return true;
+            };
+          }
         },
-        error: () => console.log("Error loading experiment")
+        error: (error) => {
+          this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+          this.router.navigate(['/research']);
+        }
       });
     }else{
       this.experimentChecked = true;
     }
-
-    window.onbeforeunload = (event) => {
-      event.preventDefault();
-      event.returnValue = '';
-      return true;
-    };
   }
 
   createExperiment(): void{
     this.stepCount++;
-    console.log("Create Experiment")
   }
 
   onStepChange(event: StepperSelectionEvent): void{

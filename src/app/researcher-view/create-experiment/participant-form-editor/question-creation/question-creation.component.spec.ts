@@ -35,4 +35,40 @@ describe('QuestionCreationComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should show validation settings only when question type is number', () => {
+    component.question.type = 'number';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#validation-div')).toBeTruthy();
+    component.question.type = 'text';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#validation-div')).toBeFalsy();
+    component.question.type = 'radio';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#validation-div')).toBeFalsy();
+    component.question.type = 'checkbox';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#validation-div')).toBeFalsy();
+    component.question.type = 'select';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#validation-div')).toBeFalsy();
+  });
+
+  it('should show options only when question type is radio or select', () => {
+    component.question.type = 'number';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#options-div')).toBeFalsy();
+    component.question.type = 'text';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#options-div')).toBeFalsy();
+    component.question.type = 'radio';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#options-div')).toBeTruthy();
+    component.question.type = 'checkbox';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#options-div')).toBeFalsy();
+    component.question.type = 'select';
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#options-div')).toBeTruthy();
+  });
 });

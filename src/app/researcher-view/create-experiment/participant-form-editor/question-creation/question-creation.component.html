@@ -16,7 +16,7 @@
     </mat-select>
   </mat-form-field>
   <mat-checkbox name="requiredInput" [(ngModel)]="question.required">Answer is required</mat-checkbox>
-  <div *ngIf="question.type === 'radio' || question.type === 'select'">
+  <div *ngIf="question.type === 'radio' || question.type === 'select'" id="options-div">
     <div *ngFor="let option of question.options; let i = index">
       <mat-form-field>
         <mat-label>Option{{i+1}}</mat-label>
@@ -27,9 +27,9 @@
       </mat-form-field>
       <button class="iconButton" (click)="removeOption(i)" [disabled]="question.options?.length == 2"><mat-icon fontIcon="delete"></mat-icon></button>
     </div>
-    <button mat-raised-button color="primary" (click)="addOption()">Add Option</button>
+    <button mat-raised-button color="primary" (click)="addOption()" [disabled]="question.options && question.options.length >= constants.MAX_OPTION_NUM">Add option</button>
   </div>
-  <div *ngIf="question.type === 'number'">
+  <div *ngIf="question.type === 'number'" id="validation-div">
     <mat-checkbox name="validateCheckbox" [(ngModel)]="useValidation" (change)="onValidationChange()">Use validation</mat-checkbox>
     <div *ngIf="useValidation && question.validation">
       <mat-form-field>

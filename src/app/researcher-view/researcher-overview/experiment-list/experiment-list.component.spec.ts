@@ -25,4 +25,10 @@ describe('ExperimentListComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should show "Looks like you don\'t have any active experiments yet!" when no active experiments are available', () => {
+    component.experiments = [];
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#no-experiments-msg')).toBeTruthy();
+  });
 });

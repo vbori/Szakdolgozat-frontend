@@ -2,7 +2,7 @@
   <h2>Canvas settings</h2>
   <mat-form-field>
     <mat-label>Canvas height</mat-label>
-    <input matInput formControlName="canvasHeight" type="number"/>
+    <input matInput formControlName="canvasHeight" [min]="constants.MIN_CANVAS_HEIGHT" [max]="constants.MAX_CANVAS_HEIGHT" type="number"/>
     <span matSuffix>px &nbsp;</span>
     <mat-error *ngIf="canvasForm.controls.canvasHeight.invalid">
       Canvas height must be between {{constants.MIN_CANVAS_HEIGHT}} and {{constants.MAX_CANVAS_HEIGHT}}!
@@ -10,7 +10,7 @@
   </mat-form-field>
   <mat-form-field>
     <mat-label>Canvas width</mat-label>
-    <input matInput formControlName="canvasWidth" type="number"/>
+    <input matInput formControlName="canvasWidth" [min]="constants.MIN_CANVAS_WIDTH" [max]="constants.MAX_CANVAS_WIDTH" type="number"/>
     <span matSuffix>px &nbsp;</span>
     <mat-error *ngIf="canvasForm.controls.canvasWidth.invalid">
       Canvas width must be between {{constants.MIN_CANVAS_WIDTH}} and {{constants.MAX_CANVAS_WIDTH}}!
@@ -24,11 +24,18 @@
       <h2><u>Round {{i+1}}</u></h2>
       <button mat-raised-button color="warn" (click)="removeRound(i)" [disabled]="isRoundValid.length == 1">Remove round</button>
     </div>
-    <app-fabric-canvas [roundIdx]="i" [round]="rounds[i]" [canvasHeight]="canvasForm.value.canvasHeight ?? 500" [canvasWidth]="canvasForm.value.canvasWidth ?? 500" (validityChange)="onValidityChange(i, $event)" (canvasCreated)="onCanvasCreated($event)"></app-fabric-canvas>
+    <app-fabric-canvas
+      [roundIdx]="i"
+      [round]="rounds[i]"
+      [canvasHeight]="canvasForm.value.canvasHeight ?? 500"
+      [canvasWidth]="canvasForm.value.canvasWidth ?? 500"
+      (validityChange)="onValidityChange(i, $event)"
+      (canvasCreated)="onCanvasCreated($event)">
+    </app-fabric-canvas>
   </div>
 </ng-container>
 
 <div class ="buttonsContainer">
-  <button mat-raised-button color="primary" (click)="addRound()">Add round</button>
-  <button mat-raised-button color="primary" [disabled]="isSubmitDisabled()" (click)="createExperiment()">Create experiment</button>
+  <button mat-raised-button color="primary" (click)="addRound()" [disabled]="rounds.length >= constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM">Add round</button>
+  <button mat-raised-button color="primary" [disabled]="hasError" (click)="createExperiment()">Create experiment</button>
 </div>
