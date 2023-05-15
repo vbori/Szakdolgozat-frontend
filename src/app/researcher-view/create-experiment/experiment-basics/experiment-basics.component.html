@@ -26,6 +26,7 @@
     <mat-label>Control group chance percentage</mat-label>
     <input type="number" matInput min="0" max="100" formControlName="controlGroupChance">
     <span matSuffix>% &nbsp;</span>
+    <mat-hint>Participants in the control group will see the experiment rounds without distractions</mat-hint>
     <mat-error *ngIf="experimentBasicsForm.controls.controlGroupChance.invalid">
       The control group chance must be a whole number between 0% and 100%!
     </mat-error>

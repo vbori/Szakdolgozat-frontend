@@ -33,8 +33,8 @@ export class PasswordChangeComponent {
       next: (response) => {
         this.toastr.success(response.body?.message, 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
       },
-      error: (response) => {
-        this.toastr.error(response.error.message, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
+      error: (error) => {
+        this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
   }
