@@ -49,7 +49,6 @@ export class ParticipantFormComponent implements OnInit{
 
   onSubmit(): void{
     if(!this.demoMode){
-      console.log(this.form.value);
       let responses: Response[] = [];
 
       Object.keys(this.form.value).forEach((key: string) => {

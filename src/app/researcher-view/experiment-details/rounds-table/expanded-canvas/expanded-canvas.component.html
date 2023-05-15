@@ -21,19 +21,19 @@
           <td *ngFor="let shape of shapes">{{getType(shape) }}</td>
         </tr>
         <tr>
-          <td><b>Distance from left side</b></td>
+          <td><b>Distance from left side (px)</b></td>
           <td *ngFor="let shape of shapes">{{shape.left}}</td>
         </tr>
         <tr>
-          <td><b>Distance from top</b></td>
+          <td><b>Distance from top (px)</b></td>
           <td *ngFor="let shape of shapes">{{shape.top}}</td>
         </tr>
         <tr>
-          <td><b>Width</b></td>
+          <td><b>Width (px)</b></td>
           <td *ngFor="let shape of shapes">{{shape.width}}</td>
         </tr>
         <tr>
-          <td><b>Height</b></td>
+          <td><b>Height (px)</b></td>
           <td *ngFor="let shape of shapes">{{shape.height}}</td>
         </tr>
         <tr>
@@ -41,7 +41,7 @@
           <td *ngFor="let shape of shapes">{{shape.fill}}&nbsp;<span class="colorSpan" [style.backgroundColor]="shape.fill"></span></td>
         </tr>
         <tr>
-          <td><b>Flash frequency</b></td>
+          <td><b>Flash frequency (ms)</b></td>
           <td *ngFor="let shape of shapes">{{shape.flashing ? shape.flashing.frequency : 'none'}}</td>
         </tr>
         <tr>

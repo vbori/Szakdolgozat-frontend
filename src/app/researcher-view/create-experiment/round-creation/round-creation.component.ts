@@ -7,9 +7,11 @@ import { Experiment } from 'src/app/common/models/experiment.model';
   styleUrls: ['./round-creation.component.scss']
 })
 export class RoundCreationComponent {
-  @Input() experiment: Experiment | undefined
+  @Input() experiment: Experiment | undefined = undefined;
   @Output() experimentChange = new EventEmitter<Experiment>();
   selectedTabIndex = 0;
+
+  constructor() { }
 
   onExperimentChange(experiment: Experiment): void{
     this.experiment = experiment;

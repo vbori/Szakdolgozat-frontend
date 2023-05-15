@@ -29,7 +29,6 @@ export class LoginComponent {
         this.toastr.success('Logged in successfully', 'Success', { progressBar: true, positionClass: 'toast-bottom-right' });
       },
       error: (error) => {
-        console.log(error)
         this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });

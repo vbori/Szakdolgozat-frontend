@@ -15,7 +15,7 @@ export class ShapeService {
     let { left, top, fill, target, distraction, originX, originY, flashing } = currentShape;
     switch (newType) {
       case 'circle':
-        let newSize: number;
+        let newSize: number; //In case of a circle, the new size will be the minimum of the width and height to make sure it fits in the canvas
         if(height && width){
           newSize = Math.min(width, height)
         }else if(height){
@@ -33,7 +33,6 @@ export class ShapeService {
           height: newSize,
           width: newSize,
           fill: fill,
-          //radius: Math.round((newSize / 2.0)),
           radius: newSize / 2.0,
           originX: originX,
           originY: originY
@@ -61,7 +60,6 @@ export class ShapeService {
     shape.target = target;
     shape.distraction = distraction;
     shape.flashing = flashing;
-    console.log(shape)
     return shape;
   }
 

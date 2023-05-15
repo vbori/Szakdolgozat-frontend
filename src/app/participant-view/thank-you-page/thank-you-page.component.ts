@@ -7,6 +7,6 @@ import { Router } from '@angular/router';
   styleUrls: ['./thank-you-page.component.scss']
 })
 export class ThankYouPageComponent {
-  @Input() demoMode: boolean;
-  @Input() experimentId: string;
+  @Input() demoMode: boolean = false;
+  @Input() experimentId: string = 'id1';
 }

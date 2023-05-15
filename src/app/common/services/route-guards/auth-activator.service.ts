@@ -14,7 +14,7 @@ export class AuthActivatorService implements CanActivate{
     });
   }
 
-  canActivate(){
+  canActivate(){ //If user is already logged in, redirect to dashboard
     if(this.isLoggedIn){
       this.router.navigate(['/research/dashboard']);
     }

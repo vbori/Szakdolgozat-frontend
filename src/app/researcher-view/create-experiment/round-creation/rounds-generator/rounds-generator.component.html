@@ -105,6 +105,7 @@
       <input matInput formControlName="minWidth" type="number"/>
       <mat-hint>
         The width of the shapes will be chosen randomly between the minimum and maximum width.
+        Note: in case of circles and squares the width will determine the height as well.
       </mat-hint>
       <mat-error *ngIf="roundGeneratorForm.controls.minWidth.invalid">
         Minimum width must be a whole number between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!
@@ -122,8 +123,12 @@
       <span matSuffix>px &nbsp;</span>
       <mat-hint>
         The width of the shapes will be chosen randomly between the minimum and maximum width.
+        Note: in case of circles and squares the width will determine the height as well.
       </mat-hint>
     </mat-form-field>
+    <mat-error *ngIf="roundGeneratorForm.hasError('canvasHeightSmallerThanNormalMaxShapeWidth')">
+      If you don't include rectangle as a shape type option to both target and base shape, the maximuum width must be smaller than the canvas height!
+    </mat-error>
     <mat-error *ngIf="roundGeneratorForm.controls.maxWidth.invalid || roundGeneratorForm.errors?.['conflictingValuesminWidthmaxWidth'] || roundGeneratorForm.errors?.['conflictingValuesmaxWidthcanvasWidth']">
       Maximum width must be a whole number between minimum width and {{constants.MAX_SHAPE_SIZE}}, and can not exceed the canvas width!
     </mat-error>
@@ -133,6 +138,7 @@
       <span matSuffix>px &nbsp;</span>
       <mat-hint>
         The height of the shapes will be chosen randomly between the minimum and maximum height.
+        Note: in case of circles and squares the width will determine the height as well.
       </mat-hint>
       <mat-error *ngIf="roundGeneratorForm.controls.minHeight.invalid">
         Minimum height must be a whole number between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!
@@ -144,6 +150,7 @@
       <span matSuffix>px &nbsp;</span>
       <mat-hint>
         The height of the shapes will be chosen randomly between the minimum and maximum height.
+        Note: in case of circles and squares the width will determine the height as well.
       </mat-hint>
     </mat-form-field>
     <mat-error *ngIf="roundGeneratorForm.controls.maxHeight.invalid || roundGeneratorForm.errors?.['conflictingValuesminHeightmaxHeight']  || roundGeneratorForm.errors?.['conflictingValuesmaxHeightcanvasHeight']">
@@ -220,6 +227,7 @@
       <span matSuffix>px &nbsp;</span>
       <mat-hint>
         The width of the distracting shape will be chosen randomly between the minimum and maximum width.
+        Note: in case of circles and squares the width will determine the height as well.
       </mat-hint>
       <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.minWidth.invalid">
         Minimum width must be a whole number between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!
@@ -234,8 +242,12 @@
       <span matSuffix>px &nbsp;</span>
       <mat-hint>
         The width of the distracting shape will be chosen randomly between the minimum and maximum width.
+        Note: in case of circles and squares the width will determine the height as well.
       </mat-hint>
     </mat-form-field>
+    <mat-error *ngIf="roundGeneratorForm.hasError('canvasHeightSmallerThanDistractionMaxShapeWidth')">
+      If you don't include rectangle as a shape type option, the maximum width must be smaller than the canvas height!
+    </mat-error>
     <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.maxWidth.invalid || roundGeneratorForm.controls.distractingShapeConfig.errors?.['conflictingValuesminWidthmaxWidth'] || roundGeneratorForm.errors?.['conflictingValuesdistractingShapeConfigmaxWidthcanvasWidth']">
       Maximum width must be a whole number between minimum width and {{constants.MAX_SHAPE_SIZE}}, and can not exceed canvas width!
     </mat-error>
@@ -245,6 +257,7 @@
       <span matSuffix>px &nbsp;</span>
       <mat-hint>
         The height of the distracting shape will be chosen randomly between the minimum and maximum height.
+        Note: in case of circles and squares the width will determine the height as well.
       </mat-hint>
       <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.minHeight.invalid">
         Minimum height must be a whole number between {{constants.MIN_SHAPE_SIZE}} and {{constants.MAX_SHAPE_SIZE}}!
@@ -256,6 +269,7 @@
       <span matSuffix>px &nbsp;</span>
       <mat-hint>
         The height of the distracting shape will be chosen randomly between the minimum and maximum height.
+        Note: in case of circles and squares the width will determine the height as well.
       </mat-hint>
     </mat-form-field>
     <mat-error *ngIf="roundGeneratorForm.controls.distractingShapeConfig.controls.maxHeight.invalid || roundGeneratorForm.controls.distractingShapeConfig.errors?.['conflictingValuesminHeightmaxHeight']|| roundGeneratorForm.errors?.['conflictingValuesdistractingShapeConfigmaxHeightcanvasHeight']">

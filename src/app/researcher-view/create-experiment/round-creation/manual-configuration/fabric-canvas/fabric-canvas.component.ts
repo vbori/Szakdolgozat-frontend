@@ -97,7 +97,6 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
   }
 
   initializeForm(): void{
-    console.log(this.round);
     this.distractionForm.patchValue(this.round);
     this.distractionForm.controls.backgroundColor.setValue(this.round.background);
     this.distractionForm.controls.useBackgroundDistraction.setValue(!!this.round.backgroundDistraction);
@@ -112,12 +111,8 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
       this.distractionForm.controls.shapeDistractionDuration.disable();
     }
 
-    console.log('useBackgroundDistraction', this.distractionForm.controls.useBackgroundDistraction.value);
-
     let subscription = this.distractionForm.statusChanges?.subscribe((status) => {
-      console.log('status', status)
       let allValid = status === 'VALID' && this.validities.baseShape && this.validities.targetShape && (this.distractionForm.value.useShapeDistraction ? this.validities.distractingShape : true);
-      console.log('allValid', allValid);
       this.validityChange.emit(allValid);
     });
 

@@ -3,7 +3,14 @@ import { BackgroundDistraction, IRound } from "src/app/common/models/round.model
 import { IShape, ShapeType } from "src/app/common/models/shape.model";
 
 export function createInitialShape(canvasHeight: number, types: ConfigShapeType[], minWidth: number, maxWidth: number, minHeight: number, maxHeight: number, color: string, target: boolean, distraction: boolean): IShape{
-  let chosenType: ConfigShapeType = types[Math.floor(Math.random() * types.length)];
+  let chosenType: ConfigShapeType;
+
+  if(canvasHeight < minWidth){ //This is only possible if rect is between the shape options, otherwise the form would have been invalid
+    chosenType = 'rect';
+  }else{
+    chosenType = types[Math.floor(Math.random() * types.length)];
+  }
+
   let width = minWidth + Math.floor(Math.random() * (maxWidth - minWidth + 1)); //choose a random width between the min and max
   let height: number = 0;
   let radius: number | undefined = undefined;
@@ -26,6 +33,7 @@ export function createInitialShape(canvasHeight: number, types: ConfigShapeType[
       sameSize = false;
       break;
   }
+
   let top = Math.floor(Math.random() * (canvasHeight - (sameSize ? width : height))); //choose a random top position between 0 and the last possible position
   let shape: IShape = {
     width: width,
@@ -83,7 +91,7 @@ export function createRound(roundIdx: number, config: ExperimentConfiguration, b
   let shapeDistractionDuration: number | undefined = undefined;
   let backgroundDistraction : BackgroundDistraction | undefined = undefined;
 
-  if(config.distractingShapeConfig && (distractionMode > 1) && distractionMaxSpace){
+  if(config.distractingShapeConfig && (distractionMode > 1) && distractionMaxSpace){ //Create shape distraction
     distractingShape = createInitialShape(config.canvasHeight ,config.distractingShapeConfig.distractingShapeTypes, config.distractingShapeConfig.minWidth, Math.min(distractionMaxSpace, config.distractingShapeConfig.maxWidth), config.distractingShapeConfig.minHeight, maxHeight, config.distractingShapeConfig.color, false, true);
     distractingShape.left = normalMaxLimit + Math.floor(Math.random() * (distractionMaxSpace - distractingShape.width));
     distractingShape.top = Math.min(Math.floor((baseShape.top + targetShape.top)/2), config.canvasHeight - distractingShape.height);
@@ -93,7 +101,7 @@ export function createRound(roundIdx: number, config: ExperimentConfiguration, b
     shapeDistractionDuration = Math.floor(Math.random() * (config.distractingShapeConfig.maxDuration - config.distractingShapeConfig.minDuration)) + config.distractingShapeConfig.minDuration;
   }
 
-  if(distractionMode % 2 == 1 && config.backgroundDistractionConfig){
+  if(distractionMode % 2 == 1 && config.backgroundDistractionConfig){ //Create background distraction
     backgroundDistraction = {
       color: config.backgroundDistractionConfig?.color,
       duration: Math.floor(Math.random() * (config.backgroundDistractionConfig?.maxDuration - config.backgroundDistractionConfig?.minDuration)) + config.backgroundDistractionConfig?.minDuration,
@@ -113,6 +121,5 @@ export function createRound(roundIdx: number, config: ExperimentConfiguration, b
     shapeDistractionDuration: shapeDistractionDuration,
     backgroundDistraction: backgroundDistraction
   }
-  console.log(round)
   return round;
 }

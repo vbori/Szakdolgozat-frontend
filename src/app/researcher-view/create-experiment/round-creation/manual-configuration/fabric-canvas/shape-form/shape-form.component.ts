@@ -71,6 +71,7 @@ export class ShapeFormComponent implements OnInit, AfterViewInit, OnDestroy{
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.removeEventHandlers(this.shape);
   }
 
   initializeForm(): void{
@@ -81,7 +82,6 @@ export class ShapeFormComponent implements OnInit, AfterViewInit, OnDestroy{
     this.shapeConfigForm.controls.left.setValue(this.shape.left ? Math.floor(this.shape.left) : 100);
     this.shapeConfigForm.controls.top.setValue(this.shape.top ? Math.floor(this.shape.top) : 100);
     this.shapeConfigForm.controls.fill.setValue(this.shape.fill ? this.shape.fill as string : 'blue');
-    //this.shapeConfigForm.controls.radius.setValue(this.shape.radius ? Math.round(this.shape.getScaledWidth()/2) : 25);
     this.shapeConfigForm.controls.radius.setValue(this.shape.radius ? Math.round(this.shape.getScaledWidth())/2 : 25);
     this.shapeConfigForm.controls.type.setValue(this.shape.type ? this.shape.type : 'circle');
     this.shapeConfigForm.controls.useFlashing.setValue(this.shape.flashing ? true : false);
@@ -94,6 +94,12 @@ export class ShapeFormComponent implements OnInit, AfterViewInit, OnDestroy{
     shape.on('scaling', this.handleObjectScaling.bind(this));
     shape.on('moving', this.handleObjectMoving.bind(this));
     shape.on('selected', this.handleObjectSelected.bind(this));
+  }
+
+  removeEventHandlers(shape: FabricShape): void{
+    shape.off('scaling');
+    shape.off('moving');
+    shape.off('selected');
   }
 
   onTypeChange(event: MatSelectChange): void{
@@ -121,10 +127,10 @@ export class ShapeFormComponent implements OnInit, AfterViewInit, OnDestroy{
   }
 
   handleObjectScaling(): void{
-    if(this.shape.getScaledWidth() > this.constants.MAX_SHAPE_SIZE){
+    if(this.shape.getScaledWidth() > this.constants.MAX_SHAPE_SIZE){ //If the shape is scaled too big, scale it back to the max size
       const newScaleX = this.shape.width ? this.constants.MAX_SHAPE_SIZE / this.shape.width : this.constants.MAX_SHAPE_SIZE;
       this.shape.set('scaleX', newScaleX);
-    }else if(this.shape.getScaledWidth() < this.constants.MIN_SHAPE_SIZE){
+    }else if(this.shape.getScaledWidth() < this.constants.MIN_SHAPE_SIZE){ //If the shape is scaled too small, scale it back to the min size
       const newScaleX = this.shape.width ? this.constants.MIN_SHAPE_SIZE / this.shape.width : this.constants.MIN_SHAPE_SIZE;
       this.shape.set('scaleX', newScaleX);
     }
@@ -151,9 +157,9 @@ export class ShapeFormComponent implements OnInit, AfterViewInit, OnDestroy{
 
   handleObjectMoving(): void{
     if(this.shape.left){
-      if(this.shape.left > this.canvas.getWidth() - this.shape.getScaledWidth() ){
+      if(this.shape.left > this.canvas.getWidth() - this.shape.getScaledWidth() ){ //If the shape is moved too far right, move it back to the right edge
         this.shape.set('left', Math.floor(this.canvas.getWidth() - this.shape.getScaledWidth()));
-      }else if(this.shape.left < 0){
+      }else if(this.shape.left < 0){ //If the shape is moved too far left, move it back to the left edge
         this.shape.set('left', 0);
       }
       this.shapeConfigForm.controls.left.setValue(Math.floor(this.shape.left));
@@ -171,10 +177,10 @@ export class ShapeFormComponent implements OnInit, AfterViewInit, OnDestroy{
     }
     this.shape.setCoords();
     this.canvas.renderAll();
-    this.checkIntersection();
+    this.checkOverlap();
   }
 
-  checkIntersection(): void{
+  checkOverlap(): void{
     this.shape.setCoords();
     this.shapesIntersect = false;
     this.shapesIntersectChange.emit(false);

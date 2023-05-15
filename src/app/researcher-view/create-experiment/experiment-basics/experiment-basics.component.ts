@@ -69,6 +69,8 @@ export class ExperimentBasicsComponent implements AfterViewInit, OnDestroy{
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.outlineCanvas.dispose();
+    this.coloredCanvas.dispose();
   }
 
   initializeForm(): void{

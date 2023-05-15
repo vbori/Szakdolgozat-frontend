@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 
 export class ExperimentCreationConstants {
-    public readonly MAX_TOTAL_EXPERIMENT_ROUND_NUM = 100;
+    public readonly MAX_TOTAL_EXPERIMENT_ROUND_NUM = 50;
     public readonly MAX_PARTICIPANT_NUM = 50;
     public readonly MAX_QUESTION_NUM = 20;
     public readonly MAX_OPTION_NUM = 10;

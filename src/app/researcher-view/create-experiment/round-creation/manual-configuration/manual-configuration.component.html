@@ -1,8 +1,11 @@
+<div class ="buttonsContainer">
+  <button mat-raised-button color="primary" id="upper-btn" [disabled]="hasError" (click)="createExperiment()">Create experiment</button>
+</div>
  <form [formGroup]="canvasForm">
   <h2>Canvas settings</h2>
   <mat-form-field>
     <mat-label>Canvas height</mat-label>
-    <input matInput formControlName="canvasHeight" [min]="constants.MIN_CANVAS_HEIGHT" [max]="constants.MAX_CANVAS_HEIGHT" type="number"/>
+    <input matInput formControlName="canvasHeight" (input) = "isSubmitDisabled()" [min]="constants.MIN_CANVAS_HEIGHT" [max]="constants.MAX_CANVAS_HEIGHT" type="number"/>
     <span matSuffix>px &nbsp;</span>
     <mat-error *ngIf="canvasForm.controls.canvasHeight.invalid">
       Canvas height must be between {{constants.MIN_CANVAS_HEIGHT}} and {{constants.MAX_CANVAS_HEIGHT}}!
@@ -10,7 +13,7 @@
   </mat-form-field>
   <mat-form-field>
     <mat-label>Canvas width</mat-label>
-    <input matInput formControlName="canvasWidth" [min]="constants.MIN_CANVAS_WIDTH" [max]="constants.MAX_CANVAS_WIDTH" type="number"/>
+    <input matInput formControlName="canvasWidth" (input) = "isSubmitDisabled()" [min]="constants.MIN_CANVAS_WIDTH" [max]="constants.MAX_CANVAS_WIDTH" type="number"/>
     <span matSuffix>px &nbsp;</span>
     <mat-error *ngIf="canvasForm.controls.canvasWidth.invalid">
       Canvas width must be between {{constants.MIN_CANVAS_WIDTH}} and {{constants.MAX_CANVAS_WIDTH}}!

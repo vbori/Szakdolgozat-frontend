@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ExperimentCreationConstants } from '../../experiment-creation.constants';
 import { IRound, Round } from 'src/app/common/models/round.model';
@@ -14,16 +14,16 @@ import { FabricShape, IShape, ShapeType } from 'src/app/common/models/shape.mode
   templateUrl: './manual-configuration.component.html',
   styleUrls: ['./manual-configuration.component.scss']
 })
-export class ManualConfigurationComponent implements OnInit{
+export class ManualConfigurationComponent implements OnInit, OnDestroy{
 
   canvasForm = new FormGroup({
     canvasHeight: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_CANVAS_HEIGHT), Validators.max(this.constants.MAX_CANVAS_HEIGHT)]}),
     canvasWidth: new FormControl<number>(600, {nonNullable: true, validators: [Validators.required, Validators.min(this.constants.MIN_CANVAS_WIDTH), Validators.max(this.constants.MAX_CANVAS_WIDTH)]}),
   });
   hasError: boolean = false;
-  isRoundValid: Boolean[] = [true];
+  isRoundValid: Boolean[] = [];
   canvases: fabric.Canvas[] = [];
-  rounds: IRound[] = [new Round()];
+  rounds: IRound[] = [];
   @Input() experiment: Experiment | undefined;
 
   constructor(public constants: ExperimentCreationConstants,
@@ -34,13 +34,23 @@ export class ManualConfigurationComponent implements OnInit{
 
   ngOnInit(): void {
     if(this.experiment?.rounds && this.experiment.rounds.length > 0){
-      this.rounds = this.experiment.rounds.map((round) => new Round(round));
-      this.isRoundValid = this.rounds.map(() => true);
-      this.canvasForm.controls.canvasHeight.setValue(this.rounds[0].canvasHeight);
-      this.canvasForm.controls.canvasWidth.setValue(this.rounds[0].canvasWidth);
-      this.changeDetector.detectChanges();
-      console.log(this.rounds);
+      this.toastr.info('Loading experiment configuration', 'Loading', { progressBar: true, positionClass: 'toast-bottom-right' });
+      setTimeout(() => {
+        if(this.experiment)
+        this.rounds = this.experiment.rounds.map((round) => new Round(round));
+        this.isRoundValid = this.rounds.map(() => true);
+        this.canvasForm.controls.canvasHeight.setValue(this.rounds[0].canvasHeight);
+        this.canvasForm.controls.canvasWidth.setValue(this.rounds[0].canvasWidth);
+        this.changeDetector.detectChanges();
+      }, 200);
+    }else{
+      this.rounds  = [new Round()];
+      this.isRoundValid = [true];
     }
+  }
+
+  ngOnDestroy(): void {
+    this.canvases.forEach((canvas) => canvas.dispose());
   }
 
   addRound(): void {
@@ -57,7 +67,7 @@ export class ManualConfigurationComponent implements OnInit{
   }
 
   isSubmitDisabled(): void {
-    this.hasError =  this.isRoundValid.includes(false);
+    this.hasError =  this.isRoundValid.includes(false) || this.canvasForm.invalid;
   }
 
   onValidityChange(index: number, valid: boolean): void {
@@ -97,7 +107,6 @@ export class ManualConfigurationComponent implements OnInit{
     }else{
       round.objects = canvas.getObjects().filter((shape: FabricShape) => !shape.distraction).map((shape: FabricShape) => this.convertToNewShape(shape));
     }
-    console.log(round)
   }
 
   convertToNewShape(shape: FabricShape): IShape {

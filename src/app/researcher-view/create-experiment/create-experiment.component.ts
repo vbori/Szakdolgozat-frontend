@@ -14,8 +14,8 @@ import { ExperimentService } from 'src/app/common/services/experiment.service';
 export class CreateExperimentComponent implements OnInit{
   totalSteps = 4;
   stepCount = 0;
-  experiment: Experiment | undefined;
-  experimentChecked: boolean;
+  experiment: Experiment | undefined = undefined;
+  experimentChecked: boolean = false;
   @ViewChild('stepper') stepper!: MatStepper;
 
   constructor(private experimentService: ExperimentService,
@@ -61,10 +61,7 @@ export class CreateExperimentComponent implements OnInit{
   }
 
   onExperimentChange(event: Experiment): void{
-    console.log(event);
     this.experiment = event;
-    console.log("Experiment changed in main component");
-    console.log(this.experiment);
 
     if(this.stepper.selected) this.stepper.selected.completed = true;
   }

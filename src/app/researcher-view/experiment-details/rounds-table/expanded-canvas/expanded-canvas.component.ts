@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { IRound } from 'src/app/common/models/round.model';
 import { fabric } from 'fabric';
 import { IShape, FabricShape } from 'src/app/common/models/shape.model';
@@ -8,7 +8,7 @@ import { IShape, FabricShape } from 'src/app/common/models/shape.model';
   templateUrl: './expanded-canvas.component.html',
   styleUrls: ['./expanded-canvas.component.scss']
 })
-export class ExpandedCanvasComponent implements AfterViewInit, OnInit{
+export class ExpandedCanvasComponent implements AfterViewInit, OnInit, OnDestroy{
   @Input() round: IRound | undefined = undefined;
   canvas: fabric.Canvas | undefined = undefined;
   canvasLoaded = false;
@@ -33,6 +33,10 @@ export class ExpandedCanvasComponent implements AfterViewInit, OnInit{
     });
     this.canvas.renderAll();
     this.changeDetector.detectChanges();
+  }
+
+  ngOnDestroy(): void {
+    this.canvas?.dispose();
   }
 
   getLabel(shape: IShape): string {

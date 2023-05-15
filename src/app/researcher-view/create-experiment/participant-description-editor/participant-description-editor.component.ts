@@ -10,7 +10,7 @@ import { ExperimentService } from 'src/app/common/services/experiment.service';
   styleUrls: ['./participant-description-editor.component.scss', '../create-experiment.component.scss']
 })
 export class ParticipantDescriptionEditorComponent implements AfterViewInit{
-  @Input() experiment: Experiment | undefined
+  @Input() experiment: Experiment | undefined = undefined;
   @Output() experimentChange = new EventEmitter<Experiment>();
   @Output() nextStep = new EventEmitter<void>();
 

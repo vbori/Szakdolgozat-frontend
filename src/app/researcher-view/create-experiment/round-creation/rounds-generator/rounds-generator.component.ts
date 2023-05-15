@@ -38,7 +38,7 @@ export class RoundsGeneratorComponent implements OnInit, OnDestroy{
 
   roundGeneratorForm = new FormGroup({
     setNum: new FormControl<number>(1,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM),Validators.pattern("^[0-9]*$")]}),
-    roundNum: new FormControl<number>(10,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM),Validators.pattern("^[0-9]*$") ]}),
+    roundNum: new FormControl<number>(5,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM),Validators.pattern("^[0-9]*$") ]}),
     backgroundColor: new FormControl<string>('#ffffff', {nonNullable: true, validators: [Validators.required]}),
     targetShapeColor: new FormControl<string>('#ff0000',{nonNullable: true, validators: [Validators.required]}),
     baseShapeColor: new FormControl<string>('#0000ff', {nonNullable: true, validators: [Validators.required]}),
@@ -101,6 +101,7 @@ export class RoundsGeneratorComponent implements OnInit, OnDestroy{
       ExperimentRoundsValidator.shapesOverlapValidator('canvasWidth',  'minWidth', 'distractingShapeConfig.minWidth', 'useShapeDistraction'),
       ExperimentRoundsValidator.noDistractionSelectedValidator( 'distractedRoundNum','useBackgroundDistraction', 'useShapeDistraction'),
       ExperimentRoundsValidator.tooManyTotalRoundsValidator(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM, 'roundNum', 'setNum'),
+      ExperimentRoundsValidator.canvasHeightSmallerThanMaxShapeWidthValidator('canvasHeight', 'maxWidth', 'distractingShapeConfig', 'maxWidth', 'useShapeDistraction', 'baseShapeTypes', 'targetShapeTypes', 'distractingShapeTypes'),
     ]}
   );
 
@@ -119,8 +120,6 @@ export class RoundsGeneratorComponent implements OnInit, OnDestroy{
   ngOnDestroy(): void {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
-
-  //TODO: add loading animation when generating rounds
 
   restoreForm(): void{
     if(this.experiment?.experimentConfiguration){
@@ -179,6 +178,7 @@ export class RoundsGeneratorComponent implements OnInit, OnDestroy{
   onSubmit(): void{
     if(!this.roundGeneratorForm.pristine || !this.experiment?.experimentConfiguration){
       this.setUnnecessaryControlsAvailability(false);
+      this.toastr.info('Generating rounds', 'Please wait', { progressBar: true, positionClass: 'toast-bottom-right' });
       const rounds = this.generateRounds(this.roundGeneratorForm.value as ExperimentConfiguration);
       const updatedExperiment = { experimentConfiguration: this.roundGeneratorForm.value, rounds: rounds};
       this.experimentService.updateExperiment({experimentId: this.experiment?._id, updatedExperiment: updatedExperiment}).subscribe({
@@ -220,7 +220,6 @@ export class RoundsGeneratorComponent implements OnInit, OnDestroy{
     const baseShape = this.createBaseShape(config, normalMaxSpace);
 
     let restrictedHeight = this.calculateRestrictedHeight(config, baseShape);
-    console.log(restrictedHeight)
 
     let initialTargetWidth, initialTargetHeight, initialTargetLeft, initialTargetTop :number|undefined = undefined;
     let rounds: IRound[] = [];

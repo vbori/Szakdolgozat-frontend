@@ -1,7 +1,7 @@
 <ng-container *ngIf="experiment">
   <div class="paddedContainer">
     <h1><b>{{ experiment.name }}</b></h1>
-    <div>
+    <div class="biggerFont">
       <span [ngClass]="{green: experiment.status === 'Active', orange: experiment.status === 'Draft', red: experiment.status === 'Closed'}"><b>{{experiment.status}}</b></span>
       <span *ngIf="experiment.status != 'Draft'"> &#9679; {{experiment.participantNum}} completed</span>
     </div>

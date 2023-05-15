@@ -63,7 +63,6 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
   ngOnInit(): void {
     this.experimentService.getRoundsAndTrackingInfo(this.experimentId).subscribe({
       next: (response) => {
-        console.log(response.rounds);
         this.cursorImageMode = response.cursorImageMode;
         this.positionTrackingFrequency = response.positionTrackingFrequency;
         this.rounds = response.rounds;
@@ -74,8 +73,6 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
         this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
       }
     });
-
-    console.log("controlMode: " + this.controlMode);
   }
 
   ngAfterViewInit(): void {
@@ -85,7 +82,6 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     this.mainCanvas.hoverCursor = 'pointer';
 
     if(!this.demoMode){
-      console.log("creating hidden canvas")
       this.hiddenCanvas = new fabric.Canvas('hiddenCanvas', {containerClass: 'hiddenCanvas'});
       this.hiddenCanvas.selection = false;
 
@@ -94,17 +90,20 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     }
   }
 
-  ngOnDestroy(): void{
-    for(let timer of this.flashTimers){
-      clearInterval(timer);
+  ngOnDestroy(): void{ //clear all timers and event listeners, dispose canvases
+    this.clearTimers();
+
+    this.mainCanvas.forEachObject((obj: any) => {
+      this.removeShapeEventHandlers(obj);
+    });
+
+    this.removeCanvasEventHandlers(this.mainCanvas);
+
+    if(this.hiddenCanvas){
+      this.hiddenCanvas.dispose();
     }
 
-    for(let timer of this.timeOuts){
-      clearTimeout(timer);
-    }
-
-    if(this.positionTracker)
-    clearInterval(this.positionTracker);
+    this.mainCanvas.dispose();
   }
 
   playRound(round: IRound): void {
@@ -116,9 +115,8 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     }
   }
 
-  initializeRound(): void{
+  initializeRound(): void{ //reset all variables, set start time and start position tracking
     if(this.positionTrackingFrequency && !this.demoMode){
-      console.log("starting position tracker")
       this.positionTracker = setInterval(() => {
         this.trackable = true;
       }, this.positionTrackingFrequency);
@@ -215,12 +213,10 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
         this.hiddenCanvas.freeDrawingBrush = new fabric.PencilBrush(this.hiddenCanvas);
       }
 
-      for(let timer of this.flashTimers){
-        clearInterval(timer);
-      }
+      this.clearTimers();
 
-      for(let timeOut of this.timeOuts){
-        clearTimeout(timeOut);
+      for(let shape of this.mainCanvas.getObjects()){
+        this.removeShapeEventHandlers(shape);
       }
 
       this.counter++;
@@ -331,10 +327,10 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     }
 
     let timeout = setTimeout(() => {
-      if(interval != null){
+      if(interval){
         clearInterval(interval);
-        this.backgroundDistractionOn = false;
       }
+      this.backgroundDistractionOn = false;
       this.mainCanvas.backgroundColor = this.background;
       this.mainCanvas.renderAll();
     }, this.rounds[this.counter].backgroundDistraction?.duration);
@@ -387,10 +383,9 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
 
   saveImage(counter: number): void {
     const imageData = this.hiddenCanvas.toDataURL("image/jpeg", 0.75);
-    console.log('image converted to data url', counter);
     this.resultService.saveImage(imageData, this.experimentId, this.participantId, counter+1).subscribe({
       next: () => {
-        console.log('Image uploaded to server',counter );
+        console.log('Image uploaded to server');
       },
       error:(error)  => {
         this.toastr.error(error.error, 'Error', { progressBar: true, positionClass: 'toast-bottom-right' });
@@ -403,4 +398,30 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     const dy = position2.y - position1.y;
     return Math.sqrt(dx * dx + dy * dy);
   }
+
+  removeShapeEventHandlers(shape: FabricShape): void {
+    shape.off('mousedown');
+    shape.off('mouseover');
+    shape.off('mouseout');
+  }
+
+  removeCanvasEventHandlers(canvas: fabric.Canvas): void {
+    canvas.off('mouse:move');
+    canvas.off('mouse:down');
+  }
+
+  clearTimers(): void {
+    for(let timer of this.flashTimers){
+      clearInterval(timer);
+    }
+
+    for(let timer of this.timeOuts){
+      clearTimeout(timer);
+    }
+
+    if(this.positionTracker){
+      clearInterval(this.positionTracker);
+    }
+  }
+
 }
