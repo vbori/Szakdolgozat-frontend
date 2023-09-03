@@ -113,6 +113,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     if(this.cursorImageMode && !this.demoMode){
       this.loadHiddenCanvas(round);
     }
+    this.startDistractions();
   }
 
   initializeRound(): void{ //reset all variables, set start time and start position tracking
@@ -161,7 +162,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
         }else{
           shape.on('mousedown', ({e}) => this.handleBaseShapeClick(e));
           shape.on('mouseover', this.handleBaseShapeHover.bind(this));
-          shape.on('mouseout', this.handleBaseShapeLeave.bind(this));
+          //shape.on('mouseout', this.handleBaseShapeLeave.bind(this));
         }
       }
 
@@ -198,6 +199,19 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
       this.hiddenCanvas.backgroundColor = 'white';
     }
   }
+
+  startDistractions(): void {
+    if(!this.targetClicked && !this.controlMode){
+      if(this.rounds[this.counter].backgroundDistraction && this.backgroundDistractionOn == undefined){
+        this.startBackgroundDistraction();
+      }
+
+      if(this.rounds[this.counter].shapeDistractionDuration && this.shapeDistractionOn == undefined && this.distractingShape){
+        this.startShapeDistraction();
+      }
+    }
+  }
+
 
   handleBaseShapeClick(event: MouseEvent): void {
     if (this.targetClicked) { //If round is finished, save results and start next round
@@ -260,7 +274,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     }
   }
 
-  handleBaseShapeLeave(): void { //When cursor leaves base shape, start background and shape distractions
+  /*handleBaseShapeLeave(): void { //When cursor leaves base shape, start background and shape distractions
     if(!this.targetClicked && !this.controlMode){
       if(this.rounds[this.counter].backgroundDistraction && this.backgroundDistractionOn == undefined){
         this.startBackgroundDistraction();
@@ -270,7 +284,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
         this.startShapeDistraction();
       }
     }
-  }
+  }*/
 
   handleMouseMove(event: MouseEvent): void { //When cursor moves, draw on hidden canvas and track cursor position and path length
     if(this.hiddenCanvas.isDrawingMode) {

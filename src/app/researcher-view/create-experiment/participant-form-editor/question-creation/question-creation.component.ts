@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './question-creation.component.html',
   styleUrls: ['./question-creation.component.scss']
 })
-export class QuestionCreationComponent implements AfterViewInit, OnDestroy {
+export class QuestionCreationComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() question: Question;
   @Output() validityChange = new EventEmitter<boolean>();
   @Output() questionChange = new EventEmitter<void>();
@@ -19,6 +19,10 @@ export class QuestionCreationComponent implements AfterViewInit, OnDestroy {
   subsciptions: Subscription[] = [];
 
   constructor(public readonly constants : ExperimentCreationConstants) {}
+
+  ngOnInit(): void {
+      this.useValidation = this.question.validation !== undefined;
+  }
 
   ngAfterViewInit(){
     let subscription = this.form.statusChanges?.subscribe((status) => {
