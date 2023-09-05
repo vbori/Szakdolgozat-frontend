@@ -15,6 +15,7 @@ export interface IRound {
   background: string;
   shapeDistractionDuration?: number;
   backgroundDistraction?: BackgroundDistraction;
+  breakTime?: number;
 }
 
 export class Round implements IRound{
@@ -26,6 +27,7 @@ export class Round implements IRound{
   background = '#ffffff';
   shapeDistractionDuration?: number = undefined;
   backgroundDistraction?: BackgroundDistraction = undefined;
+  breakTime?: number = undefined;
 
   constructor();
   constructor(round: IRound);

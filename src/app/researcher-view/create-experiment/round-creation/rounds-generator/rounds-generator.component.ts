@@ -39,6 +39,8 @@ export class RoundsGeneratorComponent implements OnInit, OnDestroy{
   roundGeneratorForm = new FormGroup({
     setNum: new FormControl<number>(1,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM),Validators.pattern("^[0-9]*$")]}),
     roundNum: new FormControl<number>(5,{nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_TOTAL_EXPERIMENT_ROUND_NUM),Validators.pattern("^[0-9]*$") ]}),
+    breakTime: new FormControl<number>(0,{nonNullable: true, validators: [Validators.min(0), Validators.max(this.constants.MAX_BREAK_TIME),Validators.pattern("^[0-9]*$")]}),
+    useBreaks: new FormControl<boolean>(false, {nonNullable: true}),
     backgroundColor: new FormControl<string>('#ffffff', {nonNullable: true, validators: [Validators.required]}),
     targetShapeColor: new FormControl<string>('#ff0000',{nonNullable: true, validators: [Validators.required]}),
     baseShapeColor: new FormControl<string>('#0000ff', {nonNullable: true, validators: [Validators.required]}),
@@ -125,6 +127,7 @@ export class RoundsGeneratorComponent implements OnInit, OnDestroy{
     if(this.experiment?.experimentConfiguration){
       this.roundGeneratorForm.patchValue(this.experiment.experimentConfiguration);
       this.subscribeToChanges();
+      this.roundGeneratorForm.get('useBreaks')?.setValue(this.experiment.experimentConfiguration.breakTime !== undefined);
       this.roundGeneratorForm.get('useBackgroundDistraction')?.setValue(this.experiment.experimentConfiguration.backgroundDistractionConfig !== undefined);
       this.roundGeneratorForm.get('useShapeDistraction')?.setValue(this.experiment.experimentConfiguration.distractingShapeConfig !== undefined);
       this.roundGeneratorForm.get('backgroundDistractionConfig')?.get('useFlashing')?.setValue(this.experiment.experimentConfiguration.backgroundDistractionConfig?.flashing !== undefined);
@@ -135,12 +138,14 @@ export class RoundsGeneratorComponent implements OnInit, OnDestroy{
   initializeForm(): void{
     this.roundGeneratorForm.get('backgroundDistractionConfig')?.disable();
     this.roundGeneratorForm.get('distractingShapeConfig')?.disable();
+    this.roundGeneratorForm.get('breakTime')?.disable();
     this.subscribeToChanges();
   }
 
   subscribeToChanges(): void{
     this.subscribeToDistractionChange('useBackgroundDistraction', 'backgroundDistractionConfig');
     this.subscribeToDistractionChange('useShapeDistraction', 'distractingShapeConfig');
+    this.subscribeToDistractionChange('useBreaks', 'breakTime');
 
     this.subscribeToFlashingChange('backgroundDistractionConfig');
     this.subscribeToFlashingChange('distractingShapeConfig');
@@ -201,11 +206,13 @@ export class RoundsGeneratorComponent implements OnInit, OnDestroy{
 
   setUnnecessaryControlsAvailability(available: boolean): void{
     if(available){
+      this.roundGeneratorForm.get('useBreaks')?.enable();
       this.roundGeneratorForm.get('useBackgroundDistraction')?.enable();
       this.roundGeneratorForm.get('useShapeDistraction')?.enable();
       this.roundGeneratorForm.get('backgroundDistractionConfig')?.get('useFlashing')?.enable();
       this.roundGeneratorForm.get('distractingShapeConfig')?.get('useFlashing')?.enable();
     }else{
+      this.roundGeneratorForm.get('useBreaks')?.disable();
       this.roundGeneratorForm.get('useBackgroundDistraction')?.disable();
       this.roundGeneratorForm.get('useShapeDistraction')?.disable();
       this.roundGeneratorForm.get('backgroundDistractionConfig')?.get('useFlashing')?.disable();
@@ -239,6 +246,9 @@ export class RoundsGeneratorComponent implements OnInit, OnDestroy{
           distractionMode = this.getDistractionMode(config);
         }
         let round = createRound(i*config.roundNum + j+1, config, baseShape, targetShape, distractionMode, distractionMaxSpace, restrictedHeight, normalMaxSpace);
+        if(j === 0 && config.breakTime && i !== 0){
+          round.breakTime = config.breakTime;
+        }
         rounds.push(round);
       }
     }

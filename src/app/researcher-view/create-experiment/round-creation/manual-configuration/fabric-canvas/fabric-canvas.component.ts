@@ -36,6 +36,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
 
   distractionForm = new FormGroup({
     backgroundColor: new FormControl<string>('#ffffff', {nonNullable: true, validators: [Validators.required]}),
+    breakTime: new FormControl<number>(0, {nonNullable: true, validators: [Validators.min(0), Validators.max(this.constants.MAX_BREAK_TIME),Validators.pattern("^[0-9]*$")]}),
     useBackgroundDistraction: new FormControl<boolean>(false, {nonNullable: true}),
     useShapeDistraction: new FormControl<boolean>(false, {nonNullable: true}),
     shapeDistractionDuration: new FormControl<number>(500, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(this.constants.MAX_DISTRACTION_DURATION_TIME),Validators.pattern("^[0-9]*$")]}),
@@ -87,7 +88,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
-  initializeCanvas(): void{
+  initializeCanvas(): void {
     this.canvas = new fabric.Canvas(`canvas${this.roundIdx}`);
     this.canvas.setHeight(this.canvasHeight);
     this.canvas.setWidth(this.canvasWidth);
@@ -96,9 +97,10 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
     this.canvasCreated.emit(this.canvas);
   }
 
-  initializeForm(): void{
+  initializeForm(): void {
     this.distractionForm.patchValue(this.round);
     this.distractionForm.controls.backgroundColor.setValue(this.round.background);
+
     this.distractionForm.controls.useBackgroundDistraction.setValue(!!this.round.backgroundDistraction);
     this.distractionForm.controls.useShapeDistraction.setValue(!!this.round.shapeDistractionDuration);
     this.distractionForm.controls.shapeDistractionDuration.setValue(this.round.shapeDistractionDuration ?? 500);
@@ -121,7 +123,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
     }
   }
 
-  loadCanvasData(round: IRound): void{
+  loadCanvasData(round: IRound): void {
     if(this.canvas)
     this.canvas.loadFromJSON(round, this.canvas.renderAll.bind(this.canvas), (o: any, shape: FabricShape) => {
       shape.setControlsVisibility({ mtr: false });
@@ -141,7 +143,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
     });
   }
 
-  handleCanvasWidthChange(): void{
+  handleCanvasWidthChange(): void {
     if(this.canvasWidth <= this.constants.MAX_CANVAS_WIDTH && this.canvasWidth >= this.constants.MIN_CANVAS_WIDTH){
       this.canvas.setWidth(this.canvasWidth);
 
@@ -157,7 +159,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
     }
   }
 
-  handleCanvasHeightChange(): void{
+  handleCanvasHeightChange(): void {
     if(this.canvasHeight <= this.constants.MAX_CANVAS_HEIGHT && this.canvasHeight >= this.constants.MIN_CANVAS_HEIGHT){
       this.canvas.setHeight(this.canvasHeight);
 
@@ -172,7 +174,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
     }
   }
 
-  setBackgroundFlashing(event: MatCheckboxChange): void{
+  setBackgroundFlashing(event: MatCheckboxChange): void {
     if(event.checked){
       this.distractionForm.controls.backgroundDistraction.controls.flashing?.enable();
       if(this.round.backgroundDistraction)
@@ -187,7 +189,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
     }
   }
 
-  setBackgroundDistraction(event: MatCheckboxChange): void{
+  setBackgroundDistraction(event: MatCheckboxChange): void {
     if(event.checked){
       this.distractionForm.controls.backgroundDistraction.enable();
       this.round.backgroundDistraction = {
@@ -204,7 +206,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
     }
   }
 
-  setShapeDistraction(event: MatCheckboxChange): void{
+  setShapeDistraction(event: MatCheckboxChange): void {
     if(event.checked){
       this.distractionForm.controls.shapeDistractionDuration.enable();
       this.round.shapeDistractionDuration = this.distractionForm.controls.shapeDistractionDuration.value;
@@ -224,7 +226,7 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
     this.canvas.renderAll();
   }
 
-  checkIntersection() {
+  checkIntersection(): void {
     if(this.distractingShape){
       this.shapesIntersect = false;
       let comparisonShape = this.distractingShape.visible ? this.distractingShape : this.targetShape;
@@ -238,41 +240,46 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
     }
   }
 
-  onBackgroundChange(): void{
+  onBackgroundChange(): void {
     this.canvas.backgroundColor = this.distractionForm.controls.backgroundColor.value;
     this.round.background = this.distractionForm.controls.backgroundColor.value;
     this.canvas.renderAll();
   }
 
-  changeBackgroundDistractionDuration(): void{
+  onBreakTimeChange(): void {
+    this.round.breakTime = this.distractionForm.controls.breakTime.value;
+  }
+
+
+  changeBackgroundDistractionDuration(): void {
     if(this.round.backgroundDistraction){
       this.round.backgroundDistraction.duration = this.distractionForm.controls.backgroundDistraction.controls.duration.value;
     }
   }
 
-  changeBackgroundDistractionColor(): void{
+  changeBackgroundDistractionColor(): void {
     if(this.round.backgroundDistraction){
       this.round.backgroundDistraction.color = this.distractionForm.controls.backgroundDistraction.controls.color.value;
     }
   }
 
-  changeBackgroundDistractionFlashingColor(): void{
+  changeBackgroundDistractionFlashingColor(): void {
     if(this.round.backgroundDistraction?.flashing){
       this.round.backgroundDistraction.flashing.color = this.distractionForm.controls.backgroundDistraction.controls.flashing?.controls.color.value;
     }
   }
 
-  changeBackgroundDistractionFlashingFrequency(): void{
+  changeBackgroundDistractionFlashingFrequency(): void {
     if(this.round.backgroundDistraction?.flashing){
       this.round.backgroundDistraction.flashing.frequency = this.distractionForm.controls.backgroundDistraction.controls.flashing?.controls.frequency.value;
     }
   }
 
-  changeShapeDistractionDuration(): void{
+  changeShapeDistractionDuration(): void {
     this.round.shapeDistractionDuration = this.distractionForm.controls.shapeDistractionDuration.value;
   }
 
-  changeSelectedObject(event: MatTabChangeEvent){
+  changeSelectedObject(event: MatTabChangeEvent): void {
     if(event.tab.textLabel == this.tabLabels[0] && this.baseShape){
       this.canvas.setActiveObject(this.baseShape);
     }else if(event.tab.textLabel == this.tabLabels[1] && this.targetShape){
@@ -284,13 +291,13 @@ export class FabricCanvasComponent implements AfterViewInit, OnChanges, OnDestro
     this.canvas.renderAll();
   }
 
-  onValidityChange(valid: boolean, shapeName: 'baseShape' | 'targetShape' | 'distractingShape'): void{
+  onValidityChange(valid: boolean, shapeName: 'baseShape' | 'targetShape' | 'distractingShape'): void {
     this.validities[shapeName] = valid;
     let allValid = !this.shapesIntersect && this.validities.baseShape && this.validities.targetShape && (this.distractionForm.value.useShapeDistraction ? this.validities.distractingShape : true);
     this.validityChange.emit(allValid);
   }
 
-  onIntersectChange(intersect: boolean){
+  onIntersectChange(intersect: boolean): void {
     this.shapesIntersect = intersect;
     let allValid = !this.shapesIntersect && this.validities.baseShape && this.validities.targetShape && (this.distractionForm.value.useShapeDistraction ? this.validities.distractingShape : true);
     this.validityChange.emit(allValid);

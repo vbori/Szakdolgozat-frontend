@@ -36,14 +36,16 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
   //Helper variables
   backgroundDistractionOn: boolean | undefined = undefined;
   shapeDistractionOn: boolean | undefined = undefined;
+  breakTime: number = 0;
   startedDrawing: boolean = false;
   counter: number = 0;
   targetClicked: boolean = false;
   baseClicked: boolean = false;
   startTime: number | undefined = undefined;
   trackable: boolean = false;
+  isBreak: boolean = false;
   positionTracker: ReturnType<typeof setInterval> | undefined = undefined;
-  flashTimers:  ReturnType<typeof setInterval>[] = [];
+  timers:  ReturnType<typeof setInterval>[] = [];
   timeOuts: ReturnType<typeof setTimeout>[] = [];
   lastBaseShapeClick: Position | undefined = undefined;
   previousCursorPosition: Position | undefined = undefined;
@@ -90,7 +92,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     }
   }
 
-  ngOnDestroy(): void{ //clear all timers and event listeners, dispose canvases
+  ngOnDestroy(): void { //clear all timers and event listeners, dispose canvases
     this.clearTimers();
 
     this.mainCanvas.forEachObject((obj: any) => {
@@ -107,22 +109,42 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
   }
 
   playRound(round: IRound): void {
-    this.initializeRound();
-    this.setBackground(round);
-    this.loadMainCanvas(round);
-    if(this.cursorImageMode && !this.demoMode){
-      this.loadHiddenCanvas(round);
+    //If the round has a break time, wait for the specified time and then start the round
+    if(round.breakTime){
+      this.startBreak(round.breakTime);
     }
-    this.startDistractions();
+
+    setTimeout(() => {
+      this.initializeRound();
+      this.setBackground(round);
+      this.loadMainCanvas(round);
+      if(this.cursorImageMode && !this.demoMode){
+        this.loadHiddenCanvas(round);
+      }
+      this.startDistractions();
+    }, round.breakTime ? round.breakTime*1000 : 0);
   }
 
-  initializeRound(): void{ //reset all variables, set start time and start position tracking
+  startBreak(breakTime: number): void {
+    this.breakTime = breakTime;
+    this.isBreak = true;
+    let interval = setInterval(() => {
+      this.breakTime -= 1;
+      if(this.breakTime <= 0){
+        this.isBreak = false;
+        clearInterval(interval);
+      }
+    }, 1000);
+    this.timers.push(interval);
+  }
+
+  initializeRound(): void { //reset all variables, set start time and start position tracking
     if(this.positionTrackingFrequency && !this.demoMode){
       this.positionTracker = setInterval(() => {
         this.trackable = true;
       }, this.positionTrackingFrequency);
     }
-    this.flashTimers = [];
+    this.timers = [];
     this.cursorPathLength = 0;
     this.clicks = [];
     this.targetClicked = false;
@@ -135,7 +157,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     this.startTime = new Date().getTime();
   }
 
-  setBackground(round: IRound): void{
+  setBackground(round: IRound): void {
     this.background = round.background;
     this.distractingBackground = round.backgroundDistraction?.color;
     if(round.backgroundDistraction?.flashing?.color){
@@ -143,7 +165,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     }
   }
 
-  loadMainCanvas(round: IRound): void{
+  loadMainCanvas(round: IRound): void {
     this.mainCanvas.clear();
     this.mainCanvas.setHeight(round.canvasHeight);
     this.mainCanvas.setWidth(round.canvasWidth);
@@ -172,13 +194,13 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
           this.mainCanvas.renderAll();
         }, shape.flashing.frequency);
 
-        this.flashTimers.push(timer);
+        this.timers.push(timer);
       }
     });
 
   }
 
-  loadHiddenCanvas(round: IRound): void{
+  loadHiddenCanvas(round: IRound): void {
     this.hiddenCanvas.setHeight(this.mainCanvas.getHeight());
     this.hiddenCanvas.setWidth(this.mainCanvas.getWidth());
 
@@ -214,10 +236,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
 
 
   handleBaseShapeClick(event: MouseEvent): void {
-    if (this.targetClicked) { //If round is finished, save results and start next round
-      if(!this.demoMode){
-        this.saveResults(this.counter);
-      }
+    if (this.targetClicked) { //If round is finished, reset timers, canvases and event listeners, and start next round
 
       this.lastBaseShapeClick = this.mainCanvas.getPointer(event);
 
@@ -261,6 +280,10 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
       if(this.cursorImageMode && !this.demoMode &&this.hiddenCanvas.isDrawingMode){
         this.hiddenCanvas.freeDrawingBrush._finalizeAndAddPath();
         this.hiddenCanvas.isDrawingMode = false;
+      }
+
+      if(!this.demoMode){
+        this.saveResults(this.counter);
       }
     }
   }
@@ -337,7 +360,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
         this.mainCanvas.backgroundColor = this.mainCanvas.backgroundColor == this.distractingBackground ? this.backgroundFlashColor : this.distractingBackground;
         this.mainCanvas.renderAll();
       }, this.rounds[this.counter].backgroundDistraction?.flashing?.frequency);
-      this.flashTimers.push(interval);
+      this.timers.push(interval);
     }
 
     let timeout = setTimeout(() => {
@@ -368,7 +391,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
     }
   }
 
-  saveResults(counter: number): void{
+  saveResults(counter: number): void {
     if(this.cursorImageMode){
       this.saveImage(counter);
     }
@@ -425,7 +448,7 @@ export class ExperimentComponent implements OnInit, AfterViewInit, OnDestroy{
   }
 
   clearTimers(): void {
-    for(let timer of this.flashTimers){
+    for(let timer of this.timers){
       clearInterval(timer);
     }
 

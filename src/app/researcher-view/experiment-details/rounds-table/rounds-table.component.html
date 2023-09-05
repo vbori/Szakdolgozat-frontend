@@ -3,7 +3,7 @@
        class="mat-elevation-z8">
   <ng-container matColumnDef="{{column.header}}" *ngFor="let column of columnsToDisplay">
     <th mat-header-cell *matHeaderCellDef> {{column.header}} </th>
-    <td mat-cell *matCellDef="let element"> {{column.property == 'roundIdx' ? element[column.property] : !!element[column.property]}} </td>
+    <td mat-cell *matCellDef="let element"> {{column.property == 'roundIdx' || column.property == 'breakTime' ? (element[column.property] > 0 ? element[column.property] : '-') : !!element[column.property]}} </td>
   </ng-container>
   <ng-container matColumnDef="expand">
     <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>

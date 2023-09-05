@@ -22,6 +22,7 @@ interface DistractingShapeConfig {
 export interface ExperimentConfiguration {
   setNum: number;
   roundNum: number;
+  breakTime?: number;
   backgroundColor: string;
   targetShapeColor: string;
   baseShapeColor: string;

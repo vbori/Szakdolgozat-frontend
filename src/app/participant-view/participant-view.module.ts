@@ -18,6 +18,7 @@ import { ParticipantDescriptionComponent } from './participant-description/parti
 import { ExperimentService } from '../common/services/experiment.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { ThankYouPageComponent } from './thank-you-page/thank-you-page.component';
+import { WelcomePageComponent } from './welcome-page/welcome-page.component';
 //import { participantRoutes } from './participant-view.routes';
 
 @NgModule({
@@ -26,7 +27,8 @@ import { ThankYouPageComponent } from './thank-you-page/thank-you-page.component
     ExperimentComponent,
     ParticipantFormComponent,
     ParticipantDescriptionComponent,
-    ThankYouPageComponent
+    ThankYouPageComponent,
+    WelcomePageComponent
   ],
   imports: [
     //CommonModule,

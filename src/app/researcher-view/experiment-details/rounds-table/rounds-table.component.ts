@@ -18,7 +18,7 @@ import { IRound } from 'src/app/common/models/round.model';
 
 export class RoundsTableComponent {
   @Input() dataSource: IRound[] = [];
-  columnsToDisplay: Column[] = [{header: 'Index', property: 'roundIdx'}, {header: 'Using Background Distraction', property: 'backgroundDistraction'}, {header: 'Using Shape Distraction', property: 'shapeDistractionDuration'}];
+  columnsToDisplay: Column[] = [{header: 'Index', property: 'roundIdx'}, {header: 'Using Background Distraction', property: 'backgroundDistraction'}, {header: 'Using Shape Distraction', property: 'shapeDistractionDuration'}, {header: 'Break Time', property: 'breakTime'}];
   headers = this.columnsToDisplay.map(column => column.header);
   columnsToDisplayWithExpand = [...this.headers,'expand'];
   expandedElement: IRound | undefined;

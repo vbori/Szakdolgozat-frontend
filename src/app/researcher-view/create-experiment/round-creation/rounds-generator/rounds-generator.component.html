@@ -24,6 +24,15 @@
     <mat-checkbox formControlName="changePosition">Change target shape position between sets</mat-checkbox>
     <mat-checkbox formControlName="changeShapeSize">Change target shape size between sets</mat-checkbox>
     <mat-checkbox formControlName="oneDimensional">Place the shapes in a parallel line to the canvas</mat-checkbox>
+    <mat-checkbox formControlName="useBreaks">Use breaks between sets</mat-checkbox>
+    <mat-form-field *ngIf="roundGeneratorForm.value.useBreaks">
+      <mat-label>Break time</mat-label>
+      <input matInput type="number" min= "0" [max]="constants.MAX_BREAK_TIME" formControlName="breakTime" required>
+      <span matSuffix>s &nbsp;</span>
+      <mat-error *ngIf="roundGeneratorForm.controls.breakTime.invalid">
+        Break time must be a whole number between 0 and {{constants.MAX_BREAK_TIME}} seconds!
+      </mat-error>
+    </mat-form-field>
     <mat-form-field>
       <mat-label>Number of distracted rounds per set</mat-label>
       <input matInput formControlName="distractedRoundNum" type="number"/>
