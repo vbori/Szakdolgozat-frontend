@@ -9,6 +9,17 @@
   <p style="color: red">
     <b> Only start the experiment if you have a mouse connected to your computer! </b>
   </p>
-  <button mat-raised-button color="primary" (click)="nextStep.emit()">Start experiment</button>
+</div>
+<div>
+  <mat-form-field>
+    <mat-label>Participant ID provided by the researcher</mat-label>
+    <input matInput type="text" formControlName="participantId"/>
+    <mat-error *ngIf="participantId.invalid">
+      This field is required!
+    </mat-error>
+  </mat-form-field>
+  <button mat-raised-button color="primary" (click)="checkId()">Start experiment</button>
+</div>
+<div>
   <img src="assets/images/undraw_researching_re_fuod.svg"/>
 </div>
